@@ -1,0 +1,5 @@
+export * from './privacy-screen'
+export * from './aboutus-screen'
+export * from './callus-screen'
+export * from './user-panel-screen'
+export * from './bookmark-screen'
