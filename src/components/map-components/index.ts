@@ -1,2 +1,2 @@
-export * from './product-location'
-export * from './select-location'
+export * from './product-location';
+export * from './select-location';

@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   Button,
   Divider,
+  ListState,
   Row,
   Screen,
   TableRow,
@@ -22,61 +23,29 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {useInfiniteQuery, useQuery} from 'react-query';
 import {getAllJobs} from '../../../services/job';
+import {usePaginatedList} from '../../../hooks/use-paginated-list';
 
-// const data = [
-//     { title: 'داروخانه ماهم', manager: 'خانم ماهم نوین فر', phone: '3352522222' },
-//     { title: 'مطب ماهم', manager: 'خانم نوین فر', phone: '3352522222' }
-// ]
 const {width} = Dimensions.get('window');
 export function SingleJobCategoryScreen() {
   const {goBack, navigate} = useNavigation();
   const {params} = useRoute();
   const [searchText, setSearchText] = useState('');
   const [category, setCategory] = useState(params?.category);
-  const [jobs, setJobs] = useState([]);
-  //   const {data} = useQuery(['categoryJobs'], getAllJobs);
-  const {data, fetchNextPage, hasNextPage, isLoading} = useInfiniteQuery({
-    queryKey: [`categoryJobs-${params?.category?.id}`, params?.category?.id],
+  const {
+    items: jobs,
+    isLoading,
+    isError,
+    onEndReached,
+  } = usePaginatedList({
+    queryKey: ['categoryJobs', params?.category?.id],
     queryFn: ({pageParam = 1}) =>
-      getAllJobs({page: pageParam, category_id: params?.category?.id}),
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage) return undefined;
-      if (
-        lastPage?.data?.pagination?.current_page <
-        lastPage?.data?.pagination?.total_pages
-      ) {
-        return lastPage?.data?.pagination?.current_page + 1;
-      } else {
-        return undefined;
-      }
-    },
-    getPreviousPageParam: (firstPage, allPages) => firstPage.prevCursor,
+      getAllJobs({page: pageParam, categoryId: params?.category?.id}),
+    selectItems: page => page?.data?.jobs,
   });
-  //   const getData = useCallback(() => {
-  //     let temp = data;
-  //     if (data.length < 10) {
-  //       for (var i = 0; temp.length < 20; i++) {
-  //         temp.push({title: '', manager: '', phone: ''});
-  //       }
-  //     }
-  //     return temp;
-  //   }, [data]);
   const handlePressItem = item => {
     navigate('singleJob', {job: item});
   };
-
-  const onEndReached = () => {
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  };
-
-  useEffect(() => {
-    const flatenData = data?.pages?.flatMap(page => page?.data?.jobs);
-    setJobs(flatenData);
-  }, [data]);
 
   const result = useMemo(() => {
     if (searchText) {
@@ -84,16 +53,12 @@ export function SingleJobCategoryScreen() {
         JSON.stringify(item).includes(searchText.toLowerCase()),
       );
     }
-    return jobs?.filter(
-      item => item?.job_category_id?.id === params?.category?.id,
-    );
+    return jobs;
   }, [jobs, searchText]);
-
-  console.log(result?.length);
 
   return (
     <Screen withoutScroll style={{flex: 1}}>
-      <View style={styles.headerCard}></View>
+      <View style={styles.headerCard} />
       <View style={styles.iconContainer}>
         <Image
           style={{width: '80%', height: '80%'}}
@@ -129,9 +94,11 @@ export function SingleJobCategoryScreen() {
         onEndReached={onEndReached}
         style={{paddingTop: 4}}
         ListEmptyComponent={
-          <Text style={{textAlign: 'center', marginTop: 16, color: 'red'}}>
-            {result?.length === 0 && isLoading == false && 'هیچ موردی پیدا نشد'}
-          </Text>
+          <ListState
+            isLoading={isLoading}
+            isError={isError}
+            emptyMessage="هیچ موردی پیدا نشد"
+          />
         }
         data={result}
         keyExtractor={item => item?.id}

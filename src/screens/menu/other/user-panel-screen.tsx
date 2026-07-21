@@ -1,60 +1,54 @@
 import {
+  Alert,
   Image,
   StyleSheet,
   TouchableOpacity,
   View,
   FlatList,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Screen, Row, Text, Divider, ChatItem} from '../../../components';
+import React, {useState} from 'react';
+import {
+  Screen,
+  Row,
+  Text,
+  Divider,
+  Button,
+  ChatItem,
+} from '../../../components';
 import {colors} from '../../../theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {useQuery} from 'react-query';
-import {getMyAds} from '../../../services';
-import database from '@react-native-firebase/database';
-import {useSelector} from 'react-redux';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {deleteAds, getConversations, getMyAds} from '../../../services';
 
 export function UserPanelScreen() {
   const [state, setState] = useState({
     adsMode: true,
   });
   const {goBack, navigate} = useNavigation();
-  const user = useSelector(s => s.user);
-  const [message, setMessage] = useState([]);
+  const queryClient = useQueryClient();
 
   const {data: myAds} = useQuery('myAds', getMyAds);
+  const {mutate: deleteAdMutate} = useMutation(deleteAds, {
+    onSuccess: () => queryClient.invalidateQueries('myAds'),
+  });
+  const {data: conversations} = useQuery('conversations', getConversations, {
+    enabled: !state.adsMode,
+  });
 
-  useEffect(() => {
-    database()
-      .ref()
-      .on('value', snapshot => {
-        // console.log(snapshot.val(), 'snapshot.val()');
-        if (!snapshot.val()) setMessage([]);
-        else {
-          const idMap = snapshot.val().reduce((acc, obj) => {
-            if (!acc[obj.id]) {
-              acc[obj.id] = [];
-            }
-            acc[obj.id].push(obj);
-            return acc;
-          }, {});
-          const latestObjects = Object.values(idMap).map(
-            idArray => idArray[idArray.length - 1],
-          );
+  const onEditAd = (item: any) => navigate('editAd', {ad: item});
+  const onDeleteAd = (item: any) => {
+    Alert.alert('حذف آگهی', 'آیا از حذف این آگهی مطمئن هستید؟', [
+      {text: 'انصراف', style: 'cancel'},
+      {
+        text: 'حذف',
+        style: 'destructive',
+        onPress: () => deleteAdMutate(item.id),
+      },
+    ]);
+  };
 
-          let temp = latestObjects.map((object: any) => ({
-            ...object,
-            me: object?.sender === user?.mobile ? true : false,
-          }));
-          //   console.log(temp, 'temp');
-          setMessage(latestObjects);
-        }
-      });
-  }, []);
-  //   console.log(myAds?.data.ads, 'myAds?.data.ads');
-  //   console.log(message, 'message');
   return (
     <Screen withoutScroll>
       <Row style={styles.header}>
@@ -76,45 +70,88 @@ export function UserPanelScreen() {
           data={myAds?.data.ads}
           ItemSeparatorComponent={<Divider height={4} />}
           renderItem={({item}) => (
-            <TouchableOpacity
-              onPress={() => navigate('singleProduct', {ads: item})}
-              style={{paddingHorizontal: 8}}>
-              <Image
-                style={{width: '100%', height: 80, resizeMode: 'contain'}}
-                source={require('../../../assets/images/adlist.png')}
-              />
-              <View
-                style={{
-                  position: 'absolute',
-                  left: 10,
-                  right: 10,
-                  top: 0,
-                  bottom: 0,
-                  paddingHorizontal: 8,
-                  paddingTop: 7,
-                  justifyContent: 'space-between',
-                }}>
-                <Text style={{paddingHorizontal: 8}} size={17}>
-                  {item.title}
-                </Text>
-                <Row style={{marginBottom: 2}}>
-                  <View style={{flex: 1.1}} />
-                  <Row
-                    style={{
-                      flex: 0.9,
-                      justifyContent: 'space-between',
-                      paddingHorizontal: 10,
-                    }}>
-                    <Text size={12} color={colors.main}>
-                      3 دقیقه پیش
+            <View>
+              <TouchableOpacity
+                onPress={() => navigate('singleProduct', {ads: item})}
+                style={{paddingHorizontal: 8}}>
+                <Image
+                  style={{width: '100%', height: 80, resizeMode: 'contain'}}
+                  source={require('../../../assets/images/adlist.png')}
+                />
+                {item.approvalStatus && item.approvalStatus !== 'APPROVED' && (
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      item.approvalStatus === 'REJECTED'
+                        ? styles.statusBadgeRejected
+                        : styles.statusBadgePending,
+                    ]}>
+                    <Text size={11} color="white">
+                      {item.approvalStatus === 'REJECTED'
+                        ? 'رد شده'
+                        : 'در انتظار تایید'}
                     </Text>
-                    <Text size={12} color={colors.main}>
-                      1399/02/15
-                    </Text>
+                  </View>
+                )}
+                <View
+                  style={{
+                    position: 'absolute',
+                    left: 10,
+                    right: 10,
+                    top: 0,
+                    bottom: 0,
+                    paddingHorizontal: 8,
+                    paddingTop: 7,
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text style={{paddingHorizontal: 8}} size={17}>
+                    {item.title}
+                  </Text>
+                  {item.approvalStatus === 'REJECTED' &&
+                    item.rejectionReason && (
+                      <Text
+                        style={{paddingHorizontal: 8}}
+                        size={12}
+                        color={colors.pallete.red}>
+                        دلیل رد: {item.rejectionReason}
+                      </Text>
+                    )}
+                  <Row style={{marginBottom: 2}}>
+                    <View style={{flex: 1.1}} />
+                    <Row
+                      style={{
+                        flex: 0.9,
+                        justifyContent: 'space-between',
+                        paddingHorizontal: 10,
+                      }}>
+                      <Text size={12} color={colors.main}>
+                        3 دقیقه پیش
+                      </Text>
+                      <Text size={12} color={colors.main}>
+                        1399/02/15
+                      </Text>
+                    </Row>
                   </Row>
-                </Row>
-              </View>
-            </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+              <Row style={{paddingHorizontal: 16, marginTop: 4}}>
+                <Button
+                  onPress={() => onEditAd(item)}
+                  style={styles.rowActionButton}>
+                  <Text size={13} color={colors.main}>
+                    ویرایش
+                  </Text>
+                </Button>
+                <Divider style={{width: 10}} />
+                <Button
+                  onPress={() => onDeleteAd(item)}
+                  style={styles.rowActionButton}>
+                  <Text size={13} color={colors.pallete.red2}>
+                    حذف
+                  </Text>
+                </Button>
+              </Row>
+            </View>
           )}
           ListHeaderComponent={<Divider height={10} />}
           ListFooterComponent={<Divider height={120} />}
@@ -122,8 +159,8 @@ export function UserPanelScreen() {
       ) : (
         <FlatList
           style={{paddingHorizontal: 8}}
-          data={message || []}
-          keyExtractor={(item, index) => String(index + 4254)}
+          data={conversations || []}
+          keyExtractor={item => item.id}
           renderItem={({item}) => <ChatItem item={item} />}
           ListFooterComponent={<Divider height={120} />}
           ListHeaderComponent={<Divider height={10} />}
@@ -163,6 +200,15 @@ const styles = StyleSheet.create({
     height: 77,
     backgroundColor: colors.main,
   },
+  rowActionButton: {
+    flex: 1,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.pallete.gray2,
+  },
   avatarCon: {
     height: 83,
     backgroundColor: colors.pallete.gray1,
@@ -188,5 +234,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.main,
+  },
+  statusBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 16,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  statusBadgePending: {
+    backgroundColor: '#E8A317',
+  },
+  statusBadgeRejected: {
+    backgroundColor: colors.pallete.red2,
   },
 });

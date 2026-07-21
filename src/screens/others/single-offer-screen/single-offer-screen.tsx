@@ -11,73 +11,34 @@ import {
   Text,
   ProductLocation,
   CallInfo,
-  ReportProblem,
-  OfferPriceDetails,
-  Rate,
-  optionsTypes,
 } from '../../../components';
 import {colors} from '../../../theme';
-import Entypo from 'react-native-vector-icons/Entypo';
-import {numberWithCommas, translations} from '../../../utiles';
-import {useQuery} from 'react-query';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {getSingleAds} from '../../../services';
-const images = [require('../../../assets/images/products/productSlider1.png')];
-const productProps = [
-  {label: 'متراژ(متر مربع)', value: '120'},
-  {label: 'رهن', value: 100000000, type: 'price'},
-  {label: 'اجاره ماهیانه', value: 1000000, type: 'price'},
-  {label: 'نوع', value: 'ارایه'},
-  {label: 'آگهی دهنده', value: 'مشاور املاک'},
-  {label: 'تعداد اتاق', value: '3'},
-  {label: 'محل', value: 'گنبد کاووس'},
-];
-const singleProduct = {
-  img: require('../../../assets/images/offerbanner1.png'),
-  location: 'مینودشت',
-  title: 'فروش کیبورد ارنجر یاماها',
-  offerPercent: 45,
-  mainPrice: '1000000',
-  price: '910000',
-  rate: 4,
-  time: 12000,
-  features: ['امکان اقساطی کردن کالا در صورت خرید ملزومات'],
-  description:
-    'تاریخ استفاده از 25/5/1402  تا 31/5/1402 \nامکان تست تا ۴۸ ساعت امکان پذیر است',
-};
+import {numberWithCommas} from '../../../utiles';
+import {useRoute} from '@react-navigation/native';
+
 export function SingleOfferScreen() {
-  const {navigate} = useNavigation();
+  const {params} = useRoute();
+  const offer = params?.offer;
 
   const [state, setState] = useState({
     callInfoModal: false,
-    reportModal: false,
   });
-  const {params} = useRoute();
-  const {data} = useQuery(
-    [`singleAd-${params?.ads?.id}`, params?.ads?.id],
-    () => getSingleAds(params?.ads?.id),
-  );
 
   const images = useMemo(() => {
-    if (!!data?.data) {
-      const imgs = Object.keys(data.data)
-        .filter(item => item.includes('image'))
-        .filter(item => !!data.data[item])
-        .map(item => data.data[item].path);
-      return imgs;
-    } else {
-      return [];
+    return offer?.image1?.path ? [offer.image1.path] : [];
+  }, [offer]);
+
+  const discountedPrice = useMemo(() => {
+    if (offer?.originalPrice && offer?.discountPercent) {
+      return Number(offer.originalPrice) * (1 - offer.discountPercent / 100);
     }
-  }, [data]);
+    return undefined;
+  }, [offer]);
 
   const toggleCallInfoModal = () => {
     setState(s => ({...s, callInfoModal: !s.callInfoModal}));
   };
-  const toggleReportModal = () => {
-    setState(s => ({...s, reportModal: !s.reportModal}));
-  };
 
-  // console.log(data, 'data chat');
   return (
     <Screen
       style={{backgroundColor: 'transparent'}}
@@ -89,56 +50,60 @@ export function SingleOfferScreen() {
       </View>
       <Screen unsafe>
         <View>
-          <View>
-            <ImageSlider images={images} autoPlay={false} loop={false} />
-            <View style={styles.rateBar}>
-              <View style={styles.badge}>
-                <Rate rate={singleProduct.rate} />
-              </View>
-              <View />
-            </View>
-          </View>
-
+          <ImageSlider images={images} autoPlay={false} loop={false} />
           <View style={{paddingHorizontal: 12, paddingVertical: 8}}>
-            <Text preset="bold">{data?.data?.title}</Text>
+            <Text preset="bold" size={18}>
+              {offer?.title}
+            </Text>
           </View>
-          <OfferPriceDetails style={styles.card} item={data?.data} />
-          <Divider />
-          <View style={{...styles.card, paddingHorizontal: 8}}>
-            <View style={styles.badge1}>
-              <Text style={{lineHeight: 20}} size={15} color="white">
-                ویژگی ها
-              </Text>
+          <Row style={{...styles.card, paddingHorizontal: 12}}>
+            {!!offer?.discountPercent && (
+              <View style={styles.percentBadge}>
+                <Text color="white" size={16}>
+                  ٪{offer.discountPercent}
+                </Text>
+              </View>
+            )}
+            <View style={{marginHorizontal: 12}}>
+              {!!offer?.originalPrice && (
+                <Text
+                  size={13}
+                  color={colors.pallete.grayText}
+                  style={{textDecorationLine: 'line-through'}}>
+                  {numberWithCommas(offer.originalPrice)} تومان
+                </Text>
+              )}
+              {discountedPrice !== undefined && (
+                <Text size={15} color={colors.main}>
+                  {numberWithCommas(Math.round(discountedPrice))} تومان
+                </Text>
+              )}
             </View>
-
-            <Text>{data?.data?.features}</Text>
-          </View>
+          </Row>
           <Divider />
-          <View style={{...styles.card, paddingHorizontal: 8}}>
-            <View style={styles.badge1}>
-              <Text style={{lineHeight: 20}} size={15} color="white">
-                توضیحات
-              </Text>
+          {!!offer?.description && (
+            <View style={{...styles.card, paddingHorizontal: 8}}>
+              <View style={styles.badge1}>
+                <Text style={{lineHeight: 20}} size={15} color="white">
+                  توضیحات
+                </Text>
+              </View>
+              <Text>{offer.description}</Text>
             </View>
-            <Text>{data?.data?.description}</Text>
-          </View>
+          )}
           <Divider />
         </View>
 
         <ProductLocation
           zoomEnabled={false}
           scrollEnabled={false}
-          lat={data?.data?.lat}
-          lng={data?.data?.lng}
+          lat={undefined}
+          lng={undefined}
         />
         <CallInfo
           visible={state.callInfoModal}
           onClose={toggleCallInfoModal}
-          phone={data?.data?.contact_info}
-        />
-        <ReportProblem
-          visible={state.reportModal}
-          onClose={toggleReportModal}
+          phone={offer?.contactInfo}
         />
       </Screen>
       <Row style={styles.buttons}>
@@ -148,24 +113,6 @@ export function SingleOfferScreen() {
             <Divider style={{width: 5}} />
             <Text size={20} preset="bold">
               اطلاعات تماس
-            </Text>
-          </Row>
-        </Button>
-        <Divider style={{width: 30}} />
-        <Button
-          style={styles.button}
-          onPress={() =>
-            navigate('chat', {
-              title: data?.data?.title,
-              id: data?.data?.id,
-              receiver: data?.data?.contact_info,
-            })
-          }>
-          <Row style={{alignItems: 'center'}}>
-            <Image source={require('../../../assets/images/chat.png')} />
-            <Divider style={{width: 5}} />
-            <Text size={20} preset="bold">
-              چت
             </Text>
           </Row>
         </Button>
@@ -180,12 +127,6 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1000,
     top: 50,
-  },
-  topDetail: {
-    backgroundColor: colors.pallete.gray1,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
-    padding: 16,
   },
   button: {
     paddingHorizontal: 8,
@@ -214,20 +155,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     backgroundColor: colors.pallete.gray1,
     paddingVertical: 10,
+    alignItems: 'center',
   },
-  rateBar: {
-    position: 'absolute',
-    bottom: 8,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    paddingHorizontal: 8,
-  },
-  badge: {
-    height: 18,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0,0,0,.3)',
-    paddingHorizontal: 5,
+  percentBadge: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    backgroundColor: colors.main,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   badge1: {

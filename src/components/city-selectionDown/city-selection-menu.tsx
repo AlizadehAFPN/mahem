@@ -1,74 +1,152 @@
-import {View, FlatList, StyleSheet, Dimensions} from 'react-native';
-import React, {useEffect} from 'react';
-import {Menu, MenuDivider, MenuItem} from 'react-native-material-menu';
-import {cities} from '../../utiles';
-import {Text, Row} from '../';
-import {colors} from '../../theme';
-import {useDispatch, useSelector} from 'react-redux';
-import {setUser, setUserCity} from '../../stateManager/reducers/user';
-import {useMutation, useQuery} from 'react-query';
+import React, {useEffect, useRef} from 'react';
+import {
+  Animated,
+  Dimensions,
+  FlatList,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import {useDispatch} from 'react-redux';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {setUserCity} from '../../stateManager/reducers/user';
+import {setFilters} from '../../stateManager/reducers/filters';
 import {getCities, updateUser} from '../../services';
-import {NativeModules} from 'react-native';
-const {height} = Dimensions.get('window');
-export function CitySelectionMenu({visible, onClose}) {
+import {Text} from '../text/text';
+import {colors} from '../../theme';
+
+const {width: screenWidth} = Dimensions.get('window');
+const DROPDOWN_WIDTH = Math.min(220, screenWidth * 0.6);
+
+export interface CityAnchor {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface CitySelectionMenuProps {
+  visible: boolean;
+  onClose: () => void;
+  anchor: CityAnchor | null;
+}
+
+// Header's city selector — a small dropdown that opens directly below the
+// city trigger (measured via `anchor`) instead of a full-width modal
+// disconnected from where the user tapped.
+export function CitySelectionMenu({
+  visible,
+  onClose,
+  anchor,
+}: CitySelectionMenuProps) {
   const dispatch = useDispatch();
-  const user = useSelector(s => s.user);
-  const {data} = useQuery(['cities'], getCities);
-
+  const queryClient = useQueryClient();
   const {mutate} = useMutation(updateUser);
-
-  const onSelectCity = city => {
-    const data = {city_id: city.id};
-    mutate(data, {
-      onSuccess: () => {},
-    });
-    dispatch(setUserCity({city: city.title, cityId: city.id}));
-    onClose();
-    setTimeout(() => {
-      NativeModules.DevSettings.reload();
-    }, 200);
-  };
+  const {data} = useQuery(['cities'], getCities, {enabled: visible});
+  const translateY = useRef(new Animated.Value(-12)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!user.city && user.cityId && data) {
-      const userCity = data.data.find(item => item.id === user.cityId);
-      dispatch(setUserCity({cityId: user.cityId, city: userCity?.title}));
+    if (visible) {
+      translateY.setValue(-12);
+      opacity.setValue(0);
+      Animated.parallel([
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 180,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
-  }, [data]);
+  }, [visible]);
+
+  const onSelectCity = (city: {id: string; title: string}) => {
+    mutate({city_id: city.id}, {onSuccess: () => {}});
+    // Wipe every cached query so the freshly-remounted app (RootNavigator
+    // keys the app stack on cityId) pulls ads/banners/splash/etc. fresh
+    // from the server for the new city instead of a stale previous-city
+    // cache lingering around.
+    queryClient.clear();
+    dispatch(setUserCity({city: city.title, cityId: city.id}));
+    dispatch(setFilters({city: undefined}));
+    onClose();
+  };
+
+  if (!visible || !anchor) {
+    return null;
+  }
+
+  const left = Math.min(
+    Math.max(8, anchor.x + anchor.width - DROPDOWN_WIDTH),
+    screenWidth - DROPDOWN_WIDTH - 8,
+  );
+
   return (
-    <Menu visible={visible} onRequestClose={onClose}>
-      <View style={sytles.container}>
+    <Modal
+      transparent
+      visible={visible}
+      animationType="none"
+      onRequestClose={onClose}>
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={StyleSheet.absoluteFill} />
+      </TouchableWithoutFeedback>
+      <Animated.View
+        style={[
+          styles.dropdown,
+          {
+            top: anchor.y + anchor.height + 6,
+            left,
+            width: DROPDOWN_WIDTH,
+            opacity,
+            transform: [{translateY}],
+          },
+        ]}>
         <FlatList
           data={data?.data || []}
+          keyExtractor={item => String(item.id)}
+          style={styles.list}
           renderItem={({item}) => (
-            <>
-              <MenuItem
-                onPress={() => onSelectCity(item)}
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor:
-                    user.cityId == item.id ? colors.main : 'transparent',
-                }}>
-                <Row style={{flex: 1, justifyContent: 'center'}}>
-                  <Text style={{textAlign: 'center'}}>{item.title}</Text>
-                </Row>
-              </MenuItem>
-              <MenuDivider color="white" />
-            </>
+            <TouchableOpacity
+              style={styles.item}
+              onPress={() => onSelectCity(item)}>
+              <Text>{item.title}</Text>
+            </TouchableOpacity>
           )}
         />
-      </View>
-    </Menu>
+      </Animated.View>
+    </Modal>
   );
 }
-const sytles = StyleSheet.create({
-  container: {
-    // width: 150,
+
+const styles = StyleSheet.create({
+  dropdown: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    paddingVertical: 4,
     borderWidth: 1,
-    backgroundColor: colors.pallete.gray1,
     borderColor: colors.pallete.gray2,
-    borderRadius: 4,
-    maxHeight: height * 0.7,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  list: {
+    maxHeight: 320,
+  },
+  item: {
+    height: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.pallete.gray2,
   },
 });

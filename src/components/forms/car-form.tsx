@@ -1,25 +1,22 @@
 import {Alert, FlatList, StyleSheet, View} from 'react-native';
 import React, {useEffect, useMemo, useState} from 'react';
-import {
-  AdsOptionsModal,
-  Button,
-  Checkbox,
-  CitySelectModal,
-  CreateAdsHeader,
-  Divider,
-  DurationModal,
-  MainHeader,
-  Row,
-  Screen,
-  SelectLocation,
-  Text,
-  TextField,
-  UnderlineTextField,
-  optionsTypes,
-} from '../../components';
+import {AdsOptionsModal} from '../modal/ads-options-modal';
+import {Button} from '../button/button';
+import {Checkbox} from '../checkbox/checkbox';
+import {CitySelectModal} from '../modal/city-select-modal';
+import {CreateAdsHeader} from '../headers/create-ads-header';
+import {Divider} from '../divider/divider';
+import {DurationModal} from '../modal/duration-modal';
+import {MainHeader} from '../headers/mainHeader';
+import {LocationSelectModal} from '../modal/location-select-modal';
+import {Row} from '../row/row';
+import {Screen} from '../screen/screen';
+import {Text} from '../text/text';
+import {TextField} from '../text-field/text-field';
+import {UnderlineTextField} from '../text-field/underline-text-field';
 import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
-import {SelectAdsCategory} from '../../components';
+import {SelectAdsCategory} from '../modal/select-ads-category';
 
 export function CarForm({subCategory, send, onSend}) {
   const [state, setState] = useState({
@@ -41,6 +38,9 @@ export function CarForm({subCategory, send, onSend}) {
     selectCategoryModal: false,
     optionType: '',
     optionModal: false,
+    locationModal: false,
+    lat: undefined as number | undefined,
+    lng: undefined as number | undefined,
   });
 
   useEffect(() => {
@@ -55,17 +55,20 @@ export function CarForm({subCategory, send, onSend}) {
           contact_info,
           city,
           brand,
+          chassi,
+          features,
+          carAdsCreator,
           operation_amount,
           product_year,
           payType,
+          lat,
+          lng,
         } = state;
-        const ad_type = optionsTypes.adsType.findIndex(
-          item => item.title === adsType,
-        );
-        const tempB = optionsTypes.adsType.findIndex(
-          item => item.title === brand,
-        );
+        // Stored as the plain label (not an index into the admin-managed
+        // option list) so adding/reordering/removing options never
+        // invalidates already-created ads.
         const is_cash = payType == 'اقساطی';
+        const by_person = carAdsCreator == 'شخصی';
         onSend({
           title,
           description,
@@ -75,8 +78,13 @@ export function CarForm({subCategory, send, onSend}) {
           operation_amount,
           product_year,
           is_cash,
-          ad_type,
-          brand: tempB,
+          ad_type: adsType,
+          brand,
+          base_type: chassi,
+          features,
+          by_person,
+          lat,
+          lng,
         });
       } else {
         onSend(false);
@@ -238,8 +246,18 @@ export function CarForm({subCategory, send, onSend}) {
         <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
           <UnderlineTextField
             onPressIn={() => setState(s => ({...s, cityModal: true}))}
-            placeholder="تعیین موقعیت"
+            placeholder="شهر"
             value={state?.city?.title}
+            editable={false}
+          />
+        </Button>
+
+        <Divider />
+        <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
+          <UnderlineTextField
+            onPressIn={() => setState(s => ({...s, locationModal: true}))}
+            placeholder="موقعیت روی نقشه (اختیاری)"
+            value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
             editable={false}
           />
         </Button>
@@ -255,6 +273,11 @@ export function CarForm({subCategory, send, onSend}) {
         onSelect={city => setState(s => ({...s, city, cityModal: false}))}
         visible={state.cityModal}
         onClose={() => setState(s => ({...s, cityModal: false}))}
+      />
+      <LocationSelectModal
+        visible={state.locationModal}
+        onClose={() => setState(s => ({...s, locationModal: false}))}
+        onSelect={(lat, lng) => setState(s => ({...s, lat, lng}))}
       />
       <AdsOptionsModal
         type={state.optionType}

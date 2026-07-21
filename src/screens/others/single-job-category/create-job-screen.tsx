@@ -18,7 +18,6 @@ import {
   FilePickerModal,
   TextField,
   JobClasessModal,
-  SelectLocation,
   Checkbox,
   CitySelectModal,
 } from '../../../components';
@@ -26,41 +25,74 @@ import {colors} from '../../../theme';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {useMutation} from 'react-query';
 import {upload} from '../../../services';
-import {createJob} from '../../../services/job';
-import {useNavigation} from '@react-navigation/native';
+import {createJob, updateJob} from '../../../services/job';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 export function CreateJobScreen() {
-  const [state, setState] = useState({
-    title: '',
-    banner: '',
-    avatar: '',
-    tempSelect: '',
-    filePickerModal: false,
-    jobClassModal: false,
-    category: '',
-    acceptance: false,
-    telegram: '',
-    instagram: '',
-    fax: '',
-    phone: '',
-    mobile: '',
-    description: '',
-    address: '',
-    register_code: '',
-    email: '',
-    manager: '',
-    city: '',
-    citySelectModal: false,
-    uploadedBanner: undefined,
-    uploadedLogo: undefined,
-    lat: '',
-    lng: '',
-  });
+  const {params} = useRoute();
+  const editItem = params?.editItem;
+  const [state, setState] = useState(() =>
+    editItem
+      ? {
+          title: editItem.title ?? '',
+          banner: editItem.banner ? {uri: editItem.banner} : '',
+          avatar: editItem.logo ? {uri: editItem.logo} : '',
+          tempSelect: '',
+          filePickerModal: false,
+          jobClassModal: false,
+          category: editItem.job_category_id ?? '',
+          acceptance: true,
+          telegram: editItem.telegram ?? '',
+          instagram: editItem.instagram ?? '',
+          fax: editItem.fax ?? '',
+          phone: editItem.phone ?? '',
+          mobile: editItem.mobile ?? '',
+          description: editItem.description ?? '',
+          salary: editItem.salary != null ? String(editItem.salary) : '',
+          address: editItem.address ?? '',
+          register_code: editItem.registerCode ?? '',
+          email: editItem.email ?? '',
+          manager: editItem.manager ?? '',
+          city: editItem.city
+            ? {id: editItem.cityId, title: editItem.city.name}
+            : '',
+          citySelectModal: false,
+          uploadedBanner: editItem.banner ? {id: editItem.banner} : undefined,
+          uploadedLogo: editItem.logo ? {id: editItem.logo} : undefined,
+        }
+      : {
+          title: '',
+          banner: '',
+          avatar: '',
+          tempSelect: '',
+          filePickerModal: false,
+          jobClassModal: false,
+          category: '',
+          acceptance: false,
+          telegram: '',
+          instagram: '',
+          fax: '',
+          phone: '',
+          mobile: '',
+          description: '',
+          salary: '',
+          address: '',
+          register_code: '',
+          email: '',
+          manager: '',
+          city: '',
+          citySelectModal: false,
+          uploadedBanner: undefined,
+          uploadedLogo: undefined,
+        },
+  );
   const {goBack} = useNavigation();
 
   const {mutate} = useMutation(upload);
-  const {mutate: jobMutate, isLoading} = useMutation(createJob);
+  const {mutate: jobMutate, isLoading} = useMutation(
+    editItem ? (data: any) => updateJob(editItem.id, data) : createJob,
+  );
 
   const handleValidation = () => {
     const {
@@ -75,8 +107,6 @@ export function CreateJobScreen() {
       telegram,
       instagram,
       city,
-      lat,
-      lng,
     } = state;
     if (!title) {
       Alert.alert('عنوان را وارد کنید');
@@ -102,9 +132,6 @@ export function CreateJobScreen() {
     } else if (!city) {
       Alert.alert('شهر را وارد کنید');
       return false;
-    } else if (!lat || !lng) {
-      Alert.alert('موقعیت را از روی نقشه انتخاب کنید');
-      return false;
     }
     return true;
   };
@@ -124,9 +151,8 @@ export function CreateJobScreen() {
         instagram,
         email,
         description,
+        salary,
         city,
-        lat,
-        lng,
         uploadedBanner,
         uploadedLogo,
       } = state;
@@ -143,9 +169,8 @@ export function CreateJobScreen() {
         instagram,
         email,
         description,
+        salary,
         city_id: city?.id,
-        lat,
-        lng,
         banner: uploadedBanner?.id,
         logo: uploadedLogo?.id,
       };
@@ -392,6 +417,21 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
+            <Text style={{...styles.itemText}}>حقوق</Text>
+          </View>
+          <Divider style={{width: 10}} />
+          <View style={{...styles.detailItem, flex: 1}}>
+            <TextField
+              value={state.salary}
+              onChangeText={text => onChangeField('salary', text)}
+              keyboardType="number-pad"
+              style={{borderWidth: 0, height: 30}}
+              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+            />
+          </View>
+        </Row>
+        <Row style={{paddingHorizontal: 8}}>
+          <View style={{...styles.detailItem, width: 70}}>
             <Text style={{...styles.itemText}}>موقعیت</Text>
           </View>
           <Divider style={{width: 10}} />
@@ -409,10 +449,6 @@ export function CreateJobScreen() {
             text="با قوانین و شرایط موافقم"
           />
         </View>
-
-        <SelectLocation
-          onSelect={(lat, lng) => setState(s => ({...s, lat, lng}))}
-        />
       </Screen>
       <FilePickerModal
         visible={state.filePickerModal}

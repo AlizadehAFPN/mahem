@@ -53,17 +53,23 @@ export function RegisterScreen() {
   const onPressRegister = () => {
     const isValid = handleValidation();
     const data = {username: state.username, mobile: state.mobile};
-    if (isValid)
+    if (isValid) {
       mutate(data, {
-        onSuccess: data => {
-          console.log(data, 'dataiiiii');
-          navigate('codeInput', {mobile: state.mobile});
+        onSuccess: response => {
+          // Uploading requires an access token, which doesn't exist until
+          // after OTP verification — the picked file is carried through
+          // navigation and actually uploaded from code-input.tsx.
+          // `response.code` is only present while the backend runs with
+          // OTP_MOCK=true (no real SMS provider wired up yet) - code-input.tsx
+          // shows it on screen so the code is testable without checking logs.
+          navigate('codeInput', {
+            mobile: state.mobile,
+            profileImage: state.profileImage,
+            otpCode: response?.code,
+          });
         },
       });
-    // if(handleValidation()){
-    //     dispatch(setUser({mobile: state.mobile, username: state.username}))
-    //     navigate("codeInput")
-    // }
+    }
   };
   const handleValidation = () => {
     const {mobile, username} = state;

@@ -1,1 +1,1 @@
-export * from './message-sender'
+export * from './message-sender';

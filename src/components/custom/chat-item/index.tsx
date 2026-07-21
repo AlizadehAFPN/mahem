@@ -1,31 +1,45 @@
 import {StyleSheet, TouchableOpacity, View, Image} from 'react-native';
 import React from 'react';
 import {colors} from '../../../theme';
-import {Text, Row} from '../../';
+import {Text} from '../../text/text';
+import {Row} from '../../row/row';
 import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+
+function formatRelativeTime(iso?: string) {
+  if (!iso) return '';
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const hours = Math.floor(diffMs / 3600000);
+  if (hours < 1) return 'چند دقیقه پیش';
+  if (hours < 24) return `${hours} ساعت پیش`;
+  return `${Math.floor(hours / 24)} روز پیش`;
+}
+
 export function ChatItem({item}) {
-  //   console.log('----', item);
   const {navigate} = useNavigation();
+  const user = useSelector(s => s.user);
+  const isBuyer = item?.buyerId === user?.id;
+  const counterparty = isBuyer ? item?.seller : item?.buyer;
+
   return (
     <TouchableOpacity
       onPress={() =>
         navigate('chat', {
-          title: item?.title,
-          id: item?.id,
-          receiver: item?.receiver,
+          title: item?.advertisement?.title,
+          conversationId: item?.id,
         })
       }
       style={styles.container}>
-      <Text size={22}>{item?.title}</Text>
+      <Text size={22}>{item?.advertisement?.title}</Text>
       <Row style={{width: '100%', justifyContent: 'space-between'}}>
         <View />
         <Row style={{}}>
           <Text style={{marginLeft: 8}} size={17}>
-            {item?.sender}
+            {counterparty?.username || counterparty?.mobile}
           </Text>
           <Image
             style={{
-              resizeMode: 'contail',
+              resizeMode: 'contain',
               marginLeft: -30,
               height: 45,
               width: 45,
@@ -36,7 +50,7 @@ export function ChatItem({item}) {
         </Row>
       </Row>
       <Text style={{marginBottom: 10}} size={12} color={colors.pallete.blue}>
-        3ساعت قبل
+        {formatRelativeTime(item?.lastMessageAt)}
       </Text>
     </TouchableOpacity>
   );
@@ -44,7 +58,6 @@ export function ChatItem({item}) {
 
 const styles = StyleSheet.create({
   container: {
-    // height:96,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.pallete.gray2,

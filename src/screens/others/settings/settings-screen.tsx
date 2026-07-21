@@ -1,66 +1,62 @@
 import {
   FlatList,
   Image,
-  NativeModules,
   StyleSheet,
   Switch,
   TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {
-  CitySelectModal,
-  CitySelectionMenu,
-  MainHeader,
-  Screen,
-  Text,
-} from '../../../components';
+import {CityPicker, MainHeader, Screen, Text} from '../../../components';
 import {colors} from '../../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 // import {Switch} from 'react-native-switch';
-import DropDownPicker from 'react-native-dropdown-picker';
 import {useLanguage} from '../../../Context/LanguageContext';
-import {useMutation, useQuery} from 'react-query';
-import {getCities, updateUser} from '../../../services';
+import {useMutation} from 'react-query';
+import {logout, updateUser} from '../../../services';
 import {removeUser, setUserCity} from '../../../stateManager/reducers/user';
+import {setFilters} from '../../../stateManager/reducers/filters';
 import {RootState} from '../../../stateManager';
-import {Dropdown} from 'react-native-element-dropdown';
 
 export function Settings() {
   const {goBack} = useNavigation();
   const dispatch = useDispatch();
   const [isPersian, setIsPersian] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [cityModalVisible, setCityModalVisible] = useState(false);
   const {translate, changeLanguage, language} = useLanguage();
-  const toggleModalVisible = () => {
-    setModalVisible(!modalVisible);
-  };
   const toggleSwitch = () => {
     setIsPersian(previousState => !previousState);
-    if (isPersian) changeLanguage('en');
-    else changeLanguage('fa');
+    if (isPersian) {
+      changeLanguage('en');
+    } else {
+      changeLanguage('fa');
+    }
   };
   const user = useSelector((s: RootState) => s.user);
   const {navigate} = useNavigation();
 
   const {mutate} = useMutation(updateUser);
-  const [value, setValue] = useState(user?.city);
-
-  const {data} = useQuery(['cities'], getCities);
 
   const onSelectCity = (item: any) => {
-    const myData = {city_id: item.id};
-    mutate(myData, {
-      onSuccess: () => {},
-    });
+    mutate(
+      {city_id: item.id},
+      {
+        onSuccess: () => {},
+      },
+    );
     dispatch(setUserCity({city: item.title, cityId: item.id}));
+    dispatch(setFilters({city: undefined}));
+    setCityModalVisible(false);
   };
   const onExit = () => {
+    // Revoke the refresh token server-side first (best-effort — a network
+    // failure here shouldn't block the user from signing out locally).
+    logout().catch(() => {});
+    // Clearing the token flips RootNavigator from AppStack to AuthStack
+    // reactively — an explicit reset() would target 'register' inside the
+    // wrong stack now that navigation is split into Auth/Onboarding/App.
     dispatch(removeUser());
-    setTimeout(() => {
-      NativeModules.DevSettings.reload();
-    }, 200);
   };
 
   return (
@@ -114,24 +110,23 @@ export function Settings() {
           {translate('chooseCity')}
         </Text>
       </View>
-      <Dropdown
-        data={data?.data || []}
-        maxHeight={300}
-        labelField="title"
-        valueField="id"
+      <TouchableOpacity
+        onPress={() => setCityModalVisible(true)}
         style={{
           borderBottomWidth: 1,
-          borderColor: 'red',
+          borderColor: colors.pallete.gray2,
           width: '85%',
           alignSelf: 'center',
-        }}
-        itemContainerStyle={{backgroundColor: '#EEEEEE'}}
-        placeholder={user?.city}
-        value={value}
-        onChange={item => {
-          console.log(item, '000');
-          onSelectCity(item);
-        }}
+          paddingVertical: 8,
+        }}>
+        <Text style={{textAlign: 'center'}}>
+          {user?.city || translate('chooseCity')}
+        </Text>
+      </TouchableOpacity>
+      <CityPicker
+        visible={cityModalVisible}
+        onClose={() => setCityModalVisible(false)}
+        onSelect={onSelectCity}
       />
 
       <TouchableOpacity

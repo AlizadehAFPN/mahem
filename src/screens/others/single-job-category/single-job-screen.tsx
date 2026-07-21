@@ -1,6 +1,7 @@
-import {Dimensions, Image, StyleSheet, View} from 'react-native';
+import {Alert, Dimensions, Image, StyleSheet, View} from 'react-native';
 import React, {useMemo, useState} from 'react';
 import {
+  Button,
   Divider,
   GradiantHeader,
   MainHeader,
@@ -10,24 +11,30 @@ import {
   ProductLocation,
 } from '../../../components';
 import {colors} from '../../../theme';
-import {useRoute} from '@react-navigation/native';
-const jobObj1 = [
-  {title: 'مدیریت', value: 'خانم ماهم نوین فر'},
-  {title: 'نوع صنف', value: 'پزشکی'},
-  {title: 'شماره ثبت', value: '125425125'},
-  {title: 'تلفن ثابت', value: '017-35258525'},
-  {title: 'تلفن همراه', value: '09111111155'},
-  {title: 'فکس', value: '017254425255'},
-  {title: 'آدرس', value: 'خیابان سرابی ربروی ساختمان ماهم'},
-  {title: 'تلگرام', value: 'Mahem_App'},
-  {title: 'اینستاگرام', value: 'Mahem_App'},
-  {title: 'ایمیل', value: 'Mahem.app@gmail.com'},
-  {title: 'توضیحات', value: 'ساعت کاری ۲۴ ساعته'},
-];
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import {useMutation, useQueryClient} from 'react-query';
+import {deleteJob} from '../../../services/job';
 const {width} = Dimensions.get('window');
 export function SingleJobScreen() {
   const {params} = useRoute();
+  const {navigate, goBack} = useNavigation();
   const [job, setJob] = useState(params?.job);
+  const user = useSelector(s => s.user);
+  const isOwner = job?.userId && job.userId === user?.id;
+  const queryClient = useQueryClient();
+  const {mutate: deleteJobMutate} = useMutation(() => deleteJob(job.id), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('categoryJobs');
+      goBack();
+    },
+  });
+  const onDeleteJob = () => {
+    Alert.alert('حذف آگهی', 'آیا از حذف این آگهی مطمئن هستید؟', [
+      {text: 'انصراف', style: 'cancel'},
+      {text: 'حذف', style: 'destructive', onPress: () => deleteJobMutate()},
+    ]);
+  };
   const jobObj = useMemo(() => {
     if (job) {
       const {
@@ -70,18 +77,35 @@ export function SingleJobScreen() {
         <View style={styles.bannerContaier}>
           <Image
             style={{width: '100%', height: '100%'}}
-            source={{uri: job?.banner?.path}}
+            source={{uri: job?.banner}}
           />
         </View>
         <View style={styles.grayCard}>
           <View style={styles.circle}>
             <Image
               style={{height: '100%', width: '100%'}}
-              source={{uri: job?.logo?.path}}
+              source={{uri: job?.logo}}
             />
           </View>
         </View>
         <Divider height={8} />
+        {isOwner && (
+          <Row style={{paddingHorizontal: 8, marginBottom: 4}}>
+            <Button
+              onPress={() => navigate('createJob', {editItem: job})}
+              style={styles.ownerActionButton}>
+              <Text size={13} color={colors.main}>
+                ویرایش
+              </Text>
+            </Button>
+            <Divider style={{width: 10}} />
+            <Button onPress={onDeleteJob} style={styles.ownerActionButton}>
+              <Text size={13} color={colors.pallete.red2}>
+                حذف
+              </Text>
+            </Button>
+          </Row>
+        )}
         {jobObj.map(item => (
           <Row style={{paddingHorizontal: 8}}>
             <View style={{...styles.detailItem, width: 70}}>
@@ -110,6 +134,15 @@ const styles = StyleSheet.create({
   bannerContaier: {
     width: '100%',
     height: width / 1.9,
+  },
+  ownerActionButton: {
+    flex: 1,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.pallete.gray2,
   },
   nav: {
     position: 'absolute',

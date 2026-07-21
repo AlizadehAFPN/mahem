@@ -1,6 +1,8 @@
 import {View, FlatList} from 'react-native';
 import React from 'react';
-import {Button, Text, Row} from '../';
+import {Button} from '../button/button';
+import {Text} from '../text/text';
+import {Row} from '../row/row';
 
 export function RowCategories({
   title,

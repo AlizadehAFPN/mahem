@@ -10,7 +10,7 @@ import React, {useMemo} from 'react';
 const {width} = Dimensions.get('window');
 export function GridProduct({product, onPress}) {
   const img = useMemo(() => {
-    if (!!product) {
+    if (product) {
       const imgs = Object.keys(product)
         .filter(item => item.includes('image'))
         .filter(item => !!product[item])

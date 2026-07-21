@@ -1,94 +1,44 @@
-import {Dimensions, FlatList, Image, StyleSheet, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React from 'react';
 import {
   Divider,
   GradiantHeader,
+  ListState,
   MainHeader,
   Screen,
-  Row,
   Text,
-  ProductLocation,
-  GridOfferCard,
 } from '../../../components';
 import {colors} from '../../../theme';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {useInfiniteQuery, useQuery} from 'react-query';
-import {getAds} from '../../../services';
-const data = [
-  {
-    img: require('../../../assets/images/market1.png'),
-    location: 'مینودشت',
-    title: 'فروش کیبورد ارنجر یاماها',
-    offerPercent: 45,
-    mainPrice: '1000000',
-    price: '910000',
-    rate: 4,
-    time: 12000,
-  },
-  {
-    img: require('../../../assets/images/market2.png'),
-    location: 'مینودشت',
-    title: 'اداپتور تایپ سی ۲۵ امپر',
-    offerPercent: 23,
-    mainPrice: '720000',
-    price: '680000',
-    rate: 1,
-    time: 25000,
-  },
-  {
-    img: require('../../../assets/images/market3.png'),
-    location: 'مینودشت',
-    title: 'قاب و گلس گوشی s23',
-    offerPercent: 13,
-    mainPrice: '230000',
-    price: '2270000',
-    rate: 3,
-    time: 9400,
-  },
-  {
-    img: require('../../../assets/images/market4.png'),
-    location: 'مینودشت',
-    title: 'قاب و گلس گوشی s23',
-    offerPercent: 13,
-    mainPrice: '230000',
-    price: '2270000',
-    rate: 3,
-    time: 9400,
-  },
-];
+import {getStoreOffers} from '../../../services/store-offers';
+import {usePaginatedList} from '../../../hooks/use-paginated-list';
+
 const {width} = Dimensions.get('window');
+
 export function OfferMarketScreen() {
   const {params} = useRoute();
-  const [ads, setAds] = useState([]);
-  const {data, fetchNextPage, hasNextPage} = useInfiniteQuery({
-    queryKey: ['ads', params?.store],
+  const {navigate} = useNavigation();
+  const store = params?.store;
+
+  const {
+    items: offers,
+    isLoading,
+    isError,
+  } = usePaginatedList({
+    queryKey: ['storeOffers', store?.id],
     queryFn: ({pageParam = 1}) =>
-      getAds({page: pageParam, store_id: params?.store?.id, per_page: 1000}),
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage) return undefined;
-      if (
-        lastPage?.data?.pagination?.current_page <
-        lastPage?.data?.pagination?.total_pages
-      ) {
-        return lastPage?.data?.pagination?.current_page + 1;
-      } else {
-        return undefined;
-      }
-    },
-    getPreviousPageParam: (firstPage, allPages) => firstPage.prevCursor,
+      getStoreOffers(store?.id, {page: pageParam, limit: 20}),
+    selectItems: page => page?.data?.offers,
+    enabled: !!store?.id,
   });
 
-  const onEndReached = () => {
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  };
-
-  useEffect(() => {
-    const flatenData = data?.pages?.flatMap(page => page?.data?.ads);
-    setAds(flatenData);
-  }, [data]);
-  const {navigate} = useNavigation();
   return (
     <Screen withoutScroll>
       <MainHeader title="تخفیف یاب" />
@@ -118,23 +68,27 @@ export function OfferMarketScreen() {
         </View>
         <Divider height={8} />
         <FlatList
-          onEndReached={onEndReached}
-          data={ads}
-          contentContainerStyle={{paddingHorizontal: 10}}
-          numColumns={2}
-          ItemSeparatorComponent={<View style={{height: 10}} />}
-          renderItem={({item, index}) => (
-            <View
-              style={{
-                marginLeft: index % 2 ? 4 : 0,
-                marginRight: index % 2 ? 0 : 4,
-                width: (width - 28) / 2,
-              }}>
-              <GridOfferCard
-                onPress={() => navigate('singleOffer', {ads: item})}
-                item={item}
-              />
-            </View>
+          data={offers}
+          scrollEnabled={false}
+          ItemSeparatorComponent={<Divider height={8} />}
+          ListEmptyComponent={
+            <ListState
+              isLoading={isLoading}
+              isError={isError}
+              emptyMessage="این فروشگاه هنوز آگهی تخفیفی ثبت نکرده است"
+            />
+          }
+          renderItem={({item}) => (
+            <TouchableOpacity
+              onPress={() => navigate('singleOffer', {offer: item})}
+              style={{paddingHorizontal: 16}}>
+              <Text size={16}>{item.title}</Text>
+              {!!item.discountPercent && (
+                <Text size={13} color={colors.main}>
+                  ٪{item.discountPercent} تخفیف
+                </Text>
+              )}
+            </TouchableOpacity>
           )}
         />
       </Screen>

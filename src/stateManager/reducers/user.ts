@@ -2,49 +2,51 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 export interface userState {
   token?: string;
+  refreshToken?: string;
   mobile?: string;
   username?: string;
+  avatar?: string;
   cityId?: string;
   sex?: string;
   id?: string;
   city?: string;
-  bookmarks: any[];
 }
 
 const initialState: userState = {
   token: undefined,
+  refreshToken: undefined,
   mobile: undefined,
   id: undefined,
   username: '',
   cityId: '',
   sex: '',
   city: '',
-  bookmarks: [],
 };
 
 export const userSlice = createSlice({
-  name: 'counter',
+  name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action) => {
-      return (state = {...state, ...action.payload});
+    setUser: (state, action: PayloadAction<Partial<userState>>) => {
+      Object.assign(state, action.payload);
     },
     removeUser: state => {
-      (state.token = undefined), (state.mobile = '');
+      state.token = undefined;
+      state.refreshToken = undefined;
+      state.mobile = '';
       state.username = '';
       state.cityId = '';
     },
-    setUserCity: (state, action) => {
+    setUserCity: (
+      state,
+      action: PayloadAction<{cityId: string; city: string}>,
+    ) => {
       state.cityId = action.payload.cityId;
       state.city = action.payload.city;
-    },
-    setBookmarks: (state, action) => {
-      state.bookmarks = action.payload || [];
     },
   },
 });
 
-export const {setUser, removeUser, setUserCity, setBookmarks} =
-  userSlice.actions;
+export const {setUser, removeUser, setUserCity} = userSlice.actions;
 
 export default userSlice.reducer;

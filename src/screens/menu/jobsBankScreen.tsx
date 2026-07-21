@@ -16,7 +16,7 @@ const {width} = Dimensions.get('window');
 
 export function JobsBankScreen() {
   const {navigate} = useNavigation();
-  const {data} = useQuery([`jobBank`], getJobsCategories);
+  const {data} = useQuery(['jobBank'], getJobsCategories);
   const handleNavigation = (item: any) => {
     //@ts-ignore
     navigate('singleJobCategory', {category: item});

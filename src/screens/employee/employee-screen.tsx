@@ -1,5 +1,5 @@
-import {FlatList, TouchableOpacity, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
 import {
   MainHeader,
   Screen,
@@ -9,36 +9,18 @@ import {
   Divider,
   SelectAdsCategory,
   RowProduct,
+  ListState,
 } from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
-import {useInfiniteQuery} from 'react-query';
+import {useSelector} from 'react-redux';
 import {getAds} from '../../services';
-const ads = [
-  {
-    title: 'استخدام منشی',
-    time: '',
-    img: require('../../assets/images/products/ads1.png'),
-  },
-  {
-    title: 'استخدام منشی',
-    time: '',
-    img: require('../../assets/images/products/ads2.png'),
-  },
-  {
-    title: 'استخدام منشی',
-    time: '',
-    img: require('../../assets/images/products/ads3.png'),
-  },
-  {
-    title: 'استخدام منشی',
-    time: '',
-    img: require('../../assets/images/products/ads4.png'),
-  },
-];
+import {RootState} from '../../stateManager';
+import {usePaginatedList} from '../../hooks/use-paginated-list';
 export function EmployeeScreen() {
   const {navigate, goBack} = useNavigation();
+  const user = useSelector((s: RootState) => s.user);
   const [state, setState] = useState({
     mainCategory: '',
     subCategory: '',
@@ -46,53 +28,49 @@ export function EmployeeScreen() {
     selectCategoryModal: true,
     searchText: '',
   });
-  const [ads, setAds] = useState([]);
-  const {data, fetchNextPage, hasNextPage} = useInfiniteQuery({
-    queryKey: ['ads', state.searchText, state.mainCategory],
+  const {
+    items: ads,
+    isLoading,
+    isError,
+    isFetching,
+    isFetchingNextPage,
+    onEndReached,
+    refetch,
+  } = usePaginatedList({
+    queryKey: ['ads', state.searchText, state.mainCategory?.id, user.cityId],
     queryFn: ({pageParam = 1}) =>
       getAds({
         page: pageParam,
-        keyword: state.searchText,
-        category_id: state.mainCategory?.id,
-        per_page: 1000,
+        limit: 20,
+        search: state.searchText || undefined,
+        categoryId: state.mainCategory?.id,
+        cityId: user.cityId,
       }),
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage) return undefined;
-      if (
-        lastPage?.data?.pagination?.current_page <
-        lastPage?.data?.pagination?.total_pages
-      ) {
-        return lastPage?.data?.pagination?.current_page + 1;
-      } else {
-        return undefined;
-      }
-    },
-    getPreviousPageParam: (firstPage, allPages) => firstPage.prevCursor,
+    selectItems: page => page?.data?.ads,
   });
-
-  const onEndReached = () => {
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  };
-
-  useEffect(() => {
-    const flatenData = data?.pages?.flatMap(page => page?.data?.ads);
-    setAds(flatenData);
-  }, [data]);
   return (
     <Screen withoutScroll>
       <MainHeader showLocation={true} />
       <FlatList
         data={ads}
+        onEndReached={onEndReached}
+        refreshControl={
+          <RefreshControl
+            refreshing={isFetching && !isFetchingNextPage}
+            onRefresh={refetch}
+          />
+        }
         style={{paddingHorizontal: 4, paddingVertical: 8}}
         ItemSeparatorComponent={<View style={{height: 4}} />}
         renderItem={({item}) => (
           <RowProduct
             product={item}
-            onPress={() => navigate('singleProduct')}
+            onPress={() => navigate('singleProduct', {ads: item})}
           />
         )}
+        ListEmptyComponent={
+          <ListState isLoading={isLoading} isError={isError} />
+        }
         ListHeaderComponent={
           <Row style={{paddingHorizontal: 8, paddingVertical: 10}}>
             <Ionicons size={25} name="search" />
@@ -119,10 +97,6 @@ export function EmployeeScreen() {
       />
       <SelectAdsCategory
         showTitle={false}
-        onRequestClose={() => {
-          setState(s => ({...s, selectCategoryModal: false}));
-          navigate('home');
-        }}
         onSelect={(m, sc, ssc) =>
           setState(s => ({
             ...s,

@@ -5,7 +5,6 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  NativeModules,
   Share,
 } from 'react-native';
 import React from 'react';
@@ -48,11 +47,6 @@ export function MenuScreen() {
       name: 'search',
     },
     {
-      title: 'استخدامی',
-      icon: require('../../assets/images/icons/employee.png'),
-      name: 'search',
-    },
-    {
       title: 'مدیریت آگهی ها',
       icon: require('../../assets/images/icons/adsmanagment.png'),
       name: 'userpanel',
@@ -87,37 +81,18 @@ export function MenuScreen() {
   const dispatch = useDispatch();
   const handlePressItem = async (item: any) => {
     if (item?.title === 'خروج') {
+      // Clearing the token flips RootNavigator from AppStack to AuthStack
+      // reactively — an explicit reset() would target 'register' inside the
+      // wrong stack now that navigation is split into Auth/Onboarding/App.
       dispatch(removeUser());
-      setTimeout(() => {
-        NativeModules.DevSettings.reload();
-      }, 200);
+      return;
     }
     if (item.name) {
-      if (item.title === 'استخدامی') {
-        dispatch(
-          setFilters({
-            mainCategory: {title: 'استخدامی', id: 1},
-            subCategory: undefined,
-            subsubCategory: undefined,
-          }),
-        );
-        return navigate(item.name as never);
-      }
       if (item.name === 'share') {
         await Share.share({
           message: 'https://cafebazaar.ir/app/com.turner.asmajormayhem?l=en',
         });
         return;
-      }
-      if (item.title === 'استخدامی') {
-        dispatch(
-          setFilters({
-            mainCategory: {title: 'استخدامی', id: 1},
-            subCategory: undefined,
-            subsubCategory: undefined,
-          }),
-        );
-        return navigate(item.name as never);
       }
       if (item.title === 'آگهی ها') {
         dispatch(

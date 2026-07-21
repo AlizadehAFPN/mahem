@@ -14,19 +14,16 @@ import {
   SingleJobScreen,
   SingleOfferScreen,
   SinlgeProduct,
-  SplashScreen,
   UserPanelScreen,
   NotifScreen,
 } from '../screens';
+import {EditAdScreen} from '../screens/others/edit-ad/edit-ad-screen';
 import {EditProfile} from '../screens/others/editProfile/editProfile-screen';
 import {Settings} from '../screens/others/settings/settings-screen';
 import {UserOfferMarketScreen} from '../screens/others/user-offer-market';
 
-export const routes = [
-  {
-    name: 'splash',
-    component: SplashScreen,
-  },
+// Not authenticated yet.
+export const authRoutes = [
   {
     name: 'register',
     component: RegisterScreen,
@@ -35,10 +32,18 @@ export const routes = [
     name: 'codeInput',
     component: CodeInput,
   },
+];
+
+// Authenticated, but hasn't finished profile setup (no city yet).
+export const onboardingRoutes = [
   {
     name: 'citySelection',
     component: CitySelectionScreen,
   },
+];
+
+// Authenticated + onboarded — everything reachable from inside the app.
+export const appRoutes = [
   {
     name: 'singleProduct',
     component: SinlgeProduct,
@@ -106,5 +111,9 @@ export const routes = [
   {
     name: 'editProfile',
     component: EditProfile,
+  },
+  {
+    name: 'editAd',
+    component: EditAdScreen,
   },
 ];

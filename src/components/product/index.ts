@@ -1,2 +1,2 @@
-export * from './grid-product'
-export * from './row-product'
+export * from './grid-product';
+export * from './row-product';

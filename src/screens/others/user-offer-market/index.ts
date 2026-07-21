@@ -1,1 +1,1 @@
-export * from './user-offer-market-screen'
+export * from './user-offer-market-screen';

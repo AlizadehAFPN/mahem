@@ -25,7 +25,7 @@ export function FilterScreen() {
     city,
     mainCategory,
     subCategory,
-    subsubCategory,
+    subSubCategory,
     price,
     onlyImages,
     sort,
@@ -34,7 +34,7 @@ export function FilterScreen() {
     selectCategoryModal: false,
     mainCategory,
     subCategory,
-    subsubCategory,
+    subSubCategory,
     city,
     cityModal: false,
     optionType: '',
@@ -54,18 +54,18 @@ export function FilterScreen() {
     if (state.subCategory) {
       title = title + ':' + state.subCategory?.title;
     }
-    if (state.subsubCategory) {
-      title = title + ':' + state.subsubCategory?.title;
+    if (state.subSubCategory) {
+      title = title + ':' + state.subSubCategory?.title;
     }
     return title;
-  }, [state.mainCategory, state.subCategory, state.subsubCategory]);
+  }, [state.mainCategory, state.subCategory, state.subSubCategory]);
 
   const handleAddFilters = () => {
     dispatch(
       setFilters({
         mainCategory: state.mainCategory,
         subCategory: state.subCategory,
-        subSubCategory: state.subsubCategory,
+        subSubCategory: state.subSubCategory,
         city: state.city,
         price: state.price,
       }),
@@ -83,7 +83,7 @@ export function FilterScreen() {
       <MainHeader title="فیلتر" />
       <Row style={{paddingHorizontal: 12, paddingVertical: 16}}>
         <Button
-          onPress={() => onPressSort('PriceMaxToMin')}
+          onPress={() => onPressSort('price_desc')}
           style={{
             ...styles.button,
             borderTopRightRadius: 8,
@@ -101,7 +101,7 @@ export function FilterScreen() {
         </Button>
         <Divider style={{width: 12}} />
         <Button
-          onPress={() => onPressSort('PriceMinToMax')}
+          onPress={() => onPressSort('price_asc')}
           style={{
             ...styles.button,
             borderTopLeftRadius: 8,
@@ -120,7 +120,7 @@ export function FilterScreen() {
           editable={true}
           onTouchStart={onToggleSelectCategory}
           value={state.mainCategory ? groupTitle : undefined}
-          // value={`${state.mainCategory} ${state.subCategory&& "/"+ state.subCategory} ${state.subsubCategory && "/"+ state.subsubCategory}`}
+          // value={`${state.mainCategory} ${state.subCategory&& "/"+ state.subCategory} ${state.subSubCategory && "/"+ state.subSubCategory}`}
         />
       </Button>
       <Divider />
@@ -128,7 +128,7 @@ export function FilterScreen() {
         <UnderlineTextField
           onPressIn={() => setState(s => ({...s, cityModal: true}))}
           placeholder="تعیین موقعیت"
-          value={state.city}
+          value={state.city?.title}
           editable={false}
         />
       </Button>
@@ -160,7 +160,7 @@ export function FilterScreen() {
             ...s,
             mainCategory: m,
             subCategory: sc,
-            subsubCategory: ssc,
+            subSubCategory: ssc,
           }))
         }
         onClose={onToggleSelectCategory}
@@ -168,7 +168,7 @@ export function FilterScreen() {
       />
       <CitySelectModal
         onSelect={selectedCity =>
-          setState(s => ({...s, city: selectedCity?.title, cityModal: false}))
+          setState(s => ({...s, city: selectedCity, cityModal: false}))
         }
         visible={state.cityModal}
         onClose={() => setState(s => ({...s, cityModal: false}))}

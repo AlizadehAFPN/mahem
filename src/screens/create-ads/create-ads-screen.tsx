@@ -18,21 +18,18 @@ import {
   CreateAdsHeader,
   Divider,
   DurationModal,
-  EmployeeForm,
   EstateForm,
   MainHeader,
-  OfferForm,
   Row,
   Screen,
-  SelectLocation,
   TextField,
   UnderlineTextField,
 } from '../../components';
 import {boldFont, colors, normalFont} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {SelectAdsCategory} from '../../components';
-import {useMutation, useQuery} from 'react-query';
-import {createAds, getMyStore, upload} from '../../services';
+import {useMutation} from 'react-query';
+import {createAds, upload} from '../../services';
 
 export function CreateAdsScreen() {
   const {navigate} = useNavigation();
@@ -64,38 +61,39 @@ export function CreateAdsScreen() {
     optionType: '',
     optionModal: false,
     send: 'no',
+    uploadingCount: 0,
   });
 
   const {mutate} = useMutation(upload);
   const {mutate: createAdsMutate} = useMutation(createAds);
-  const {data: myStores} = useQuery('myStore', getMyStore);
   const handleSelectImage = (
     image: {fileName: any; type: any; uri: any},
     index: string | number,
   ) => {
-    // const images = state.images
-    // images[index] = image
-    // // setState(s => ({ ...s, images }))
     const {fileName, type, uri} = image;
     const doc = {name: fileName, type, uri};
     const form = new FormData();
     form.append('file', doc);
-    const images = state.images;
+    setState(s => ({...s, uploadingCount: s.uploadingCount + 1}));
     mutate(form, {
       onSuccess: data => {
+        const images = state.images;
         images[index] = data?.data;
-        setState(s => ({...s, images}));
+        setState(s => ({...s, images, uploadingCount: s.uploadingCount - 1}));
+      },
+      onError: () => {
+        Alert.alert('خطا در آپلود تصویر', 'لطفا دوباره تلاش کنید');
+        setState(s => ({...s, uploadingCount: s.uploadingCount - 1}));
       },
     });
   };
 
   const onSendPress = () => {
+    if (state.uploadingCount > 0) {
+      Alert.alert('لطفا صبر کنید', 'تصاویر در حال آپلود هستند');
+      return;
+    }
     setState(s => ({...s, send: `send-${new Date()}`}));
-    // if(state?.mainCategory?.title == "استخدامی"|| state?.mainCategory?.title=="تخفیف یاب"){
-    //     navigate("createAddsPay")
-    // }else{
-    //     navigate("createAdsFinal")
-    // }
   };
   const onToggleSelectCategory = () => {
     setState(s => ({
@@ -107,49 +105,25 @@ export function CreateAdsScreen() {
 
   const hanldeCreateAd = (data: any) => {
     if (data) {
-      const {images, mainCategory, lat, lng}: any = state;
-      if (
-        mainCategory?.title?.includes('تخفیف') &&
-        (myStores?.data?.length === 0 || !myStores)
-      ) {
-        return Alert.alert(
-          'برای ایجاد تخفیف ابتدا باید یک فروشگاه تخفیف بسازید!',
-        );
-      }
+      const {images, mainCategory}: any = state;
       if (!mainCategory) {
         return Alert.alert('دسته بندی را انتخاب کنید');
-      } else if (!lat || !lng) {
-        return Alert.alert('موقعیت را از روی نقشه انتخاب کنید');
       }
       let imageData: any = {};
       images.forEach((item: {id: any}, index: number) => {
-        if (!!item) {
+        if (item) {
           imageData[`image_${index + 1}`] = item.id;
         }
       });
       const payload = {
-        category_id: mainCategory.id,
+        category_id: (state.subsubCategory || state.subCategory || mainCategory)
+          ?.id,
         ...imageData,
         ...data,
-        lat,
-        lng,
       };
-      // return console.log(payload )
-      if (mainCategory?.title?.includes('تخفیف')) {
-        payload.store = myStores?.data?.[0]?.id;
-      }
       createAdsMutate(payload, {
-        onSuccess: data => {
-          if (
-            mainCategory?.title?.includes('تخفیف') ||
-            mainCategory?.title?.includes('استخدام')
-          ) {
-            navigate('createAddsPay' as never);
-          } else {
-            navigate('createAdsFinal' as never);
-          }
-
-          navigate('createAdsFinal');
+        onSuccess: () => {
+          navigate('createAdsFinal' as never);
         },
       });
     }
@@ -199,17 +173,19 @@ export function CreateAdsScreen() {
           </TouchableOpacity>
           <Divider />
 
-          {state?.mainCategory?.title?.includes('استخدامی') ? (
-            <EmployeeForm send={state.send} onSend={hanldeCreateAd} />
-          ) : state?.mainCategory?.title?.includes('تخفیف یاب') ? (
-            <OfferForm send={state.send} onSend={hanldeCreateAd} />
-          ) : state?.mainCategory?.title?.includes('وسایل نقلیه') ? (
+          {/* Matched by the top-level category's Persian name, which is what
+              the backend seed data actually sets (see mahem-backend's
+              prisma/seed.ts) — the previous slug check ('vehicles' /
+              'real-estate') never matched real seeded slugs ('املاک',
+              'وسایل-نقلیه'), so these specialized forms silently never
+              rendered and every ad fell back to CommonForm. */}
+          {state?.mainCategory?.title === 'وسایل نقلیه' ? (
             <CarForm
               send={state.send}
               onSend={hanldeCreateAd}
               subCategory={state.subCategory}
             />
-          ) : state?.mainCategory?.title?.includes('املاک') ? (
+          ) : state?.mainCategory?.title === 'املاک' ? (
             <EstateForm
               send={state.send}
               onSend={hanldeCreateAd}
@@ -235,10 +211,6 @@ export function CreateAdsScreen() {
               text="با قوانین و شرایط موافقم"
             />
           </View>
-
-          <SelectLocation
-            onSelect={(lat: any, lng: any) => setState(s => ({...s, lat, lng}))}
-          />
         </View>
       </Screen>
 

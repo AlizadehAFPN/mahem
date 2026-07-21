@@ -1,7 +1,11 @@
 import {View, StyleSheet} from 'react-native';
 import React from 'react';
 import LinearGradient from 'react-native-linear-gradient';
-import {Button, Divider, Row, SocialShare, Text} from '../';
+import {Button} from '../button/button';
+import {Divider} from '../divider/divider';
+import {Row} from '../row/row';
+import {SocialShare} from '../social-share/social-share';
+import {Text} from '../text/text';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';

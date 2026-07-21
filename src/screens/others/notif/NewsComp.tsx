@@ -1,13 +1,22 @@
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import {MainHeader, Screen} from '../../../components';
 import {colors} from '../../../theme';
-import {useNavigation} from '@react-navigation/native';
-import {useDispatch, useSelector} from 'react-redux';
 
-export function NewsComp() {
+function formatDate(iso?: string) {
+  if (!iso) return '';
+  const date = new Date(iso);
+  return date.toLocaleDateString('fa-IR');
+}
+function formatTime(iso?: string) {
+  if (!iso) return '';
+  const date = new Date(iso);
+  return date.toLocaleTimeString('fa-IR', {hour: '2-digit', minute: '2-digit'});
+}
+
+export function NewsComp({item, onPress}: {item: any; onPress?: () => void}) {
   return (
-    <View
+    <TouchableOpacity
+      onPress={onPress}
       style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -21,8 +30,9 @@ export function NewsComp() {
           width: '100%',
           paddingHorizontal: 10,
           borderRadius: 4,
-          backgroundColor: '#D0D0D0D0',
+          backgroundColor: item?.isRead ? '#D0D0D0D0' : colors.pallete.gray1,
           borderWidth: 1,
+          borderColor: item?.isRead ? '#D0D0D0' : colors.main,
         }}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Image
@@ -34,10 +44,19 @@ export function NewsComp() {
             }}
             source={require('../../../assets/images/logo.png')}
           />
-          <Text style={{textAlign: 'right'}} numberOfLines={2}>
-            سلام سلام سلا مسلاس لامسلامس لامسلامس سلام سلام سلا مسلام سلامسلام
-            لامسلامس لام
-          </Text>
+          <View style={{flex: 1, marginRight: 8}}>
+            <Text
+              style={{
+                textAlign: 'right',
+                fontWeight: item?.isRead ? 'normal' : 'bold',
+              }}
+              numberOfLines={1}>
+              {item?.title}
+            </Text>
+            <Text style={{textAlign: 'right'}} numberOfLines={2}>
+              {item?.body}
+            </Text>
+          </View>
         </View>
 
         <View
@@ -54,34 +73,10 @@ export function NewsComp() {
             justifyContent: 'space-between',
             flexDirection: 'row',
           }}>
-          <Text>۱۱:۵۶</Text>
-          <Text>۱۳۹۹/۱۱/۱۶</Text>
+          <Text>{formatTime(item?.createdAt)}</Text>
+          <Text>{formatDate(item?.createdAt)}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    flex: 1,
-    height: 29,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.pallete.gray2,
-    backgroundColor: colors.pallete.gray1,
-    marginHorizontal: 2,
-  },
-  Button: {
-    flex: undefined,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.main,
-  },
-});

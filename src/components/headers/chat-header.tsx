@@ -1,10 +1,17 @@
 import {StyleSheet, View, Image} from 'react-native';
 import React from 'react';
-import {Row, Button, Text, Divider, AdsImageSelection} from '../';
+import {Row} from '../row/row';
+import {Button} from '../button/button';
+import {Text} from '../text/text';
+import {Divider} from '../divider/divider';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
-export function ChatHeader({onCreatePress, onSelectImage}) {
+interface ChatHeaderProps {
+  title?: string;
+  onCreatePress?: () => void;
+}
+export function ChatHeader({title, onCreatePress}: ChatHeaderProps) {
   const {goBack} = useNavigation();
   return (
     <View style={styles.continer}>
@@ -34,13 +41,15 @@ export function ChatHeader({onCreatePress, onSelectImage}) {
           />
           <Divider style={{width: 5}} />
           <Text size={17} color="white">
-            کاربر ماهم
+            {title || 'کاربر ماهم'}
           </Text>
         </Row>
 
-        <Button onPress={onCreatePress}>
-          <Image source={require('../../assets/images/phone-white.png')} />
-        </Button>
+        {onCreatePress && (
+          <Button onPress={onCreatePress}>
+            <Image source={require('../../assets/images/phone-white.png')} />
+          </Button>
+        )}
       </Row>
     </View>
   );

@@ -1,6 +1,7 @@
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import React from 'react';
-import {Row, Text} from '../';
+import {Row} from '../row/row';
+import {Text} from '../text/text';
 import {colors} from '../../theme';
 export function TableRow({onPress, item, header = false}) {
   return (

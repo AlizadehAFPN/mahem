@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, FlatList, Platform} from 'react-native';
+import {FlatList, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {
   ChatHeader,
@@ -10,59 +10,92 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useRoute} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
-import database from '@react-native-firebase/database';
+import {useQuery} from 'react-query';
+import {
+  getMessages,
+  getOrCreateConversation,
+  markConversationRead,
+} from '../../../services';
+import {getSocket} from '../../../services/socket';
 
 export function ChatScreen() {
   const insents = useSafeAreaInsets();
   const {params} = useRoute();
-  const [message, setMessage] = useState([]);
-  const [total, setTotal] = useState([]);
   const user = useSelector(s => s.user);
-  //   console.log(params, 'rrrr');
+  const [conversationId, setConversationId] = useState(params?.conversationId);
+  const [messages, setMessages] = useState<any[]>([]);
+
+  // A brand-new thread (opened from an ad's detail screen) needs
+  // get-or-create first; opened from the conversation list, the id is
+  // already known.
+  const {data: conversation} = useQuery(
+    ['conversation', params?.advertisementId],
+    () => getOrCreateConversation(params?.advertisementId),
+    {enabled: !conversationId && !!params?.advertisementId},
+  );
+
   useEffect(() => {
-    database()
-      .ref()
-      .on('value', snapshot => {
-        if (!snapshot.val()) setMessage([]);
-        else {
-          setTotal(snapshot.val());
-          let temp = snapshot.val();
-          temp = temp?.filter(item => item?.id === params?.id);
-          if (temp.length > 0) {
-            temp = temp.map((object: any) => ({
-              ...object,
-              me: object?.sender === user?.mobile ? true : false,
-            }));
-          }
-          setMessage(temp);
-        }
-      });
-  }, []);
-  console.log(params, Platform?.OS, 'params');
+    if (conversation?.id) {
+      setConversationId(conversation.id);
+    }
+  }, [conversation]);
+
+  useQuery(['messages', conversationId], () => getMessages(conversationId), {
+    enabled: !!conversationId,
+    onSuccess: data => setMessages(data.items ?? []),
+  });
+
+  useEffect(() => {
+    if (!conversationId) {
+      return;
+    }
+    markConversationRead(conversationId).catch(() => {});
+
+    const socket = getSocket();
+    if (!socket) {
+      return;
+    }
+    socket.emit('conversation:join', {conversationId});
+
+    const onMessageNew = (message: any) => {
+      if (message.conversationId !== conversationId) {
+        return;
+      }
+      setMessages(prev => [...prev, message]);
+    };
+    socket.on('message:new', onMessageNew);
+    return () => {
+      socket.off('message:new', onMessageNew);
+    };
+  }, [conversationId]);
 
   const onPressButton = (text: string) => {
-    const newObj = {
-      ...params,
-      sender: user?.mobile,
-      text,
-      id: params?.id,
-      receiver: params?.receiver,
-      title: params?.title,
-    };
-    const newArray = [...total, newObj];
-    database().ref().set(newArray);
+    if (!text.trim() || !conversationId) {
+      return;
+    }
+    const socket = getSocket();
+    socket?.emit('message:send', {conversationId, text});
   };
+
+  const mappedMessages = messages.map(message => ({
+    ...message,
+    me: message.senderId === user?.id,
+  }));
 
   return (
     <Screen withoutScroll style={{paddingBottom: insents.bottom}}>
-      <ChatHeader />
+      <ChatHeader title={params?.title} />
       <View style={{flex: 1}}>
         <FlatList
-          data={message}
-          keyExtractor={(item, index) => String(index)}
+          data={mappedMessages}
+          keyExtractor={(item, index) => item.id ?? String(index)}
           ItemSeparatorComponent={<Divider height={10} />}
           renderItem={({item, index}) => (
-            <Message key={String(index + 190)} message={item} index={index} />
+            <Message
+              key={item.id ?? String(index)}
+              message={item}
+              index={index}
+            />
           )}
         />
       </View>
@@ -70,5 +103,3 @@ export function ChatScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({});

@@ -1,20 +1,22 @@
-import {View, Text, Image, StyleSheet, Dimensions} from 'react-native';
-import React, {useEffect} from 'react';
+import {Image, StyleSheet, Dimensions} from 'react-native';
+import React from 'react';
 import {Screen} from '../../components';
-import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
 const {width, height} = Dimensions.get('window');
-export function SplashScreen() {
-  const {replace, navigate} = useNavigation();
-  const user = useSelector(s => s.user);
-  useEffect(() => {
-    setTimeout(() => {
-      if (user.mobile) {
-        return replace('dashboard');
-      }
-      navigate('register');
-    }, 2000);
-  }, []);
+
+interface SplashScreenProps {
+  // Per-city splash image URL, set by an admin. Falls back to the bundled
+  // default when absent (no per-city image configured yet, still loading,
+  // or — during PersistGate's rehydration — the user's city isn't even
+  // known yet).
+  imageUrl?: string;
+}
+
+// Purely presentational now — used as PersistGate's loading view and while
+// RootNavigator validates the session, not as a navigable route. The old
+// version did both jobs (branding + an imperative setTimeout-based
+// register/dashboard redirect); the redirect logic now lives in
+// RootNavigator, driven reactively by redux state instead of a timer.
+export function SplashScreen({imageUrl}: SplashScreenProps) {
   return (
     <Screen
       statusbarBackgroundColor="black"
@@ -23,7 +25,11 @@ export function SplashScreen() {
       style={{flex: 1}}>
       <Image
         style={styles.image}
-        source={require('../../assets/images/splash.png')}
+        source={
+          imageUrl
+            ? {uri: imageUrl}
+            : require('../../assets/images/splash.png')
+        }
       />
     </Screen>
   );

@@ -5,13 +5,11 @@ import {colors} from '../../theme';
 import {cities} from '../../utiles';
 import {useDispatch} from 'react-redux';
 import {setUser} from '../../stateManager/reducers/user';
-import {useNavigation} from '@react-navigation/native';
 import {useMutation, useQuery} from 'react-query';
 import {getCities, updateUser} from '../../services';
 
 export function CitySelectionScreen() {
   const dispatch = useDispatch();
-  const {navigate} = useNavigation();
   const [state, setState] = useState({
     gender: '',
     city: '',
@@ -25,19 +23,21 @@ export function CitySelectionScreen() {
       sex: state?.gender == 'man' ? 1 : 0,
     };
     mutate(data);
-    console.log(state, 'state');
+    // Setting cityId flips RootNavigator from OnboardingStack to AppStack
+    // reactively — no explicit navigate('dashboard') needed.
     dispatch(
       setUser({
         cityId: state.city.id,
         city: state.city.title,
-        gender: state.gender,
+        sex: state.gender === 'man' ? 'MALE' : 'FEMALE',
       }),
     );
-    navigate('dashboard');
   };
   const handleValidation = () => {
     const {city, gender} = state;
-    if (!city || !gender) return false;
+    if (!city || !gender) {
+      return false;
+    }
     return true;
   };
 

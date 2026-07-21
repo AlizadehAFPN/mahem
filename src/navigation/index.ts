@@ -1,2 +1,2 @@
-export * from './tabNavigator'
-export * from './mainNavigator'
+export * from './tabNavigator';
+export * from './mainNavigator';

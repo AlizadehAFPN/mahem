@@ -8,7 +8,14 @@ import {
 } from 'react-native';
 import React from 'react';
 
-export function MainModal({visible, onClose, children, style}) {
+interface MainModalProps {
+  visible: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  style?: object;
+}
+
+export function MainModal({visible, onClose, children, style}: MainModalProps) {
   return (
     <Modal transparent onRequestClose={onClose} visible={visible}>
       <TouchableWithoutFeedback onPress={onClose}>

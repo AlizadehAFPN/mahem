@@ -19,10 +19,14 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {numberWithCommas, translations} from '../../../utiles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {useQuery} from 'react-query';
-import {getSingleAds} from '../../../services';
-import {useDispatch, useSelector} from 'react-redux';
-import {setBookmarks} from '../../../stateManager/reducers/user';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useSelector} from 'react-redux';
+import {
+  addBookmark,
+  getBookmarks,
+  getSingleAds,
+  removeBookmark,
+} from '../../../services';
 
 const images = [require('../../../assets/images/products/productSlider1.png')];
 const productProps = [
@@ -42,8 +46,17 @@ export function SinlgeProduct() {
   });
   const {params} = useRoute();
   const [ad, setAd] = useState(params?.ads);
-  const {bookmarks} = useSelector(s => s.user);
-  const dispatch = useDispatch();
+  const currentUser = useSelector(s => s.user);
+  const isOwnAd = ad?.userId && ad.userId === currentUser?.id;
+  const queryClient = useQueryClient();
+  const {data: bookmarksData} = useQuery(['bookmarks'], getBookmarks);
+  const bookmarks = bookmarksData?.data;
+  const {mutate: addBookmarkMutate} = useMutation(addBookmark, {
+    onSuccess: () => queryClient.invalidateQueries(['bookmarks']),
+  });
+  const {mutate: removeBookmarkMutate} = useMutation(removeBookmark, {
+    onSuccess: () => queryClient.invalidateQueries(['bookmarks']),
+  });
   const {data} = useQuery(
     [`singleAd-${params?.ads?.id}`, params?.ads?.id],
     () => getSingleAds(params?.ads?.id),
@@ -58,23 +71,17 @@ export function SinlgeProduct() {
   };
 
   const adsProps = useMemo(() => {
-    if (!!ad) {
+    if (ad) {
       const arr = [];
       Object.keys(ad).forEach(item => {
         if (ad[item] !== null && !!translations[item]) {
           let value;
-          if (item === 'ad_type') {
-            value = optionsTypes.adsType[ad[item]].title;
-          } else if (item == 'contract_type') {
+          if (item == 'contract_type') {
             value = optionsTypes.contractType[ad[item]].title;
           } else if (item == 'degree') {
             value = optionsTypes.education[ad[item]].title;
-          } else if (item == 'brand') {
-            value = optionsTypes.brand[ad[item]].title;
-          } else if (item == 'floor') {
-            value = optionsTypes.floor[ad[item]].title;
           } else if (item == 'parking') {
-            value = ad[item] == 0 ? 'دارد' : 'ندارد';
+            value = ad[item] ? 'دارد' : 'ندارد';
           } else if (item == 'is_cash') {
             value = ad[item] ? 'قسطی' : 'نقد';
           } else if (item == 'by_person') {
@@ -94,7 +101,7 @@ export function SinlgeProduct() {
     return [];
   }, []);
   useEffect(() => {
-    if (!!data) {
+    if (data) {
       setAd(data?.data);
     }
   }, [data]);
@@ -116,11 +123,9 @@ export function SinlgeProduct() {
 
   const onBookMark = () => {
     if (isBookmarked) {
-      dispatch(
-        setBookmarks(bookmarks?.filter(item => item.id !== params?.ads?.id)),
-      );
+      removeBookmarkMutate(params?.ads?.id);
     } else {
-      dispatch(setBookmarks(bookmarks?.concat(params?.ads)));
+      addBookmarkMutate(params?.ads?.id);
     }
   };
 
@@ -139,13 +144,30 @@ export function SinlgeProduct() {
           onCreatePress={undefined}
         />
       </View>
-      <Screen unsafe>
+      <Screen unsafe style={{paddingBottom: insets.bottom + 90}}>
         <View>
           <ImageSlider images={images} autoPlay={false} loop={false} />
           <View style={styles.topDetail}>
             <Text preset="bold" size={20}>
               {ad?.title}
             </Text>
+            {ad?.approvalStatus && ad.approvalStatus !== 'APPROVED' && (
+              <View
+                style={[
+                  styles.statusBanner,
+                  ad.approvalStatus === 'REJECTED'
+                    ? styles.statusBannerRejected
+                    : styles.statusBannerPending,
+                ]}>
+                <Text size={13} color="white">
+                  {ad.approvalStatus === 'REJECTED'
+                    ? `این آگهی رد شده است${
+                        ad.rejectionReason ? `: ${ad.rejectionReason}` : ''
+                      }`
+                    : 'این آگهی در انتظار تایید مدیر است و فقط برای شما نمایش داده می‌شود.'}
+                </Text>
+              </View>
+            )}
 
             <Divider />
             <Row style={{justifyContent: 'space-between'}}>
@@ -194,6 +216,7 @@ export function SinlgeProduct() {
         <ReportProblem
           visible={state.reportModal}
           onClose={toggleReportModal}
+          advertisementId={params?.ads?.id}
         />
       </Screen>
       <Row
@@ -210,24 +233,27 @@ export function SinlgeProduct() {
             </Text>
           </Row>
         </Button>
-        <Divider style={{width: 30}} />
-        <Button
-          onPress={() =>
-            navigate('chat', {
-              title: data?.data?.title,
-              id: data?.data?.id,
-              receiver: data?.data?.contact_info,
-            })
-          }
-          style={styles.button}>
-          <Row style={{alignItems: 'center'}}>
-            <Image source={require('../../../assets/images/chat.png')} />
-            <Divider style={{width: 5}} />
-            <Text size={20} preset="bold">
-              چت
-            </Text>
-          </Row>
-        </Button>
+        {!isOwnAd && (
+          <>
+            <Divider style={{width: 30}} />
+            <Button
+              onPress={() =>
+                navigate('chat', {
+                  title: data?.data?.title,
+                  advertisementId: data?.data?.id,
+                })
+              }
+              style={styles.button}>
+              <Row style={{alignItems: 'center'}}>
+                <Image source={require('../../../assets/images/chat.png')} />
+                <Divider style={{width: 5}} />
+                <Text size={20} preset="bold">
+                  چت
+                </Text>
+              </Row>
+            </Button>
+          </>
+        )}
       </Row>
     </Screen>
   );
@@ -245,6 +271,17 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
     padding: 16,
+  },
+  statusBanner: {
+    marginTop: 8,
+    padding: 8,
+    borderRadius: 8,
+  },
+  statusBannerPending: {
+    backgroundColor: '#E8A317',
+  },
+  statusBannerRejected: {
+    backgroundColor: colors.pallete.red2,
   },
   button: {
     paddingHorizontal: 8,

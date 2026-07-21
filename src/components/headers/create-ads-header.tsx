@@ -1,6 +1,10 @@
 import {StyleSheet, View, BackHandler} from 'react-native';
 import React, {useEffect} from 'react';
-import {Row, Button, Text, Divider, AdsImageSelection} from '../';
+import {Row} from '../row/row';
+import {Button} from '../button/button';
+import {Text} from '../text/text';
+import {Divider} from '../divider/divider';
+import {AdsImageSelection} from '../file-picker/ads-image-selection';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
@@ -57,7 +61,8 @@ export function CreateAdsHeader({onCreatePress, onSelectImage, onBack}: any) {
         style={{height: 1, width: '100%'}}
         colors={[colors.main, 'white', 'white', 'white', colors.main]}
         start={{x: 0, y: 0}}
-        end={{x: 1, y: 0}}></LinearGradient>
+        end={{x: 1, y: 0}}
+      />
       <Divider height={10} />
       <Text preset="bold" size={20} style={{textAlign: 'center'}}>
         انتخاب تصویر مناسب برای آگهی

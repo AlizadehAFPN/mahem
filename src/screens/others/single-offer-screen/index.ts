@@ -1,1 +1,1 @@
-export * from './single-offer-screen'
+export * from './single-offer-screen';

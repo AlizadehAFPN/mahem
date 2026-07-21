@@ -1,8 +1,8 @@
 import axios, {AxiosInstance} from 'axios';
 import store from '../stateManager';
-import {Platform} from 'react-native';
+import {removeUser, setUser} from '../stateManager/reducers/user';
 
-const domainName = 'https://indexshope.ir';
+export const domainName = 'http://2.28.2.151:3000';
 const baseURL = `${domainName}/api`;
 
 const axiosInstance: AxiosInstance = axios.create({
@@ -25,30 +25,81 @@ axiosInstance.interceptors.request.use(
       config.headers.cityId = cityId;
     }
 
-    // Only log in development environment
-    // if (__DEV__) {
-    //   console.log(
-    //     `${new Date()} api method=${config.method}, baseURL=${
-    //       config.baseURL
-    //     }, url=${config.url}, BODY=${
-    //       config.data ? JSON.stringify(config.data) : ''
-    //     } , TOKEN= ${token} params=${
-    //       config.params ? JSON.stringify(config.params) : ''
-    //     }`,
-    //   );
-    // }
-
     return config;
   },
   error => Promise.reject(error),
 );
 
+// 401 handling: refresh the access token once and retry, queuing any other
+// requests that fail concurrently behind that single refresh call instead of
+// each firing its own. If the refresh token itself is gone/invalid, log out
+// (clearing `token` flips RootNavigator back to AuthStack reactively).
+let isRefreshing = false;
+let pendingRequests: Array<(token: string | null) => void> = [];
+
+function resolvePendingRequests(token: string | null) {
+  pendingRequests.forEach(callback => callback(token));
+  pendingRequests = [];
+}
+
 axiosInstance.interceptors.response.use(
   response => response,
-  error => {
-    // Optionally transform error for user-friendly error messages
-    console.error('Axios response error:', error);
-    return Promise.reject(error);
+  async error => {
+    const originalRequest = error.config;
+    const status = error.response?.status;
+    const isAuthEndpoint =
+      typeof originalRequest?.url === 'string' &&
+      (originalRequest.url.includes('/auth/refresh') ||
+        originalRequest.url.includes('/auth/otp/'));
+
+    if (status !== 401 || isAuthEndpoint || originalRequest?._retry) {
+      console.error('Axios response error:', error);
+      return Promise.reject(error);
+    }
+
+    const {refreshToken} = store.getState().user;
+    if (!refreshToken) {
+      store.dispatch(removeUser());
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        pendingRequests.push(newToken => {
+          if (!newToken) {
+            reject(error);
+            return;
+          }
+          originalRequest.headers[HEADER_AUTHORIZATION] = `Bearer ${newToken}`;
+          resolve(axiosInstance(originalRequest));
+        });
+      });
+    }
+
+    isRefreshing = true;
+    try {
+      // Plain axios, not axiosInstance: this call must not carry the
+      // (expired) access token or re-enter this same interceptor.
+      const {data} = await axios.post(`${baseURL}/auth/refresh`, {
+        refreshToken,
+      });
+      store.dispatch(
+        setUser({token: data.accessToken, refreshToken: data.refreshToken}),
+      );
+      resolvePendingRequests(data.accessToken);
+      originalRequest.headers[
+        HEADER_AUTHORIZATION
+      ] = `Bearer ${data.accessToken}`;
+      return axiosInstance(originalRequest);
+    } catch (refreshError) {
+      resolvePendingRequests(null);
+      store.dispatch(removeUser());
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   },
 );
 

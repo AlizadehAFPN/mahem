@@ -1,13 +1,33 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
+interface Category {
+  // `id` is optional because home-screen/menu's "همه‌ی آگهی‌ها" entries use a
+  // pseudo-category ({title, allAds: true}) with no real id to mean "no
+  // category filter".
+  id?: string;
+  title: string;
+  slug?: string;
+  sub_categories?: Category[];
+  [key: string]: unknown;
+}
+
+interface City {
+  id: string;
+  title: string;
+}
+
+// Matches the backend's AdvertisementSort enum (find-advertisements.dto.ts)
+// so it can be passed straight through to GET /advertisements.
+type SortOrder = 'new' | 'price_asc' | 'price_desc' | '';
+
 interface filterState {
-  mainCategory?: any;
-  subCategory?: any;
-  subSubCategory?: any;
-  sort: any;
+  mainCategory?: Category;
+  subCategory?: Category;
+  subSubCategory?: Category;
+  sort: SortOrder;
   onlyImages: boolean;
-  price: any;
-  city: any;
+  price?: number | string;
+  city?: City;
   allAds: boolean;
 }
 
@@ -26,8 +46,8 @@ export const filterSlice = createSlice({
   name: 'filter',
   initialState,
   reducers: {
-    setFilters: (state, action) => {
-      return (state = {...state, ...action.payload});
+    setFilters: (state, action: PayloadAction<Partial<filterState>>) => {
+      Object.assign(state, action.payload);
     },
   },
 });

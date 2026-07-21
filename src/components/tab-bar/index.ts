@@ -1,1 +1,1 @@
-export * from './main-tabBar'
+export * from './main-tabBar';

@@ -1,6 +1,8 @@
 import {StyleSheet, TextInput, View} from 'react-native';
 import React, {useState} from 'react';
-import {Row, Button, Text} from '../';
+import {Row} from '../row/row';
+import {Button} from '../button/button';
+import {Text} from '../text/text';
 import {colors, normalFont} from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 

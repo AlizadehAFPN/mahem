@@ -1,4 +1,24 @@
 {
   "name": "mahem_app",
-  "displayName": "mahem_app"
+  "displayName": "mahem_app",
+  "expo": {
+    "name": "mahem_app",
+    "slug": "mahem_app",
+    "version": "1.0.0",
+    "owner": "farzad2023",
+    "extra": {
+      "eas": {
+        "projectId": "43fd5c66-1b97-4f66-9e2d-28e15b2e46b0"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/43fd5c66-1b97-4f66-9e2d-28e15b2e46b0",
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
+    },
+    "android": {},
+    "ios": {}
+  }
 }

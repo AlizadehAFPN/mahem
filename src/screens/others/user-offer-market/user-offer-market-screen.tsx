@@ -1,80 +1,64 @@
 import {
+  Alert,
   View,
-  FlatList,
   StyleSheet,
   Image,
   Dimensions,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
+  Button,
   GradiantHeader,
-  ImageSlider,
+  ListState,
   MainHeader,
   Screen,
   Row,
-  Button,
   Divider,
   Text,
-  GridOfferCard,
 } from '../../../components';
 import {colors} from '../../../theme';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {useInfiniteQuery, useMutation} from 'react-query';
-import {getAds} from '../../../services';
+import {useSelector} from 'react-redux';
+import {useMutation, useQueryClient} from 'react-query';
+import {deleteStore} from '../../../services';
+import {getStoreOffers} from '../../../services/store-offers';
+import {usePaginatedList} from '../../../hooks/use-paginated-list';
 const {width} = Dimensions.get('window');
 
-const data = [
-  {
-    img: require('../../../assets/images/market1.png'),
-    location: 'مینودشت',
-    title: 'فروش کیبورد ارنجر یاماها',
-    offerPercent: 45,
-    mainPrice: '1000000',
-    price: '910000',
-    rate: 4,
-    time: 12000,
-  },
-];
-
 export function UserOfferMarketScreen() {
-  const {navigate} = useNavigation();
+  const {navigate, goBack} = useNavigation();
   const {params} = useRoute();
-  const [state, setState] = useState({
-    callInfoModal: false,
-    reportModal: false,
-  });
-
-  const [ads, setAds] = useState([]);
-  const {data, fetchNextPage, hasNextPage} = useInfiniteQuery({
-    queryKey: ['ads', params?.store],
-    queryFn: ({pageParam = 1}) =>
-      getAds({page: pageParam, store_id: params?.store?.id, per_page: 1000}),
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage) return undefined;
-      if (
-        lastPage?.data?.pagination?.current_page <
-        lastPage?.data?.pagination?.total_pages
-      ) {
-        return lastPage?.data?.pagination?.current_page + 1;
-      } else {
-        return undefined;
-      }
+  const user = useSelector(s => s.user);
+  const store = params?.store;
+  const isOwner = store?.userId && store.userId === user?.id;
+  const queryClient = useQueryClient();
+  const {mutate: deleteStoreMutate} = useMutation(() => deleteStore(store.id), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('myStore');
+      goBack();
     },
-    getPreviousPageParam: (firstPage, allPages) => firstPage.prevCursor,
   });
-
-  const onEndReached = () => {
-    if (hasNextPage) {
-      fetchNextPage();
-    }
+  const onDeleteStore = () => {
+    Alert.alert('حذف فروشگاه', 'آیا از حذف این فروشگاه مطمئن هستید؟', [
+      {text: 'انصراف', style: 'cancel'},
+      {text: 'حذف', style: 'destructive', onPress: () => deleteStoreMutate()},
+    ]);
   };
 
-  useEffect(() => {
-    const flatenData = data?.pages?.flatMap(page => page?.data?.ads);
-    setAds(flatenData);
-  }, [data]);
+  const {
+    items: offers,
+    isLoading,
+    isError,
+  } = usePaginatedList({
+    queryKey: ['storeOffers', store?.id],
+    queryFn: ({pageParam = 1}) =>
+      getStoreOffers(store?.id, {page: pageParam, limit: 20}),
+    selectItems: page => page?.data?.offers,
+    enabled: !!store?.id,
+  });
 
   return (
     <Screen
@@ -106,45 +90,71 @@ export function UserOfferMarketScreen() {
             </Text>
           </View>
         </View>
-        <Divider />
-        <Row style={{paddingHorizontal: 10}}>
-          <TouchableOpacity style={{...styles.grid, marginLeft: 4}}>
-            <View style={styles.icon}>
-              <Image source={require('../../../assets/images/tamdid.png')} />
-            </View>
-            <Text size={17} color={colors.main}>
-              تمدید فروشگاه
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigate('newAdvertising')}
-            style={{...styles.grid, marginRight: 4}}>
-            <View style={styles.icon}>
-              <Entypo name="plus" size={100} color={colors.main} />
-            </View>
-            <Text size={17} color={colors.main}>
-              ثبت تخفیف
-            </Text>
-          </TouchableOpacity>
-        </Row>
+        {isOwner && (
+          <>
+            <Row style={{paddingHorizontal: 10, marginTop: 8}}>
+              <Button
+                onPress={() => navigate('createOfferMarket', {editItem: store})}
+                style={styles.ownerActionButton}>
+                <Text size={13} color={colors.main}>
+                  ویرایش فروشگاه
+                </Text>
+              </Button>
+              <Divider style={{width: 10}} />
+              <Button onPress={onDeleteStore} style={styles.ownerActionButton}>
+                <Text size={13} color={colors.pallete.red2}>
+                  حذف فروشگاه
+                </Text>
+              </Button>
+            </Row>
+            <Divider />
+            <Row style={{paddingHorizontal: 10}}>
+              <TouchableOpacity style={{...styles.grid, marginLeft: 4}}>
+                <View style={styles.icon}>
+                  <Image
+                    source={require('../../../assets/images/tamdid.png')}
+                  />
+                </View>
+                <Text size={17} color={colors.main}>
+                  تمدید فروشگاه
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigate('createOffer', {storeId: store?.id})}
+                style={{...styles.grid, marginRight: 4}}>
+                <View style={styles.icon}>
+                  <Entypo name="plus" size={100} color={colors.main} />
+                </View>
+                <Text size={17} color={colors.main}>
+                  ثبت تخفیف
+                </Text>
+              </TouchableOpacity>
+            </Row>
+          </>
+        )}
         <Divider height={8} />
         <FlatList
-          data={ads}
-          contentContainerStyle={{paddingHorizontal: 10}}
-          numColumns={2}
-          ItemSeparatorComponent={<View style={{height: 10}} />}
-          renderItem={({item, index}) => (
-            <View
-              style={{
-                marginLeft: index % 2 ? 4 : 0,
-                marginRight: index % 2 ? 0 : 4,
-                width: (width - 28) / 2,
-              }}>
-              <GridOfferCard
-                onPress={() => navigate('singleOffer', {ads: item})}
-                item={item}
-              />
-            </View>
+          data={offers}
+          scrollEnabled={false}
+          ItemSeparatorComponent={<Divider height={8} />}
+          ListEmptyComponent={
+            <ListState
+              isLoading={isLoading}
+              isError={isError}
+              emptyMessage="هنوز آگهی تخفیفی ثبت نکرده‌اید"
+            />
+          }
+          renderItem={({item}) => (
+            <TouchableOpacity
+              onPress={() => navigate('singleOffer', {offer: item})}
+              style={{paddingHorizontal: 16}}>
+              <Text size={16}>{item.title}</Text>
+              {!!item.discountPercent && (
+                <Text size={13} color={colors.main}>
+                  ٪{item.discountPercent} تخفیف
+                </Text>
+              )}
+            </TouchableOpacity>
           )}
         />
         <Divider />
@@ -159,6 +169,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.pallete.gray3,
+  },
+  ownerActionButton: {
+    flex: 1,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.main,
   },
   nav: {
     position: 'absolute',

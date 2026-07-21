@@ -5,41 +5,25 @@ import {
   View,
   FlatList,
 } from 'react-native';
-import React, {useState} from 'react';
-import {Screen, Row, Text, Divider, RowProduct} from '../../../components';
+import React from 'react';
+import {
+  Screen,
+  Row,
+  Text,
+  Divider,
+  RowProduct,
+  ListState,
+} from '../../../components';
 import {colors} from '../../../theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
-import Entypo from 'react-native-vector-icons/Entypo';
-import {useSelector} from 'react-redux';
-const ads = [
-  {
-    title: 'استخدام منشی',
-    time: '',
-    img: require('../../../assets/images/products/ads1.png'),
-  },
-  {
-    title: 'استخدام منشی',
-    time: '',
-    img: require('../../../assets/images/products/ads2.png'),
-  },
-  {
-    title: 'استخدام منشی',
-    time: '',
-    img: require('../../../assets/images/products/ads3.png'),
-  },
-  {
-    title: 'استخدام منشی',
-    time: '',
-    img: require('../../../assets/images/products/ads4.png'),
-  },
-];
+import {useQuery} from 'react-query';
+import {getBookmarks} from '../../../services';
+
 export function BookmarkScreen() {
-  const [state, setState] = useState({
-    adsMode: true,
-  });
-  const {bookmarks} = useSelector(s => s.user);
   const {goBack, navigate} = useNavigation();
+  const {data, isLoading, isError} = useQuery(['bookmarks'], getBookmarks);
+  const bookmarks = data?.data;
   return (
     <Screen withoutScroll>
       <Row style={styles.header}>
@@ -67,6 +51,13 @@ export function BookmarkScreen() {
             product={item}
           />
         )}
+        ListEmptyComponent={
+          <ListState
+            isLoading={isLoading}
+            isError={isError}
+            emptyMessage="هنوز آگهی‌ای نشان نکرده‌اید"
+          />
+        }
         ListHeaderComponent={<Divider height={10} />}
         ListFooterComponent={<Divider height={120} />}
       />

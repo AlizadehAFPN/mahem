@@ -1,30 +1,30 @@
-import { StyleProp, ViewStyle, TextStyle } from "react-native"
+import {StyleProp, ViewStyle, TextStyle} from 'react-native';
 
 export interface CheckboxProps {
   /**
    * Additional container style. Useful for margins.
    */
-  style?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>;
 
   /**
    * Additional outline style.
    */
-  outlineStyle?: StyleProp<ViewStyle>
+  outlineStyle?: StyleProp<ViewStyle>;
 
   /**
    * Additional fill style. Only visible when checked.
    */
-  fillStyle?: StyleProp<ViewStyle>
+  fillStyle?: StyleProp<ViewStyle>;
 
   /**
    * Is the checkbox checked?
    */
-  value?: boolean
+  value?: boolean;
 
   /**
    * The text to display if there isn't a tx.
    */
-  text?: string
+  text?: string;
 
   /**
    * The i18n lookup key.
@@ -33,17 +33,17 @@ export interface CheckboxProps {
   /**
    * Multiline or clipped single line?
    */
-  multiline?: boolean
+  multiline?: boolean;
 
   /**
    * Fires when the user tabs to change the value.
    */
 
-  disabled?: boolean
-  
-  onToggle?: (newValue: boolean) => void
+  disabled?: boolean;
 
-  labelStyle?: TextStyle
+  onToggle?: (newValue: boolean) => void;
 
-  checkedColor?: string
+  labelStyle?: TextStyle;
+
+  checkedColor?: string;
 }

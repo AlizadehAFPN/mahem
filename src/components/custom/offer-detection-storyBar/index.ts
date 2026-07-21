@@ -1,1 +1,1 @@
-export * from './storybar'
+export * from './storybar';

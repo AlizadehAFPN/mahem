@@ -13,7 +13,7 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {useMutation} from 'react-query';
-import {updateUser} from '../../../services';
+import {updateUser, upload} from '../../../services';
 import {RootState} from '../../../stateManager';
 import {setUser} from '../../../stateManager/reducers/user';
 
@@ -21,12 +21,12 @@ export function EditProfile() {
   const user = useSelector((s: RootState) => s.user);
   const dispatch = useDispatch();
 
-  console.log(user?.username, 'user');
   const {goBack} = useNavigation();
   const [state, setState] = useState({
     username: user?.username,
     pickerModal: false,
-    profileImage: undefined,
+    profileImage: undefined as {uri?: string} | undefined,
+    uploadedAvatar: user?.avatar,
     usernameError: '',
   });
 
@@ -34,19 +34,34 @@ export function EditProfile() {
     setState(s => ({...s, [label]: value}));
   };
 
+  const {mutate: uploadMutate, isLoading: isUploading} = useMutation(upload);
+  const onSelectAvatar = (file: {fileName: any; type: any; uri: any}) => {
+    setState(s => ({...s, profileImage: file}));
+    const {fileName, type, uri} = file;
+    const form = new FormData();
+    form.append('file', {name: fileName, type, uri} as any);
+    uploadMutate(form, {
+      onSuccess: data => {
+        setState(s => ({...s, uploadedAvatar: data?.data?.id}));
+      },
+    });
+  };
+
   const {mutate, isLoading} = useMutation(updateUser);
 
   const onPressEdit = () => {
     const isValid = handleValidation();
-    const data = {username: state.username};
-    // if (isValid)
-    //   mutate(data, {
-    //     onSuccess: data => {
-    //       goBack();
-    //     },
-    //   });
-    dispatch(setUser({username: state.username}));
-    goBack();
+    const data = {username: state.username, avatar: state.uploadedAvatar};
+    if (isValid) {
+      mutate(data, {
+        onSuccess: () => {
+          dispatch(
+            setUser({username: state.username, avatar: state.uploadedAvatar}),
+          );
+          goBack();
+        },
+      });
+    }
   };
   const handleValidation = () => {
     const {username} = state;
@@ -68,10 +83,9 @@ export function EditProfile() {
         <TouchableOpacity
           onPress={() => setState(s => ({...s, pickerModal: true}))}
           style={sytles.cammeraButton}>
-          {/*@ts-ignore*/}
-          {state?.profileImage?.uri ? (
-            <Image //@ts-ignore
-              source={{uri: state?.profileImage?.uri}}
+          {state?.profileImage?.uri || state?.uploadedAvatar ? (
+            <Image
+              source={{uri: state?.profileImage?.uri ?? state?.uploadedAvatar}}
               style={{width: '100%', height: '100%', overflow: 'hidden'}}
             />
           ) : (
@@ -92,7 +106,7 @@ export function EditProfile() {
 
         <Button
           loading={isLoading}
-          disabled={!enableButton() || isLoading}
+          disabled={!enableButton() || isLoading || isUploading}
           onPress={onPressEdit}
           style={{
             ...sytles.button,
@@ -106,7 +120,7 @@ export function EditProfile() {
         </Button>
       </View>
       <FilePickerModal
-        onSelectFile={file => setState(s => ({...s, profileImage: file}))}
+        onSelectFile={onSelectAvatar}
         visible={state.pickerModal}
         handleClose={() => setState(s => ({...s, pickerModal: false}))}
       />
