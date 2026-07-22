@@ -3,6 +3,7 @@ export const i18n = {
   listContinue: 'ادامه لیست',
   ads: 'آگهی ها',
   findingDiscount: 'تخفیف یاب',
+  jobsBank: 'بانک مشاغل',
   setting: 'تنظیمات',
   chooseCity: 'انتخاب شهر',
   editProfile: 'ویرایش حساب کاربری ',
