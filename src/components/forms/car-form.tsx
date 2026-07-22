@@ -123,13 +123,6 @@ export function CarForm({subCategory, send, onSend}) {
                 setState(s => ({...s, optionModal: true, optionType: 'brand'}))
               }>
               <UnderlineTextField
-                onPressIn={() =>
-                  setState(s => ({
-                    ...s,
-                    optionModal: true,
-                    optionType: 'brand',
-                  }))
-                }
                 value={state.brand}
                 keyboardType="number-pad"
                 placeholder="برند"
@@ -142,13 +135,6 @@ export function CarForm({subCategory, send, onSend}) {
                 setState(s => ({...s, optionModal: true, optionType: 'chassi'}))
               }>
               <UnderlineTextField
-                onPressIn={() =>
-                  setState(s => ({
-                    ...s,
-                    optionModal: true,
-                    optionType: 'chassi',
-                  }))
-                }
                 value={state.chassi}
                 keyboardType="number-pad"
                 placeholder="نوع شاسی"
@@ -163,9 +149,6 @@ export function CarForm({subCategory, send, onSend}) {
             setState(s => ({...s, optionModal: true, optionType: 'payType'}))
           }>
           <UnderlineTextField
-            onPressIn={() =>
-              setState(s => ({...s, optionModal: true, optionType: 'payType'}))
-            }
             value={state.payType}
             keyboardType="number-pad"
             placeholder="نقد/اقساط"
@@ -192,7 +175,6 @@ export function CarForm({subCategory, send, onSend}) {
         <UnderlineTextField
           value={state.price}
           onChangeText={text => setState(s => ({...s, price: text}))}
-          // onPressIn={() => setState(s => ({ ...s, optionModal: true, optionType: 'price' }))}
           keyboardType="number-pad"
           placeholder="قیمت"
           // editable={false}
@@ -204,9 +186,6 @@ export function CarForm({subCategory, send, onSend}) {
             setState(s => ({...s, optionModal: true, optionType: 'adsType'}))
           }>
           <UnderlineTextField
-            onPressIn={() =>
-              setState(s => ({...s, optionModal: true, optionType: 'adsType'}))
-            }
             editable={false}
             placeholder="نوع آگهی"
             value={state.adsType}
@@ -245,7 +224,6 @@ export function CarForm({subCategory, send, onSend}) {
         <Divider />
         <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
           <UnderlineTextField
-            onPressIn={() => setState(s => ({...s, cityModal: true}))}
             placeholder="شهر"
             value={state?.city?.title}
             editable={false}
@@ -255,7 +233,6 @@ export function CarForm({subCategory, send, onSend}) {
         <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            onPressIn={() => setState(s => ({...s, locationModal: true}))}
             placeholder="موقعیت روی نقشه (اختیاری)"
             value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
             editable={false}

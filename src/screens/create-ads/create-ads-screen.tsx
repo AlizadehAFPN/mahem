@@ -61,50 +61,25 @@ export function CreateAdsScreen() {
     optionType: '',
     optionModal: false,
     send: 'no',
-    uploadingCount: 0,
-    uploadingIndexes: [] as (string | number)[],
+    isSubmitting: false,
+    uploadingIndexes: [] as number[],
   });
 
-  const {mutate} = useMutation(upload);
   const {mutate: createAdsMutate} = useMutation(createAds);
+
+  // Images are only kept as local picker references here — nothing is
+  // uploaded until the user actually presses submit (see hanldeCreateAd).
   const handleSelectImage = (
     image: {fileName: any; type: any; uri: any},
-    index: string | number,
+    index: number,
   ) => {
-    const {fileName, type, uri} = image;
-    const doc = {name: fileName, type, uri};
-    const form = new FormData();
-    form.append('file', doc);
-    setState(s => ({
-      ...s,
-      uploadingCount: s.uploadingCount + 1,
-      uploadingIndexes: [...s.uploadingIndexes, index],
-    }));
-    mutate(form, {
-      onSuccess: data => {
-        const images = state.images;
-        images[index] = data?.data;
-        setState(s => ({
-          ...s,
-          images,
-          uploadingCount: s.uploadingCount - 1,
-          uploadingIndexes: s.uploadingIndexes.filter(i => i !== index),
-        }));
-      },
-      onError: () => {
-        Alert.alert('خطا در آپلود تصویر', 'لطفا دوباره تلاش کنید');
-        setState(s => ({
-          ...s,
-          uploadingCount: s.uploadingCount - 1,
-          uploadingIndexes: s.uploadingIndexes.filter(i => i !== index),
-        }));
-      },
+    setState(s => {
+      const images = [...s.images];
+      images[index] = image as any;
+      return {...s, images};
     });
   };
 
-  // The submit button shows its own loading state (and ignores presses)
-  // while any image is still uploading — see CreateAdsHeader's `loading`
-  // prop — so there's nothing left to guard here.
   const onSendPress = () => {
     setState(s => ({...s, send: `send-${new Date()}`}));
   };
@@ -116,30 +91,63 @@ export function CreateAdsScreen() {
     }));
   };
 
-  const hanldeCreateAd = (data: any) => {
-    if (data) {
-      const {images, mainCategory}: any = state;
-      if (!mainCategory) {
-        return Alert.alert('دسته بندی را انتخاب کنید');
-      }
-      let imageData: any = {};
-      images.forEach((item: {id: any}, index: number) => {
-        if (item) {
-          imageData[`image_${index + 1}`] = item.id;
-        }
-      });
-      const payload = {
-        category_id: (state.subsubCategory || state.subCategory || mainCategory)
-          ?.id,
-        ...imageData,
-        ...data,
-      };
-      createAdsMutate(payload, {
-        onSuccess: () => {
-          navigate('createAdsFinal' as never);
-        },
-      });
+  const hanldeCreateAd = async (data: any) => {
+    if (!data) {
+      return;
     }
+    const {images, mainCategory}: any = state;
+    if (!mainCategory) {
+      return Alert.alert('دسته بندی را انتخاب کنید');
+    }
+
+    setState(s => ({...s, isSubmitting: true}));
+
+    // Images are uploaded here, one at a time, only now that the user has
+    // actually pressed submit — not eagerly as each one is picked.
+    const imageData: Record<string, any> = {};
+    try {
+      for (let index = 0; index < images.length; index++) {
+        const image = images[index];
+        if (image?.uri) {
+          setState(s => ({
+            ...s,
+            uploadingIndexes: [...s.uploadingIndexes, index],
+          }));
+          const form = new FormData();
+          form.append('file', {
+            name: image.fileName,
+            type: image.type,
+            uri: image.uri,
+          } as any);
+          const uploaded = await upload(form);
+          imageData[`image_${index + 1}`] = uploaded?.data?.id;
+          setState(s => ({
+            ...s,
+            uploadingIndexes: s.uploadingIndexes.filter(i => i !== index),
+          }));
+        }
+      }
+    } catch (e) {
+      setState(s => ({...s, isSubmitting: false, uploadingIndexes: []}));
+      Alert.alert('خطا در آپلود تصویر', 'لطفا دوباره تلاش کنید');
+      return;
+    }
+
+    const payload = {
+      category_id: (state.subsubCategory || state.subCategory || mainCategory)
+        ?.id,
+      ...imageData,
+      ...data,
+    };
+    createAdsMutate(payload, {
+      onSuccess: () => {
+        navigate('createAdsFinal' as never);
+      },
+      onError: () => {
+        setState(s => ({...s, isSubmitting: false}));
+        Alert.alert('خطا', 'ثبت آگهی با خطا مواجه شد.');
+      },
+    });
   };
 
   const groupTitle = useMemo(() => {
@@ -161,7 +169,7 @@ export function CreateAdsScreen() {
         onBack={() => navigate('home' as never)}
         onCreatePress={onSendPress}
         onSelectImage={handleSelectImage}
-        isSending={state.uploadingCount > 0}
+        isSending={state.isSubmitting}
         uploadingIndexes={state.uploadingIndexes}
       />
       <Screen unsafe>

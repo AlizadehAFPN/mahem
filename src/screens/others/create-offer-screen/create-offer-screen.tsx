@@ -164,7 +164,6 @@ export function CreateOfferScreen() {
                 <UnderlineTextField
                   editable={false}
                   value={state.category}
-                  onPressIn={() => setState(s => ({...s, step: '1'}))}
                 />
               </Button>
               <Divider />
@@ -224,7 +223,6 @@ export function CreateOfferScreen() {
                   placeholder="تعیین موقعیت"
                   value={state.city?.title}
                   editable={false}
-                  onPressIn={() => setState(s => ({...s, cityModal: true}))}
                 />
               </Button>
               <Divider />

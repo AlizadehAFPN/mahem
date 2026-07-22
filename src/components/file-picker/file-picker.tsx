@@ -46,12 +46,12 @@ export const FilePickerModal: FunctionComponent<FilePickerModalProps> = ({
     }
   };
   const lounchMedia = async () => {
-    const result = await launchImageLibrary({selectionLimit: 0});
+    // Each call to this modal fills exactly one image slot, so the picker
+    // itself should only allow a single selection — letting the user select
+    // several photos here was misleading since only the first was ever used.
+    const result = await launchImageLibrary({selectionLimit: 1});
     if (result.assets) {
-      if (multiple) {
-      } else {
-        onSelectFile && onSelectFile(result.assets[0]);
-      }
+      onSelectFile && onSelectFile(result.assets[0]);
       handleClose();
     }
   };

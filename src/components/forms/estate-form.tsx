@@ -133,7 +133,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
             <Divider />
             {/* <Button onPress={() => setState(s => ({ ...s, optionModal: true, optionType: 'price' }))}> */}
             <UnderlineTextField
-              // onPressIn={() => setState(s => ({ ...s, optionModal: true, optionType: 'price' }))}
               value={state.price}
               onChangeText={text => setState(s => ({...s, price: text}))}
               keyboardType="number-pad"
@@ -151,13 +150,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
                 }))
               }>
               <UnderlineTextField
-                onPressIn={() =>
-                  setState(s => ({
-                    ...s,
-                    optionModal: true,
-                    optionType: 'adsType',
-                  }))
-                }
                 editable={false}
                 placeholder="نوع آگهی"
                 value={state.adsType}
@@ -173,13 +165,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
                 }))
               }>
               <UnderlineTextField
-                onPressIn={() =>
-                  setState(s => ({
-                    ...s,
-                    optionModal: true,
-                    optionType: 'adsCreator',
-                  }))
-                }
                 editable={false}
                 placeholder="نوع آگهی دهنده"
                 value={state.adsCreator}
@@ -205,7 +190,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
         <Divider />
         <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
           <UnderlineTextField
-            onPressIn={() => setState(s => ({...s, cityModal: true}))}
             placeholder="شهر"
             value={state?.city?.title}
             editable={false}
@@ -215,7 +199,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
         <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            onPressIn={() => setState(s => ({...s, locationModal: true}))}
             placeholder="موقعیت روی نقشه (اختیاری)"
             value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
             editable={false}
@@ -242,13 +225,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
                     }))
                   }>
                   <UnderlineTextField
-                    onPressIn={() =>
-                      setState(s => ({
-                        ...s,
-                        optionModal: true,
-                        optionType: 'floor',
-                      }))
-                    }
                     editable={false}
                     placeholder="طبقه"
                     value={state.floor}
@@ -264,13 +240,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
                     }))
                   }>
                   <UnderlineTextField
-                    onPressIn={() =>
-                      setState(s => ({
-                        ...s,
-                        optionModal: true,
-                        optionType: 'elevator',
-                      }))
-                    }
                     editable={false}
                     placeholder="آسانسور"
                     value={state.elevator}
@@ -286,13 +255,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
                     }))
                   }>
                   <UnderlineTextField
-                    onPressIn={() =>
-                      setState(s => ({
-                        ...s,
-                        optionModal: true,
-                        optionType: 'parking',
-                      }))
-                    }
                     editable={false}
                     placeholder="پارکینگ"
                     value={state.parking}
@@ -306,13 +268,6 @@ export function EstateForm({subCategory, subsubCategory, send, onSend}) {
                 setState(s => ({...s, optionModal: true, optionType: 'suburb'}))
               }>
               <UnderlineTextField
-                onPressIn={() =>
-                  setState(s => ({
-                    ...s,
-                    optionModal: true,
-                    optionType: 'suburb',
-                  }))
-                }
                 editable={false}
                 placeholder="حومه شهر"
                 value={state.suburb}

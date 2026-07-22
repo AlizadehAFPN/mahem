@@ -101,9 +101,6 @@ export function CommonForm({mainCategory, send, onSend}) {
             setState(s => ({...s, optionModal: true, optionType: 'adsType'}))
           }>
           <UnderlineTextField
-            onPressIn={() =>
-              setState(s => ({...s, optionModal: true, optionType: 'adsType'}))
-            }
             editable={false}
             placeholder="نوع آگهی"
             value={state.adsType}
@@ -132,7 +129,6 @@ export function CommonForm({mainCategory, send, onSend}) {
             placeholder="شهر"
             value={state?.city?.title}
             editable={false}
-            onPressIn={() => setState(s => ({...s, cityModal: true}))}
           />
         </Button>
 
@@ -142,7 +138,6 @@ export function CommonForm({mainCategory, send, onSend}) {
             placeholder="موقعیت روی نقشه (اختیاری)"
             value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
             editable={false}
-            onPressIn={() => setState(s => ({...s, locationModal: true}))}
           />
         </Button>
 
