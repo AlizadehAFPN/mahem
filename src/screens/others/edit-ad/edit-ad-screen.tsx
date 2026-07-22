@@ -50,6 +50,13 @@ export function EditAdScreen() {
     {
       onSuccess: () => {
         queryClient.invalidateQueries('myAds');
+        // Home screen's general/تخفیف‌یاب rows and the search screen all key
+        // their ads queries off ['ads', ...] and stay mounted across
+        // navigation, so without this they'd keep showing this ad's
+        // pre-edit data (including stale/missing images) until a manual
+        // pull-to-refresh or app restart.
+        queryClient.invalidateQueries(['ads']);
+        queryClient.invalidateQueries([`singleAd-${ad?.id}`, ad?.id]);
         goBack();
       },
       onError: () => {
