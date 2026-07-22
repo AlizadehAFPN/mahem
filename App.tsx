@@ -6,13 +6,13 @@
  */
 
 import React from 'react';
-import {Alert} from 'react-native';
+import {Alert, AppState} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {MainNavigator} from './src/navigation';
 import {PersistGate} from 'redux-persist/integration/react';
 import {Provider} from 'react-redux';
 import store, {persistor} from './src/stateManager';
-import {QueryClient, QueryClientProvider} from 'react-query';
+import {QueryClient, QueryClientProvider, focusManager} from 'react-query';
 import {LanguageProvider} from './src/Context/LanguageContext';
 import {getErrorMessage} from './src/utiles';
 import {ErrorBoundary} from './src/components/error-boundary/error-boundary';
@@ -28,6 +28,18 @@ const queryClient = new QueryClient({
       onError: error => Alert.alert('خطا', getErrorMessage(error)),
     },
   },
+});
+
+// react-query's default refetch-on-focus listens for a browser `window`
+// focus event, which never fires in React Native — so without this, data
+// fetched before the app was backgrounded (e.g. banners/ads changed from the
+// admin panel while the user had switched away) stays stale until a manual
+// pull-to-refresh or a full app restart. Bridge focus to AppState instead.
+focusManager.setEventListener(handleFocus => {
+  const subscription = AppState.addEventListener('change', state => {
+    handleFocus(state === 'active');
+  });
+  return () => subscription.remove();
 });
 
 export default function App() {
