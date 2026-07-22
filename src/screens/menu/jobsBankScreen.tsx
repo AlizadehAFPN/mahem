@@ -11,6 +11,7 @@ import {Divider, MainHeader, Screen, Text} from '../../components';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useQuery} from 'react-query';
 import {getJobsCategories} from '../../services/job';
+import {getJobCategoryIcon} from '../../utiles';
 
 const {width} = Dimensions.get('window');
 
@@ -34,7 +35,7 @@ export function JobsBankScreen() {
           <TouchableOpacity
             onPress={() => handleNavigation(item)}
             style={styles.itemContainer}>
-            <Image style={styles.img} source={{uri: item.logo}} />
+            <Image style={styles.img} source={getJobCategoryIcon(item.title)} />
             <Text size={12} style={{textAlign: 'center'}}>
               {item.title}
             </Text>

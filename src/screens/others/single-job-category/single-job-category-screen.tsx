@@ -25,6 +25,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {getAllJobs} from '../../../services/job';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
+import {getJobCategoryIcon} from '../../../utiles';
 
 const {width} = Dimensions.get('window');
 export function SingleJobCategoryScreen() {
@@ -62,7 +63,7 @@ export function SingleJobCategoryScreen() {
       <View style={styles.iconContainer}>
         <Image
           style={{width: '80%', height: '80%'}}
-          source={{uri: category?.logo}}
+          source={getJobCategoryIcon(category?.title)}
         />
       </View>
       <View style={styles.titleBar}>
@@ -119,7 +120,7 @@ export function SingleJobCategoryScreen() {
       <View style={styles.addContainer}>
         <TouchableOpacity
           style={styles.circle}
-          onPress={() => navigate('createJob')}>
+          onPress={() => navigate('createJob', {category})}>
           <Entypo name="plus" color="white" size={30} />
         </TouchableOpacity>
         <Divider height={8} />

@@ -68,7 +68,10 @@ export function CreateJobScreen() {
           tempSelect: '',
           filePickerModal: false,
           jobClassModal: false,
-          category: '',
+          // Pre-filled when arriving from a category's own "+" button
+          // (SingleJobCategoryScreen) so the user isn't asked to pick the
+          // same category again right after they just navigated into it.
+          category: params?.category ?? '',
           acceptance: false,
           telegram: '',
           instagram: '',
@@ -213,7 +216,7 @@ export function CreateJobScreen() {
   };
   return (
     <Screen withoutScroll>
-      <MainHeader title="پزشکی" />
+      <MainHeader title={editItem ? 'ویرایش صنف' : 'ثبت صنف جدید'} />
       <View style={styles.nav}>
         <GradiantHeader
           details={false}
