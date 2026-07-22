@@ -22,8 +22,14 @@ import {SelectAdsCategory} from '../modal/select-ads-category';
 // mapAdvertisement) — its category-specific fields are already flattened
 // from `attributes` onto the object directly, under the same wire names
 // this form's onSend sends them as (ad_type, not the local `adsType`).
+// استخدامی is a GENERAL category like any other and goes through this same
+// form, but its `price` field actually means a proposed salary — often left
+// unset ("توافقی") rather than a mandatory sale price.
+const JOB_CATEGORY_TITLE = 'استخدامی';
+
 export function CommonForm({mainCategory, editItem, send, onSend}) {
   const {navigate} = useNavigation();
+  const isJobListing = mainCategory?.title === JOB_CATEGORY_TITLE;
   const [state, setState] = useState(() =>
     editItem
       ? {
@@ -98,7 +104,7 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
     if (!title) {
       isValid = false;
       Alert.alert('عنوان را وارد کنید');
-    } else if (!price) {
+    } else if (!price && !isJobListing) {
       isValid = false;
       Alert.alert('قیمت را وارد کنید');
     } else if (!city) {
@@ -136,7 +142,10 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
             <UnderlineTextField
               value={state.price}
               onChangeText={text => setState(s => ({...s, price: text}))}
-              placeholder="قیمت"
+              placeholder={
+                isJobListing ? 'حقوق پیشنهادی (اختیاری)' : 'قیمت'
+              }
+              keyboardType="number-pad"
             />
             <Divider />
             <UnderlineTextField

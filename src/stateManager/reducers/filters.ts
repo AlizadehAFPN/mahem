@@ -18,7 +18,7 @@ interface City {
 
 // Matches the backend's AdvertisementSort enum (find-advertisements.dto.ts)
 // so it can be passed straight through to GET /advertisements.
-type SortOrder = 'new' | 'price_asc' | 'price_desc' | '';
+type SortOrder = 'new' | 'old' | 'price_asc' | 'price_desc' | 'most_viewed' | '';
 
 interface filterState {
   mainCategory?: Category;
@@ -26,7 +26,8 @@ interface filterState {
   subSubCategory?: Category;
   sort: SortOrder;
   onlyImages: boolean;
-  price?: number | string;
+  minPrice?: number | string;
+  maxPrice?: number | string;
   city?: City;
   allAds: boolean;
 }
@@ -38,7 +39,8 @@ const initialState: filterState = {
   sort: '',
   onlyImages: false,
   city: undefined,
-  price: undefined,
+  minPrice: undefined,
+  maxPrice: undefined,
   allAds: false,
 };
 
@@ -49,9 +51,10 @@ export const filterSlice = createSlice({
     setFilters: (state, action: PayloadAction<Partial<filterState>>) => {
       Object.assign(state, action.payload);
     },
+    clearFilters: () => initialState,
   },
 });
 
-export const {setFilters} = filterSlice.actions;
+export const {setFilters, clearFilters} = filterSlice.actions;
 
 export default filterSlice.reducer;

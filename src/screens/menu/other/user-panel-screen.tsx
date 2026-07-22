@@ -21,6 +21,7 @@ import {useNavigation} from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {deleteAds, getConversations, getMyAds} from '../../../services';
+import {formatRelativeTime} from '../../../utiles/utiles_funcs';
 
 export function UserPanelScreen() {
   const [state, setState] = useState({
@@ -125,7 +126,7 @@ export function UserPanelScreen() {
                         paddingHorizontal: 10,
                       }}>
                       <Text size={12} color={colors.main}>
-                        3 دقیقه پیش
+                        {item.createdAt ? formatRelativeTime(item.createdAt) : ''}
                       </Text>
                       <Text size={12} color={colors.main}>
                         1399/02/15

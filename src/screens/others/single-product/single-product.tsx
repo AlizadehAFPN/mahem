@@ -18,13 +18,15 @@ import {
 import {colors} from '../../../theme';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {numberWithCommas, translations} from '../../../utiles';
-import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
+import {formatRelativeTime, getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useSelector} from 'react-redux';
 import {
   addBookmark,
+  findMainCategory,
+  getAdsCategories,
   getBookmarks,
   getSingleAds,
   removeBookmark,
@@ -72,6 +74,18 @@ export function SinlgeProduct() {
     setState(s => ({...s, reportModal: !s.reportModal}));
   };
 
+  const {data: categoriesData} = useQuery(['adsCategories'], getAdsCategories);
+  // استخدامی ads use `price` for a proposed salary rather than a sale price
+  // (see CommonForm) — ads are only ever tagged with leaf categories, so
+  // this walks up the tree to find which top-level branch the ad's category
+  // actually belongs to.
+  const isJobListing = useMemo(
+    () =>
+      findMainCategory(categoriesData?.data ?? [], ad?.category_id?.id)
+        ?.title === 'استخدامی',
+    [categoriesData, ad?.category_id?.id],
+  );
+
   const adsProps = useMemo(() => {
     if (ad) {
       const arr = [];
@@ -95,13 +109,15 @@ export function SinlgeProduct() {
           } else {
             value = ad[item];
           }
-          arr.push({label: translations[item], value});
+          const label =
+            item === 'price' && isJobListing ? 'حقوق پیشنهادی' : translations[item];
+          arr.push({label, value});
         }
       });
       return arr;
     }
     return [];
-  }, []);
+  }, [ad, isJobListing]);
   useEffect(() => {
     if (data) {
       setAd(data?.data);
@@ -162,7 +178,9 @@ export function SinlgeProduct() {
 
             <Divider />
             <Row style={{justifyContent: 'space-between'}}>
-              <Text color={colors.main}>لحظاتی پیش</Text>
+              <Text color={colors.main}>
+                {ad?.createdAt ? formatRelativeTime(ad.createdAt) : ''}
+              </Text>
               <Text preset="bold" size={20}>
                 {ad?.city?.title}
               </Text>

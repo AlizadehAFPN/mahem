@@ -21,8 +21,8 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
-import {useQuery} from 'react-query';
-import {getAds, getAdsCategories} from '../../services';
+import {getAds} from '../../services';
+import {numberWithCommas} from '../../utiles';
 import {useDispatch, useSelector} from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {setFilters} from '../../stateManager/reducers/filters';
@@ -39,7 +39,8 @@ export function SearchScreen() {
     subCategory,
     subSubCategory,
     sort,
-    price,
+    minPrice,
+    maxPrice,
     onlyImages,
     city,
   } = useSelector((s: RootState) => s.filter);
@@ -49,14 +50,6 @@ export function SearchScreen() {
   // every city until the user opens the filter screen.
   const effectiveCityId = city?.id ?? userCityId;
   const effectiveCategory = subSubCategory || subCategory || mainCategory;
-
-  // Browsing without a specific category (e.g. "همه آگهی‌ها") would
-  // otherwise mix تخفیف‌یاب's ads into the general list — it has its own
-  // dedicated section now, so exclude its subcategories here.
-  const {data: adsCategories} = useQuery(['adsCategories'], getAdsCategories);
-  const discountCategoryId = adsCategories?.data?.find(
-    (category: any) => category.title === 'تخفیف یاب',
-  )?.id;
 
   const {
     items: ads,
@@ -74,7 +67,8 @@ export function SearchScreen() {
       effectiveCityId,
       sort,
       onlyImages,
-      discountCategoryId,
+      minPrice,
+      maxPrice,
     ],
     queryFn: ({pageParam = 1}) =>
       getAds({
@@ -82,9 +76,9 @@ export function SearchScreen() {
         limit: 20,
         search: debouncedSearchText || undefined,
         categoryId: effectiveCategory?.id,
-        excludeParentCategoryId: !effectiveCategory ? discountCategoryId : undefined,
         cityId: effectiveCityId,
-        maxPrice: price,
+        minPrice,
+        maxPrice,
         sort: sort || undefined,
         onlyImages: onlyImages || undefined,
       }),
@@ -111,7 +105,7 @@ export function SearchScreen() {
   };
 
   const onRemoveFilterPrice = () => {
-    dispatch(setFilters({price: undefined}));
+    dispatch(setFilters({minPrice: undefined, maxPrice: undefined}));
   };
 
   const onRemoveFilterCity = () => {
@@ -127,7 +121,7 @@ export function SearchScreen() {
 
   return (
     <Screen withoutScroll>
-      <MainHeader title={mainCategory?.title} showLocation={true} />
+      <MainHeader title={mainCategory?.title ?? 'جست و جو'} showLocation={true} />
       <FlatList
         onEndReached={onEndReached}
         data={agahi}
@@ -186,7 +180,7 @@ export function SearchScreen() {
                 </View>
               )}
 
-              {price !== undefined && (
+              {(minPrice !== undefined || maxPrice !== undefined) && (
                 <View style={styles.badge}>
                   <Button onPress={onRemoveFilterPrice}>
                     <AntDesign
@@ -195,7 +189,13 @@ export function SearchScreen() {
                       name="closecircleo"
                     />
                   </Button>
-                  <Text>{price} قیمت کمتر از </Text>
+                  <Text>
+                    {minPrice !== undefined && maxPrice !== undefined
+                      ? `قیمت ${numberWithCommas(minPrice)} تا ${numberWithCommas(maxPrice)}`
+                      : minPrice !== undefined
+                      ? `قیمت از ${numberWithCommas(minPrice)}`
+                      : `قیمت تا ${numberWithCommas(maxPrice)}`}
+                  </Text>
                 </View>
               )}
               {onlyImages === true && (

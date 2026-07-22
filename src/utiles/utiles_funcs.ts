@@ -1,4 +1,4 @@
-export function numberWithCommas(input: string | number) {
+export function numberWithCommas(input: string | number | undefined) {
   return input ? input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
 }
 
@@ -41,6 +41,43 @@ export function isSupportedImageType(mimeType?: string): boolean {
 
 export const UNSUPPORTED_IMAGE_TYPE_MESSAGE =
   'فرمت این تصویر پشتیبانی نمی‌شود (مثلاً HEIC). لطفا یک عکس JPEG یا PNG انتخاب کنید، یا از دوربین اپلیکیشن استفاده کنید.';
+
+const MINUTE_MS = 60 * 1000;
+const HOUR_MS = 60 * MINUTE_MS;
+const DAY_MS = 24 * HOUR_MS;
+const MONTH_MS = 30 * DAY_MS;
+
+// Buckets time-ago display the way Persian classifieds listings do —
+// "یک ربع"/"نیم ساعت" instead of "۱۵ دقیقه"/"۳۰ دقیقه" specifically at
+// those two marks, matching what was asked for exactly rather than a
+// generic Intl.RelativeTimeFormat rounding.
+export function formatRelativeTime(date: string | number | Date): string {
+  const diffMs = Date.now() - new Date(date).getTime();
+  const diffMinutes = Math.floor(diffMs / MINUTE_MS);
+
+  if (diffMinutes < 1) {
+    return 'لحظاتی پیش';
+  }
+  if (diffMinutes < 15) {
+    return `${diffMinutes} دقیقه پیش`;
+  }
+  if (diffMinutes < 30) {
+    return 'یک ربع پیش';
+  }
+  if (diffMinutes < 60) {
+    return 'نیم ساعت پیش';
+  }
+  const diffHours = Math.floor(diffMs / HOUR_MS);
+  if (diffHours < 24) {
+    return `${diffHours} ساعت پیش`;
+  }
+  const diffDays = Math.floor(diffMs / DAY_MS);
+  if (diffDays < 30) {
+    return `${diffDays} روز پیش`;
+  }
+  const diffMonths = Math.floor(diffMs / MONTH_MS);
+  return `${diffMonths} ماه پیش`;
+}
 
 const IMAGE_FIELD_PATTERN = /^image(\d+)$/;
 

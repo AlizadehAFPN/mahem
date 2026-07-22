@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import React, {useMemo, useState} from 'react';
 import {
   Row,
@@ -7,7 +7,6 @@ import {
   MainHeader,
   Screen,
   Divider,
-  CommonForm,
   UnderlineTextField,
   SelectAdsCategory,
   CitySelectModal,
@@ -16,8 +15,25 @@ import {
 import {colors} from '../../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
-import {setFilters} from '../../../stateManager/reducers/filters';
+import {clearFilters, setFilters} from '../../../stateManager/reducers/filters';
+import {RootState} from '../../../stateManager';
 
+// Matches the backend's AdvertisementSort enum values exactly (see
+// find-advertisements.dto.ts) so `state.sort` can be dispatched straight
+// through to GET /advertisements with no extra mapping step.
+const SORT_OPTIONS = [
+  {value: 'new', label: 'جدیدترین'},
+  {value: 'old', label: 'قدیمی‌ترین'},
+  {value: 'price_desc', label: 'گران‌ترین'},
+  {value: 'price_asc', label: 'ارزان‌ترین'},
+  {value: 'most_viewed', label: 'پربازدیدترین'},
+] as const;
+
+// Every field here is collected into local `state` and only reaches redux
+// (via one setFilters dispatch) when "اعمال" is pressed — the previous
+// version dispatched sort immediately and navigated back on tap, so sort
+// could never be combined with category/city/price in the same visit to
+// this screen even though the reducer itself merges filters fine.
 export function FilterScreen() {
   const {goBack} = useNavigation();
   const dispatch = useDispatch();
@@ -26,10 +42,12 @@ export function FilterScreen() {
     mainCategory,
     subCategory,
     subSubCategory,
-    price,
+    minPrice,
+    maxPrice,
     onlyImages,
     sort,
-  } = useSelector(s => s.filter);
+  } = useSelector((s: RootState) => s.filter);
+
   const [state, setState] = useState({
     selectCategoryModal: false,
     mainCategory,
@@ -37,123 +55,143 @@ export function FilterScreen() {
     subSubCategory,
     city,
     cityModal: false,
-    optionType: '',
     optionModal: false,
-    image: '',
-    price,
+    minPrice: minPrice !== undefined ? String(minPrice) : '',
+    maxPrice: maxPrice !== undefined ? String(maxPrice) : '',
+    onlyImages: !!onlyImages,
+    sort: sort || 'new',
   });
-  // console.log(price, state.price);
+
   const onToggleSelectCategory = () => {
     setState(s => ({...s, selectCategoryModal: !s.selectCategoryModal}));
   };
+
   const groupTitle = useMemo(() => {
     let title = '';
     if (state.mainCategory) {
       title = state.mainCategory?.title;
     }
     if (state.subCategory) {
-      title = title + ':' + state.subCategory?.title;
+      title = title + ' / ' + state.subCategory?.title;
     }
     if (state.subSubCategory) {
-      title = title + ':' + state.subSubCategory?.title;
+      title = title + ' / ' + state.subSubCategory?.title;
     }
     return title;
   }, [state.mainCategory, state.subCategory, state.subSubCategory]);
 
-  const handleAddFilters = () => {
+  const handleApply = () => {
     dispatch(
       setFilters({
         mainCategory: state.mainCategory,
         subCategory: state.subCategory,
         subSubCategory: state.subSubCategory,
         city: state.city,
-        price: state.price,
+        minPrice: state.minPrice ? Number(state.minPrice) : undefined,
+        maxPrice: state.maxPrice ? Number(state.maxPrice) : undefined,
+        onlyImages: state.onlyImages,
+        sort: state.sort as any,
       }),
     );
     goBack();
   };
-  const onPressSort = sort => {
-    dispatch(setFilters({sort}));
+
+  const handleClear = () => {
+    dispatch(clearFilters());
     goBack();
   };
 
-  // console.log(state.city);
   return (
     <Screen withoutScroll style={{flex: 1}}>
-      <MainHeader title="فیلتر" />
-      <Row style={{paddingHorizontal: 12, paddingVertical: 16}}>
-        <Button
-          onPress={() => onPressSort('price_desc')}
-          style={{
-            ...styles.button,
-            borderTopRightRadius: 8,
-            borderBottomRightRadius: 8,
-          }}>
-          <Text style={{lineHeight: 29}} size={19} color={colors.main}>
-            گران ترین
-          </Text>
-        </Button>
-        <Divider style={{width: 12}} />
-        <Button onPress={() => onPressSort('new')} style={styles.button}>
-          <Text style={{lineHeight: 29}} size={19} color={colors.main}>
-            جدید ترین
-          </Text>
-        </Button>
-        <Divider style={{width: 12}} />
-        <Button
-          onPress={() => onPressSort('price_asc')}
-          style={{
-            ...styles.button,
-            borderTopLeftRadius: 8,
-            borderBottomLeftRadius: 8,
-          }}>
-          <Text style={{lineHeight: 29}} size={19} color={colors.main}>
-            ارزان ترین
-          </Text>
-        </Button>
-      </Row>
-      <Divider />
+      <MainHeader title="فیلتر و مرتب‌سازی" />
+      <ScrollView
+        style={{flex: 1}}
+        contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 24}}
+        keyboardShouldPersistTaps="handled">
+        <Text size={14} color={colors.pallete.gray2} style={styles.sectionTitle}>
+          مرتب‌سازی
+        </Text>
+        <View style={styles.sortWrap}>
+          {SORT_OPTIONS.map(option => {
+            const active = state.sort === option.value;
+            return (
+              <Button
+                key={option.value}
+                onPress={() => setState(s => ({...s, sort: option.value}))}
+                style={active ? styles.sortChipActive : styles.sortChip}>
+                <Text size={14} color={active ? 'white' : colors.main}>
+                  {option.label}
+                </Text>
+              </Button>
+            );
+          })}
+        </View>
 
-      <Button onPress={onToggleSelectCategory}>
-        <UnderlineTextField
-          placeholder="انتخاب گروه"
-          editable={true}
-          onTouchStart={onToggleSelectCategory}
-          value={state.mainCategory ? groupTitle : undefined}
-          // value={`${state.mainCategory} ${state.subCategory&& "/"+ state.subCategory} ${state.subSubCategory && "/"+ state.subSubCategory}`}
-        />
-      </Button>
-      <Divider />
-      <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
-        <UnderlineTextField
-          onPressIn={() => setState(s => ({...s, cityModal: true}))}
-          placeholder="تعیین موقعیت"
-          value={state.city?.title}
-          editable={false}
-        />
-      </Button>
-      <Divider />
-      <UnderlineTextField
-        value={state.price}
-        onChangeText={(text: any) => {
-          setState(s => ({...s, price: text}));
-        }}
-        placeholder="قیمت"
-      />
-      <Divider />
-      <Button
-        onPress={() =>
-          setState(s => ({...s, optionModal: true, optionType: 'image'}))
-        }>
-        <UnderlineTextField
-          onPressIn={() =>
-            setState(s => ({...s, optionModal: true, optionType: 'image'}))
-          }
-          placeholder="نمایش فقط اگهی های عکس دار"
-          value={state.image || onlyImages ? 'بله' : 'خیر'}
-          editable={false}
-        />
-      </Button>
+        <Divider height={16} />
+        <Text size={14} color={colors.pallete.gray2} style={styles.sectionTitle}>
+          دسته‌بندی و شهر
+        </Text>
+        <Button onPress={onToggleSelectCategory}>
+          <UnderlineTextField
+            placeholder="انتخاب گروه"
+            editable={false}
+            onPressIn={onToggleSelectCategory}
+            value={state.mainCategory ? groupTitle : undefined}
+          />
+        </Button>
+        <Divider />
+        <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
+          <UnderlineTextField
+            onPressIn={() => setState(s => ({...s, cityModal: true}))}
+            placeholder="شهر"
+            value={state.city?.title}
+            editable={false}
+          />
+        </Button>
+
+        <Divider height={16} />
+        <Text size={14} color={colors.pallete.gray2} style={styles.sectionTitle}>
+          بازه قیمت (تومان)
+        </Text>
+        <Row>
+          <View style={{flex: 1}}>
+            <UnderlineTextField
+              value={state.minPrice}
+              onChangeText={(text: any) => setState(s => ({...s, minPrice: text}))}
+              placeholder="حداقل قیمت"
+              keyboardType="number-pad"
+            />
+          </View>
+          <Divider style={{width: 12}} />
+          <View style={{flex: 1}}>
+            <UnderlineTextField
+              value={state.maxPrice}
+              onChangeText={(text: any) => setState(s => ({...s, maxPrice: text}))}
+              placeholder="حداکثر قیمت"
+              keyboardType="number-pad"
+            />
+          </View>
+        </Row>
+
+        <Divider height={16} />
+        <Button onPress={() => setState(s => ({...s, optionModal: true}))}>
+          <UnderlineTextField
+            onPressIn={() => setState(s => ({...s, optionModal: true}))}
+            placeholder="فقط آگهی‌های عکس‌دار"
+            value={state.onlyImages ? 'بله' : 'خیر'}
+            editable={false}
+          />
+        </Button>
+
+        <Divider height={24} />
+        <Button onPress={handleClear} style={styles.clearButton}>
+          <Text size={15} color={colors.main}>
+            پاک کردن همه فیلترها
+          </Text>
+        </Button>
+        <Divider height={64} />
+      </ScrollView>
+
       <SelectAdsCategory
         onSelect={(m, sc, ssc) =>
           setState(s => ({
@@ -174,15 +212,18 @@ export function FilterScreen() {
         onClose={() => setState(s => ({...s, cityModal: false}))}
       />
       <AdsOptionsModal
-        type={state.optionType}
+        type="image"
         visible={state.optionModal}
-        onSelect={item => {
-          setState(s => ({...s, [s.optionType]: item}));
-          dispatch(setFilters({onlyImages: item === 'بله'}));
-        }}
+        onSelect={item =>
+          setState(s => ({
+            ...s,
+            onlyImages: item === 'بله',
+            optionModal: false,
+          }))
+        }
         onClose={() => setState(s => ({...s, optionModal: false}))}
       />
-      <Button onPress={handleAddFilters} style={styles.Button}>
+      <Button onPress={handleApply} style={styles.Button}>
         <Text size={19} color="white">
           اعمال
         </Text>
@@ -192,15 +233,39 @@ export function FilterScreen() {
 }
 
 const styles = StyleSheet.create({
-  button: {
-    flex: 1,
-    height: 29,
+  sectionTitle: {
+    marginBottom: 8,
+  },
+  sortWrap: {
+    flexDirection: 'row-reverse',
+    flexWrap: 'wrap',
+  },
+  sortChip: {
+    height: 34,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 14,
+    borderRadius: 17,
     borderWidth: 1,
-    borderColor: colors.pallete.gray2,
-    backgroundColor: colors.pallete.gray1,
-    marginHorizontal: 2,
+    borderColor: colors.main,
+    backgroundColor: 'white',
+    marginLeft: 8,
+    marginBottom: 8,
+  },
+  sortChipActive: {
+    height: 34,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: colors.main,
+    backgroundColor: colors.main,
+    marginLeft: 8,
+    marginBottom: 8,
+  },
+  clearButton: {
+    alignSelf: 'center',
   },
   Button: {
     flex: undefined,
