@@ -150,6 +150,14 @@ export function TextField(props: TextFieldProps) {
   const handleChangeText = isNumeric
     ? (text: string) => onChangeText?.(toEnglishDigits(text))
     : onChangeText;
+  // A non-editable TextInput is typically used as a fake "picker trigger"
+  // wrapped in a Button/TouchableOpacity (city/category/option selects) —
+  // but a TextInput still captures touches itself even when non-editable,
+  // so taps landing on it never reached the wrapping Button's onPress at
+  // all. Letting touches pass straight through to the parent is what makes
+  // the wrapping Button's own tap-vs-scroll gesture handling actually work.
+  const pointerEvents =
+    rest.pointerEvents ?? (rest.editable === false ? 'none' : undefined);
   return (
     <View>
       <View
@@ -182,6 +190,7 @@ export function TextField(props: TextFieldProps) {
           onBlur={() => setFocused(false)}
           {...rest}
           onChangeText={handleChangeText}
+          pointerEvents={pointerEvents}
         />
       </View>
       {error && (
