@@ -1,106 +1,180 @@
-import {View, StyleSheet} from 'react-native';
-import React, {useState} from 'react';
+import {Alert, StyleSheet, View} from 'react-native';
+import React, {useMemo, useState} from 'react';
 import {
-  Button,
-  Divider,
-  MainHeader,
+  CarForm,
+  CommonForm,
+  CreateAdsHeader,
+  EstateForm,
+  OfferForm,
   Screen,
-  Text,
-  UnderlineTextField,
 } from '../../../components';
 import {colors} from '../../../theme';
-import {useMutation, useQueryClient} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {updateAds} from '../../../services';
+import {
+  findMainCategory,
+  getAdsCategories,
+  updateAds,
+  upload,
+} from '../../../services';
 
-// Lightweight edit for the fields every ad category shares (title,
-// description, price, contact info). Category-specific attributes (car
-// brand/year, real-estate area/floor, etc.) live in CarForm/EstateForm's own
-// internal state and aren't editable from here — re-create the ad instead
-// if those need to change.
+// Reuses the exact same category-specific forms CreateAdsScreen uses (see
+// each form's `editItem` support) so every field collected at creation is
+// also editable here — the previous version of this screen only exposed
+// title/price/contact/description and had no image management at all.
 export function EditAdScreen() {
   const {goBack} = useNavigation();
   const {params} = useRoute();
   const ad = params?.ad;
   const queryClient = useQueryClient();
-  const [state, setState] = useState({
-    title: ad?.title ?? '',
-    description: ad?.description ?? '',
-    price: ad?.price != null ? String(ad.price) : '',
-    contact_info: ad?.contact_info ?? '',
-  });
 
-  const {mutate, isLoading} = useMutation(
+  const {data: categoriesData} = useQuery(['adsCategories'], getAdsCategories);
+  const mainCategory = useMemo(
+    () => findMainCategory(categoriesData?.data ?? [], ad?.category_id?.id),
+    [categoriesData, ad?.category_id?.id],
+  );
+
+  const [state, setState] = useState(() => ({
+    images: [1, 2, 3, 4, 5].map(n => ad?.[`image${n}`]?.path ?? ''),
+    isSubmitting: false,
+    uploadingIndexes: [] as number[],
+    send: 'no',
+  }));
+
+  const {mutate: updateAdsMutate} = useMutation(
     (data: any) => updateAds(ad.id, data),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('myAds');
         goBack();
       },
+      onError: () => {
+        setState(s => ({...s, isSubmitting: false}));
+        Alert.alert('خطا', 'ذخیره تغییرات با خطا مواجه شد.');
+      },
     },
   );
 
-  const onSave = () => {
-    mutate(state);
+  const handleSelectImage = (image: any, index: number) => {
+    setState(s => {
+      const images = [...s.images];
+      images[index] = image;
+      return {...s, images};
+    });
+  };
+  const handleRemoveImage = (index: number) => {
+    setState(s => {
+      const images = [...s.images];
+      images[index] = '';
+      return {...s, images};
+    });
+  };
+
+  const onSendPress = () => {
+    setState(s => ({...s, send: `send-${new Date()}`}));
+  };
+
+  // Existing (already-uploaded) images are plain strings and are resent
+  // as-is; only freshly-picked local files (objects with a `uri`) get
+  // uploaded here. A slot cleared via the remove button is simply absent
+  // from state.images by then, so it's dropped from the final array —
+  // that's how an image actually gets removed from the ad.
+  const handleSave = async (data: any) => {
+    if (!data) {
+      return;
+    }
+    setState(s => ({...s, isSubmitting: true}));
+
+    const finalImages: string[] = [];
+    try {
+      for (let index = 0; index < state.images.length; index++) {
+        const image = state.images[index];
+        if (!image) {
+          continue;
+        }
+        if (typeof image === 'string') {
+          finalImages.push(image);
+          continue;
+        }
+        setState(s => ({
+          ...s,
+          uploadingIndexes: [...s.uploadingIndexes, index],
+        }));
+        const form = new FormData();
+        form.append('file', {
+          name: image.fileName,
+          type: image.type,
+          uri: image.uri,
+        } as any);
+        const uploaded = await upload(form);
+        finalImages.push(uploaded?.data?.id);
+        setState(s => ({
+          ...s,
+          uploadingIndexes: s.uploadingIndexes.filter(i => i !== index),
+        }));
+      }
+    } catch (e) {
+      setState(s => ({...s, isSubmitting: false, uploadingIndexes: []}));
+      Alert.alert('خطا در آپلود تصویر', 'لطفا دوباره تلاش کنید');
+      return;
+    }
+
+    updateAdsMutate({
+      ...data,
+      category_id: ad?.category_id?.id,
+      images: finalImages,
+    });
   };
 
   return (
-    <Screen style={{flex: 1}}>
-      <MainHeader title="ویرایش آگهی" />
-      <View style={styles.form}>
-        <UnderlineTextField
-          value={state.title}
-          onChangeText={text => setState(s => ({...s, title: text}))}
-          placeholder="عنوان آگهی"
-        />
-        <Divider />
-        <UnderlineTextField
-          value={state.price}
-          onChangeText={text => setState(s => ({...s, price: text}))}
-          placeholder="قیمت"
-          keyboardType="number-pad"
-        />
-        <Divider />
-        <UnderlineTextField
-          value={state.contact_info}
-          onChangeText={text => setState(s => ({...s, contact_info: text}))}
-          placeholder="اطلاعات تماس"
-        />
-        <Divider />
-        <UnderlineTextField
-          value={state.description}
-          onChangeText={text => setState(s => ({...s, description: text}))}
-          placeholder="توضیحات"
-        />
-        <Divider height={40} />
-        <Text size={13} color={colors.pallete.grayText}>
-          پس از ویرایش، آگهی مجدداً در صف بررسی مدیر قرار می‌گیرد.
-        </Text>
-        <Divider height={20} />
-        <Button
-          loading={isLoading}
-          disabled={isLoading}
-          onPress={onSave}
-          style={styles.button}>
-          <Text color="white" size={17}>
-            ذخیره تغییرات
-          </Text>
-        </Button>
-      </View>
+    <Screen withoutScroll>
+      <CreateAdsHeader
+        title="ویرایش آگهی"
+        onCreatePress={onSendPress}
+        onSelectImage={handleSelectImage}
+        onRemoveImage={handleRemoveImage}
+        isSending={state.isSubmitting}
+        uploadingIndexes={state.uploadingIndexes}
+        initialImages={state.images.map((img: any) =>
+          typeof img === 'string' ? img : img?.uri,
+        )}
+      />
+      <Screen unsafe>
+        <View style={styles.form}>
+          {mainCategory?.title === 'وسایل نقلیه' ? (
+            <CarForm
+              send={state.send}
+              onSend={handleSave}
+              subCategory={ad?.category_id}
+              editItem={ad}
+            />
+          ) : mainCategory?.title === 'املاک' ? (
+            <EstateForm
+              send={state.send}
+              onSend={handleSave}
+              subCategory={ad?.category_id}
+              subsubCategory={ad?.category_id}
+              editItem={ad}
+            />
+          ) : mainCategory?.title === 'تخفیف یاب' ? (
+            <OfferForm send={state.send} onSend={handleSave} editItem={ad} />
+          ) : (
+            <CommonForm
+              send={state.send}
+              onSend={handleSave}
+              mainCategory={mainCategory}
+              editItem={ad}
+            />
+          )}
+        </View>
+      </Screen>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   form: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  button: {
-    height: 48,
-    backgroundColor: colors.main,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
 });

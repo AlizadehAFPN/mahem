@@ -18,30 +18,70 @@ import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {SelectAdsCategory} from '../modal/select-ads-category';
 
-export function CarForm({subCategory, send, onSend}) {
-  const [state, setState] = useState({
-    title: '',
-    description: '',
-    contact_info: '',
-    product_year: '',
-    operation_amount: '',
-    price: '',
-    brand: '',
-    chassi: '',
-    payType: '',
-    features: '',
-    usage: '',
-    adsType: '',
-    carAdsCreator: '',
-    city: '',
-    cityModal: false,
-    selectCategoryModal: false,
-    optionType: '',
-    optionModal: false,
-    locationModal: false,
-    lat: undefined as number | undefined,
-    lng: undefined as number | undefined,
-  });
+function boolToLabel(
+  value: boolean | null | undefined,
+  trueLabel: string,
+  falseLabel: string,
+) {
+  if (value === true) return trueLabel;
+  if (value === false) return falseLabel;
+  return '';
+}
+
+export function CarForm({subCategory, editItem, send, onSend}) {
+  const [state, setState] = useState(() =>
+    editItem
+      ? {
+          title: editItem.title ?? '',
+          description: editItem.description ?? '',
+          contact_info: editItem.contact_info ?? '',
+          product_year:
+            editItem.product_year != null ? String(editItem.product_year) : '',
+          operation_amount:
+            editItem.operation_amount != null
+              ? String(editItem.operation_amount)
+              : '',
+          price: editItem.price != null ? String(editItem.price) : '',
+          brand: editItem.brand ?? '',
+          chassi: editItem.base_type ?? '',
+          payType: boolToLabel(editItem.is_cash, 'اقساطی', 'نقدی'),
+          features: editItem.features ?? '',
+          usage: '',
+          adsType: editItem.ad_type ?? '',
+          carAdsCreator: boolToLabel(editItem.by_person, 'شخصی', 'شرکتی'),
+          city: editItem.city ?? '',
+          cityModal: false,
+          selectCategoryModal: false,
+          optionType: '',
+          optionModal: false,
+          locationModal: false,
+          lat: editItem.lat ?? undefined,
+          lng: editItem.lng ?? undefined,
+        }
+      : {
+          title: '',
+          description: '',
+          contact_info: '',
+          product_year: '',
+          operation_amount: '',
+          price: '',
+          brand: '',
+          chassi: '',
+          payType: '',
+          features: '',
+          usage: '',
+          adsType: '',
+          carAdsCreator: '',
+          city: '',
+          cityModal: false,
+          selectCategoryModal: false,
+          optionType: '',
+          optionModal: false,
+          locationModal: false,
+          lat: undefined as number | undefined,
+          lng: undefined as number | undefined,
+        },
+  );
 
   useEffect(() => {
     if (send?.includes('send')) {

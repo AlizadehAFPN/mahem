@@ -13,9 +13,12 @@ import {useNavigation} from '@react-navigation/native';
 export function CreateAdsHeader({
   onCreatePress,
   onSelectImage,
+  onRemoveImage,
   onBack,
   isSending,
   uploadingIndexes = [],
+  initialImages = [],
+  title = 'ثبت رایگان آگهی',
 }: any) {
   const {goBack} = useNavigation();
   const handleBack = () => {
@@ -50,7 +53,7 @@ export function CreateAdsHeader({
               name="keyboard-arrow-right"
             />
             <Text color="white" size={17}>
-              ثبت رایگان آگهی
+              {title}
             </Text>
           </Row>
         </Button>
@@ -83,7 +86,9 @@ export function CreateAdsHeader({
           <AdsImageSelection
             key={String(index + 3132)}
             onSelectImage={(image: any) => onSelectImage(image, index)}
+            onRemoveImage={() => onRemoveImage && onRemoveImage(index)}
             uploading={uploadingIndexes.includes(index)}
+            initialImageUri={initialImages[index]}
           />
         ))}
       </Row>

@@ -18,32 +18,73 @@ import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {SelectAdsCategory} from '../modal/select-ads-category';
 
-export function EstateForm({subCategory, subsubCategory, send, onSend}) {
+// Booleans (parking/elevator/suburbs/by_person) are stored as plain
+// booleans on the ad but presented as one of two Persian labels here — this
+// reverses that mapping for prefill. Returns '' (unset) rather than
+// guessing when the ad genuinely has no value yet.
+function boolToLabel(
+  value: boolean | null | undefined,
+  trueLabel: string,
+  falseLabel: string,
+) {
+  if (value === true) return trueLabel;
+  if (value === false) return falseLabel;
+  return '';
+}
+
+export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}) {
   const {navigate} = useNavigation();
-  const [state, setState] = useState({
-    title: '',
-    contact_info: '',
-    area: '',
-    adsType: '',
-    adsCreator: '',
-    description: '',
-    floor: '',
-    elevator: '',
-    parking: '',
-    suburb: '',
-    price: '',
-    features: '',
-    city: '',
-    cityModal: false,
-    acceptance: false,
-    selectCategoryModal: false,
-    durationModal: false,
-    optionType: '',
-    optionModal: false,
-    locationModal: false,
-    lat: undefined as number | undefined,
-    lng: undefined as number | undefined,
-  });
+  const [state, setState] = useState(() =>
+    editItem
+      ? {
+          title: editItem.title ?? '',
+          contact_info: editItem.contact_info ?? '',
+          area: editItem.area != null ? String(editItem.area) : '',
+          adsType: editItem.ad_type ?? '',
+          adsCreator: boolToLabel(editItem.by_person, 'شخصی', 'املاک'),
+          description: editItem.description ?? '',
+          floor: editItem.floor ?? '',
+          elevator: boolToLabel(editItem.elevator, 'دارد', 'ندارد'),
+          parking: boolToLabel(editItem.parking, 'دارد', 'ندارد'),
+          suburb: boolToLabel(editItem.suburbs, 'هست', 'نیست'),
+          price: editItem.price != null ? String(editItem.price) : '',
+          features: editItem.features ?? '',
+          city: editItem.city ?? '',
+          cityModal: false,
+          acceptance: true,
+          selectCategoryModal: false,
+          durationModal: false,
+          optionType: '',
+          optionModal: false,
+          locationModal: false,
+          lat: editItem.lat ?? undefined,
+          lng: editItem.lng ?? undefined,
+        }
+      : {
+          title: '',
+          contact_info: '',
+          area: '',
+          adsType: '',
+          adsCreator: '',
+          description: '',
+          floor: '',
+          elevator: '',
+          parking: '',
+          suburb: '',
+          price: '',
+          features: '',
+          city: '',
+          cityModal: false,
+          acceptance: false,
+          selectCategoryModal: false,
+          durationModal: false,
+          optionType: '',
+          optionModal: false,
+          locationModal: false,
+          lat: undefined as number | undefined,
+          lng: undefined as number | undefined,
+        },
+  );
 
   useEffect(() => {
     if (send?.includes('send')) {

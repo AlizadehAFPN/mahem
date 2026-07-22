@@ -208,6 +208,7 @@ export function CreateAdsScreen() {
               send={state.send}
               onSend={hanldeCreateAd}
               subCategory={state.subCategory}
+              editItem={undefined}
             />
           ) : state?.mainCategory?.title === 'املاک' ? (
             <EstateForm
@@ -215,14 +216,16 @@ export function CreateAdsScreen() {
               onSend={hanldeCreateAd}
               subCategory={state.subCategory}
               subsubCategory={state.subsubCategory}
+              editItem={undefined}
             />
           ) : state?.mainCategory?.title === 'تخفیف یاب' ? (
-            <OfferForm send={state.send} onSend={hanldeCreateAd} />
+            <OfferForm send={state.send} onSend={hanldeCreateAd} editItem={undefined} />
           ) : (
             <CommonForm
               send={state.send}
               onSend={hanldeCreateAd}
               mainCategory={state.mainCategory}
+              editItem={undefined}
             />
           )}
 

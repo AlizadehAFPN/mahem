@@ -22,6 +22,27 @@ export const getAdsCategories = () => {
     }));
 };
 
+function subtreeContains(node: any, targetId: string): boolean {
+  if (node.id === targetId) {
+    return true;
+  }
+  return (node.sub_categories || []).some((child: any) =>
+    subtreeContains(child, targetId),
+  );
+}
+
+// EditAdScreen needs to know which specialized form (CarForm/EstateForm/
+// OfferForm/CommonForm) an existing ad belongs to, but an ad is always
+// tagged with its most specific (leaf) category, not the top-level one
+// CreateAdsScreen branches on — walk the tree to find which top-level
+// branch actually contains it.
+export function findMainCategory(tree: any[], targetId?: string) {
+  if (!targetId) {
+    return undefined;
+  }
+  return tree.find(node => subtreeContains(node, targetId));
+}
+
 // Maps a new-backend advertisement into the old flat shape the ad-detail
 // screens read: nested `category_id`/`city` objects with `.title`, plus
 // synthesized `image1..imageN` keys (the old backend stored numbered image
@@ -125,7 +146,11 @@ export const getMyAds = (query?: any) => {
 
 // Same field-splitting as createAds (category-specific fields fall through
 // into `attributes`), but every field is optional since this is a partial
-// update — omitted fields are left untouched server-side.
+// update — omitted fields are left untouched server-side. `images` is taken
+// as a plain, already-resolved string[] (not the image_N convention
+// createAds uses) so the caller can send an explicit `[]` to clear every
+// image — omitting the key entirely (undefined) is what leaves images
+// untouched, so those two cases have to stay distinguishable.
 export const updateAds = (id: string, data: any) => {
   const {
     category_id,
@@ -136,16 +161,13 @@ export const updateAds = (id: string, data: any) => {
     contact_info,
     lat,
     lng,
+    images,
     ...rest
   } = data;
-  const images: string[] = [];
   const attributes: Record<string, unknown> = {};
 
   Object.entries(rest).forEach(([key, value]) => {
-    const imageMatch = key.match(/^image_(\d+)$/);
-    if (imageMatch) {
-      images[Number(imageMatch[1]) - 1] = value as string;
-    } else if (value !== undefined && value !== '') {
+    if (value !== undefined && value !== '') {
       attributes[key] = value;
     }
   });
@@ -160,9 +182,7 @@ export const updateAds = (id: string, data: any) => {
       ...(city_id !== undefined ? {cityId: city_id} : {}),
       ...(lat !== undefined && lat !== '' ? {lat: Number(lat)} : {}),
       ...(lng !== undefined && lng !== '' ? {lng: Number(lng)} : {}),
-      ...(images.filter(Boolean).length > 0
-        ? {images: images.filter(Boolean)}
-        : {}),
+      ...(images !== undefined ? {images} : {}),
       ...(Object.keys(attributes).length > 0 ? {attributes} : {}),
     })
     .then(res => ({data: mapAdvertisement(res.data)}));

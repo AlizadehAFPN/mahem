@@ -11,14 +11,26 @@ import React, {useState} from 'react';
 import {colors} from '../../theme';
 import {FilePickerModal} from './file-picker';
 const {width} = Dimensions.get('window');
-export function AdsImageSelection({onSelectImage, uploading}) {
-  const [state, setState] = useState({
-    image: '',
+export function AdsImageSelection({
+  onSelectImage,
+  onRemoveImage,
+  uploading,
+  initialImageUri,
+}) {
+  // initialImageUri only matters on mount (edit mode prefilling an existing
+  // remote image into this slot) — the slot's own state takes over from
+  // there, same as before.
+  const [state, setState] = useState(() => ({
+    image: initialImageUri ? {uri: initialImageUri} : '',
     filepickerModal: false,
-  });
+  }));
   const onSelectFile = image => {
     onSelectImage(image);
     setState(s => ({...s, image}));
+  };
+  const onRemove = () => {
+    setState(s => ({...s, image: ''}));
+    onRemoveImage && onRemoveImage();
   };
   return (
     <TouchableOpacity
@@ -32,6 +44,14 @@ export function AdsImageSelection({onSelectImage, uploading}) {
             : require('../../assets/images/icons/camera.png')
         }
       />
+      {!!state.image && !uploading && (
+        <TouchableOpacity
+          style={styles.removeButton}
+          onPress={onRemove}
+          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+          <Text style={styles.removeButtonText}>×</Text>
+        </TouchableOpacity>
+      )}
       {uploading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator color="white" />
@@ -67,5 +87,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,.35)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 2,
+    left: 2,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeButtonText: {
+    color: 'white',
+    fontSize: 14,
+    lineHeight: 16,
   },
 });

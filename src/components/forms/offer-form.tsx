@@ -20,25 +20,72 @@ import {colors} from '../../theme';
 // to the discounted price so this ad behaves like any other in price
 // search/sort. Duration is collected as days/hours/minutes (matching the
 // old create-offer-screen.tsx) and converted to an absolute `expiresAt`.
-export function OfferForm({send, onSend}) {
-  const [state, setState] = useState({
-    title: '',
-    description: '',
-    contact_info: '',
-    originalPrice: '',
-    discountPercent: '',
-    city: '',
-    cityModal: false,
-    locationModal: false,
-    durationModal: false,
-    duration: {
-      minutes: '',
-      houres: '',
-      days: '',
-    },
-    lat: undefined as number | undefined,
-    lng: undefined as number | undefined,
-  });
+// expiresAt is stored as an absolute timestamp, not a duration — reverse it
+// back into days/houres/minutes so re-saving without touching the duration
+// fields resends (approximately) the same expiry instead of silently
+// clearing it (attributes is replaced wholesale on update, not merged).
+// Already-expired/unset discounts start blank rather than negative.
+function remainingDuration(expiresAt?: string | null) {
+  const blank = {minutes: '', houres: '', days: ''};
+  if (!expiresAt) {
+    return blank;
+  }
+  const remainingMinutes = Math.floor(
+    (new Date(expiresAt).getTime() - Date.now()) / 60000,
+  );
+  if (remainingMinutes <= 0) {
+    return blank;
+  }
+  const days = Math.floor(remainingMinutes / (24 * 60));
+  const houres = Math.floor((remainingMinutes % (24 * 60)) / 60);
+  const minutes = remainingMinutes % 60;
+  return {
+    days: days > 0 ? String(days) : '',
+    houres: houres > 0 ? String(houres) : '',
+    minutes: minutes > 0 ? String(minutes) : '',
+  };
+}
+
+export function OfferForm({editItem, send, onSend}) {
+  const [state, setState] = useState(() =>
+    editItem
+      ? {
+          title: editItem.title ?? '',
+          description: editItem.description ?? '',
+          contact_info: editItem.contact_info ?? '',
+          originalPrice:
+            editItem.originalPrice != null ? String(editItem.originalPrice) : '',
+          discountPercent:
+            editItem.discountPercent != null
+              ? String(editItem.discountPercent)
+              : '',
+          city: editItem.city ?? '',
+          cityModal: false,
+          locationModal: false,
+          durationModal: false,
+          duration: remainingDuration(editItem.expiresAt),
+          lat: editItem.lat ?? undefined,
+          lng: editItem.lng ?? undefined,
+        }
+      : {
+          title: '',
+          description: '',
+          contact_info: '',
+          originalPrice: '',
+          discountPercent: '',
+          city: '',
+          cityModal: false,
+          locationModal: false,
+          durationModal: false,
+          duration: {
+            minutes: '',
+            houres: '',
+            days: '',
+          },
+          lat: undefined as number | undefined,
+          lng: undefined as number | undefined,
+        },
+  );
 
   const handleToggleDurationModal = () => {
     setState(s => ({...s, durationModal: !s.durationModal}));

@@ -18,25 +18,49 @@ import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {SelectAdsCategory} from '../modal/select-ads-category';
 
-export function CommonForm({mainCategory, send, onSend}) {
+// `editItem` is the mapped ad returned from getSingleAds/getAds (see
+// mapAdvertisement) — its category-specific fields are already flattened
+// from `attributes` onto the object directly, under the same wire names
+// this form's onSend sends them as (ad_type, not the local `adsType`).
+export function CommonForm({mainCategory, editItem, send, onSend}) {
   const {navigate} = useNavigation();
-  const [state, setState] = useState({
-    title: '',
-    description: '',
-    contact_info: '',
-    city: '',
-    adsType: '',
-    price: '',
-    cityModal: false,
-    acceptance: false,
-    selectCategoryModal: false,
-    durationModal: false,
-    optionType: '',
-    optionModal: false,
-    locationModal: false,
-    lat: undefined as number | undefined,
-    lng: undefined as number | undefined,
-  });
+  const [state, setState] = useState(() =>
+    editItem
+      ? {
+          title: editItem.title ?? '',
+          description: editItem.description ?? '',
+          contact_info: editItem.contact_info ?? '',
+          city: editItem.city ?? '',
+          adsType: editItem.ad_type ?? '',
+          price: editItem.price != null ? String(editItem.price) : '',
+          cityModal: false,
+          acceptance: true,
+          selectCategoryModal: false,
+          durationModal: false,
+          optionType: '',
+          optionModal: false,
+          locationModal: false,
+          lat: editItem.lat ?? undefined,
+          lng: editItem.lng ?? undefined,
+        }
+      : {
+          title: '',
+          description: '',
+          contact_info: '',
+          city: '',
+          adsType: '',
+          price: '',
+          cityModal: false,
+          acceptance: false,
+          selectCategoryModal: false,
+          durationModal: false,
+          optionType: '',
+          optionModal: false,
+          locationModal: false,
+          lat: undefined as number | undefined,
+          lng: undefined as number | undefined,
+        },
+  );
 
   useEffect(() => {
     if (send?.includes('send')) {
