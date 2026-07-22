@@ -62,6 +62,7 @@ export function CreateAdsScreen() {
     optionModal: false,
     send: 'no',
     uploadingCount: 0,
+    uploadingIndexes: [] as (string | number)[],
   });
 
   const {mutate} = useMutation(upload);
@@ -74,25 +75,37 @@ export function CreateAdsScreen() {
     const doc = {name: fileName, type, uri};
     const form = new FormData();
     form.append('file', doc);
-    setState(s => ({...s, uploadingCount: s.uploadingCount + 1}));
+    setState(s => ({
+      ...s,
+      uploadingCount: s.uploadingCount + 1,
+      uploadingIndexes: [...s.uploadingIndexes, index],
+    }));
     mutate(form, {
       onSuccess: data => {
         const images = state.images;
         images[index] = data?.data;
-        setState(s => ({...s, images, uploadingCount: s.uploadingCount - 1}));
+        setState(s => ({
+          ...s,
+          images,
+          uploadingCount: s.uploadingCount - 1,
+          uploadingIndexes: s.uploadingIndexes.filter(i => i !== index),
+        }));
       },
       onError: () => {
         Alert.alert('خطا در آپلود تصویر', 'لطفا دوباره تلاش کنید');
-        setState(s => ({...s, uploadingCount: s.uploadingCount - 1}));
+        setState(s => ({
+          ...s,
+          uploadingCount: s.uploadingCount - 1,
+          uploadingIndexes: s.uploadingIndexes.filter(i => i !== index),
+        }));
       },
     });
   };
 
+  // The submit button shows its own loading state (and ignores presses)
+  // while any image is still uploading — see CreateAdsHeader's `loading`
+  // prop — so there's nothing left to guard here.
   const onSendPress = () => {
-    if (state.uploadingCount > 0) {
-      Alert.alert('لطفا صبر کنید', 'تصاویر در حال آپلود هستند');
-      return;
-    }
     setState(s => ({...s, send: `send-${new Date()}`}));
   };
   const onToggleSelectCategory = () => {
@@ -148,6 +161,8 @@ export function CreateAdsScreen() {
         onBack={() => navigate('home' as never)}
         onCreatePress={onSendPress}
         onSelectImage={handleSelectImage}
+        isSending={state.uploadingCount > 0}
+        uploadingIndexes={state.uploadingIndexes}
       />
       <Screen unsafe>
         <View style={styles.form}>

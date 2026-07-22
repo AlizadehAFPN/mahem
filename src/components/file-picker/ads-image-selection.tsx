@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   StyleSheet,
@@ -10,7 +11,7 @@ import React, {useState} from 'react';
 import {colors} from '../../theme';
 import {FilePickerModal} from './file-picker';
 const {width} = Dimensions.get('window');
-export function AdsImageSelection({onSelectImage}) {
+export function AdsImageSelection({onSelectImage, uploading}) {
   const [state, setState] = useState({
     image: '',
     filepickerModal: false,
@@ -31,6 +32,11 @@ export function AdsImageSelection({onSelectImage}) {
             : require('../../assets/images/icons/camera.png')
         }
       />
+      {uploading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator color="white" />
+        </View>
+      )}
       <FilePickerModal
         onSelectFile={onSelectFile}
         visible={state.filepickerModal}
@@ -51,5 +57,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -10,7 +10,13 @@ import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
-export function CreateAdsHeader({onCreatePress, onSelectImage, onBack}: any) {
+export function CreateAdsHeader({
+  onCreatePress,
+  onSelectImage,
+  onBack,
+  isSending,
+  uploadingIndexes = [],
+}: any) {
   const {goBack} = useNavigation();
   const handleBack = () => {
     if (onBack) {
@@ -48,7 +54,7 @@ export function CreateAdsHeader({onCreatePress, onSelectImage, onBack}: any) {
             </Text>
           </Row>
         </Button>
-        <Button onPress={onCreatePress}>
+        <Button onPress={onCreatePress} loading={isSending}>
           <Row>
             <Text size={15} color="white">
               ارسال
@@ -77,6 +83,7 @@ export function CreateAdsHeader({onCreatePress, onSelectImage, onBack}: any) {
           <AdsImageSelection
             key={String(index + 3132)}
             onSelectImage={(image: any) => onSelectImage(image, index)}
+            uploading={uploadingIndexes.includes(index)}
           />
         ))}
       </Row>
