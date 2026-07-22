@@ -32,6 +32,13 @@ export function usePaginatedList({
     queryKey,
     queryFn,
     enabled,
+    // A queryKey change (typing a search term, switching a filter) would
+    // otherwise reset `data` to undefined until the new page resolves —
+    // the list momentarily empties out, collapsing to the empty/loading
+    // state and snapping back once results arrive. Keeping the previous
+    // page around during that gap keeps the list's height and content
+    // stable, only swapping once the new results are ready.
+    keepPreviousData: true,
     getNextPageParam: lastPage => {
       const pagination = lastPage?.data?.pagination;
       if (!pagination) {

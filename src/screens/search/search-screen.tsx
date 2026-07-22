@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   MainHeader,
   Screen,
@@ -28,11 +28,12 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import {setFilters} from '../../stateManager/reducers/filters';
 import {RootState} from '../../stateManager';
 import {usePaginatedList} from '../../hooks/use-paginated-list';
+import {useDebouncedValue} from '../../hooks/use-debounced-value';
 export function SearchScreen() {
   const {navigate} = useNavigation();
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState('');
-  const [debouncedSearchText, setDebouncedSearchText] = useState('');
+  const debouncedSearchText = useDebouncedValue(searchText);
   const {
     mainCategory,
     subCategory,
@@ -56,11 +57,6 @@ export function SearchScreen() {
   const discountCategoryId = adsCategories?.data?.find(
     (category: any) => category.title === 'تخفیف یاب',
   )?.id;
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedSearchText(searchText), 300);
-    return () => clearTimeout(timeout);
-  }, [searchText]);
 
   const {
     items: ads,

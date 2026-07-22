@@ -15,6 +15,7 @@ import {useSelector} from 'react-redux';
 import {getAds} from '../../services';
 import {RootState} from '../../stateManager';
 import {usePaginatedList} from '../../hooks/use-paginated-list';
+import {useDebouncedValue} from '../../hooks/use-debounced-value';
 
 // Final step of the employee category browse — plain ads list for whichever
 // branch the user stopped at (params.categoryIds is undefined for "همه
@@ -26,6 +27,7 @@ export function EmployeeAdsScreen() {
   const title: string = params?.title ?? 'آگهی‌ها';
   const user = useSelector((s: RootState) => s.user);
   const [searchText, setSearchText] = useState('');
+  const debouncedSearchText = useDebouncedValue(searchText);
 
   const {
     items: ads,
@@ -40,14 +42,14 @@ export function EmployeeAdsScreen() {
       'ads',
       'employee',
       categoryIds?.join(',') ?? '',
-      searchText,
+      debouncedSearchText,
       user.cityId,
     ],
     queryFn: ({pageParam = 1}) =>
       getAds({
         page: pageParam,
         limit: 20,
-        search: searchText || undefined,
+        search: debouncedSearchText || undefined,
         categoryIds: categoryIds?.join(','),
         cityId: user.cityId,
       }),

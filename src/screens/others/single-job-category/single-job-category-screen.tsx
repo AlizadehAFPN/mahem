@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Button,
   Divider,
@@ -25,6 +25,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {getAllJobs} from '../../../services/job';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
+import {useDebouncedValue} from '../../../hooks/use-debounced-value';
 import {getJobCategoryIcon} from '../../../utiles';
 
 const {width} = Dimensions.get('window');
@@ -32,6 +33,7 @@ export function SingleJobCategoryScreen() {
   const {goBack, navigate} = useNavigation();
   const {params} = useRoute();
   const [searchText, setSearchText] = useState('');
+  const debouncedSearchText = useDebouncedValue(searchText);
   const [category, setCategory] = useState(params?.category);
   const {
     items: jobs,
@@ -39,23 +41,18 @@ export function SingleJobCategoryScreen() {
     isError,
     onEndReached,
   } = usePaginatedList({
-    queryKey: ['categoryJobs', params?.category?.id],
+    queryKey: ['categoryJobs', params?.category?.id, debouncedSearchText],
     queryFn: ({pageParam = 1}) =>
-      getAllJobs({page: pageParam, categoryId: params?.category?.id}),
+      getAllJobs({
+        page: pageParam,
+        categoryId: params?.category?.id,
+        search: debouncedSearchText || undefined,
+      }),
     selectItems: page => page?.data?.jobs,
   });
   const handlePressItem = item => {
     navigate('singleJob', {job: item});
   };
-
-  const result = useMemo(() => {
-    if (searchText) {
-      return jobs.filter(item =>
-        JSON.stringify(item).includes(searchText.toLowerCase()),
-      );
-    }
-    return jobs;
-  }, [jobs, searchText]);
 
   return (
     <Screen withoutScroll style={{flex: 1}}>
@@ -101,7 +98,7 @@ export function SingleJobCategoryScreen() {
             emptyMessage="هیچ موردی پیدا نشد"
           />
         }
-        data={result}
+        data={jobs}
         keyExtractor={item => item?.id}
         renderItem={({item, index}) => {
           return (
