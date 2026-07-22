@@ -23,6 +23,12 @@ interface PickerProps {
   valueField?: string;
   getChildren?: (item: any) => any[] | undefined;
   searchable?: boolean;
+  // Ad creation must always end at a leaf (every ad needs one specific
+  // category), so this defaults off there. Browsing screens want the
+  // opposite — the ability to stop at any level, including before picking
+  // anything at all, and see everything under that branch.
+  allowSelectParent?: boolean;
+  allItemsLabel?: string;
 }
 
 // Shared single-select list/tree picker backing CityPicker, CategoryPicker,
@@ -38,6 +44,8 @@ export function Picker({
   valueField = 'id',
   getChildren,
   searchable = false,
+  allowSelectParent = false,
+  allItemsLabel = 'همه موارد',
 }: PickerProps) {
   const [path, setPath] = useState<any[]>([]);
   const [query, setQuery] = useState('');
@@ -72,6 +80,11 @@ export function Picker({
     }
   };
 
+  const onSelectAll = () => {
+    onSelect(...path);
+    onClose();
+  };
+
   return (
     <MainModal onClose={onClose} visible={visible}>
       <View style={styles.card}>
@@ -93,6 +106,13 @@ export function Picker({
               <Text>{item[labelField]}</Text>
             </TouchableOpacity>
           )}
+          ListHeaderComponent={
+            allowSelectParent && !query ? (
+              <TouchableOpacity onPress={onSelectAll} style={styles.item}>
+                <Text preset="bold">{allItemsLabel}</Text>
+              </TouchableOpacity>
+            ) : null
+          }
           ListFooterComponent={<View style={{height: 100}} />}
         />
       </View>

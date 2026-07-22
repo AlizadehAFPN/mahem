@@ -43,6 +43,19 @@ export function findMainCategory(tree: any[], targetId?: string) {
   return tree.find(node => subtreeContains(node, targetId));
 }
 
+// Ads are only ever tagged with a leaf category (see Picker's create-flow
+// behavior: onSelect only fires once a node with no further children is
+// reached), never an intermediate one — so "show everything under این
+// دسته" (a category browse stopped at a non-leaf node, or the top of the
+// tree) means resolving to every leaf underneath it, not the node's own id.
+export function collectLeafCategoryIds(node: any): string[] {
+  const children = node?.sub_categories || [];
+  if (children.length === 0) {
+    return node?.id ? [node.id] : [];
+  }
+  return children.flatMap((child: any) => collectLeafCategoryIds(child));
+}
+
 // Maps a new-backend advertisement into the old flat shape the ad-detail
 // screens read: nested `category_id`/`city` objects with `.title`, plus
 // synthesized `image1..imageN` keys (the old backend stored numbered image
