@@ -7,19 +7,10 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useMemo} from 'react';
+import {getLegacyImagePaths} from '../../utiles/utiles_funcs';
 const {width} = Dimensions.get('window');
 export function GridProduct({product, onPress}) {
-  const img = useMemo(() => {
-    if (product) {
-      const imgs = Object.keys(product)
-        .filter(item => item.includes('image'))
-        .filter(item => !!product[item])
-        .map(item => product[item].path);
-      return imgs[0];
-    } else {
-      return [];
-    }
-  }, [product]);
+  const img = useMemo(() => getLegacyImagePaths(product)[0], [product]);
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image

@@ -11,20 +11,10 @@ import {OfferPriceDetails} from './offer-price-details';
 import {Rate} from '../../rating/rate';
 import {Row} from '../../row/row';
 import {Text} from '../../text/text';
+import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 
 export function OfferCard({item, onPress}) {
-  const img = useMemo(() => {
-    console.log(item, 'item---');
-    const imgs = Object.keys(item)
-      .filter(key => key.includes('image'))
-      .filter(img => !!item[img])
-      .map(elem => item[elem].path);
-    if (imgs?.length > 0) {
-      console.log(imgs, 'imsss');
-      return imgs[0];
-    }
-    return '';
-  }, [item]);
+  const img = useMemo(() => getLegacyImagePaths(item)[0], [item]);
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <View>

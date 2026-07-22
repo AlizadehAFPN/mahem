@@ -14,24 +14,11 @@ import {Rate} from '../../rating/rate';
 import {Row} from '../../row/row';
 import {Text} from '../../text/text';
 import {numberWithCommas} from '../../../utiles';
+import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 
 const {width} = Dimensions.get('window');
 export function GridOfferCard({item, onPress}) {
-  const img = useMemo(() => {
-    if (item) {
-      const imgs = Object.keys(item)
-        .filter(key => key.includes('image'))
-        .filter(elem => !!item[elem])
-        .map(elem => item[elem].path);
-      if (imgs?.length > 0) {
-        return imgs[0];
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }, [item]);
+  const img = useMemo(() => getLegacyImagePaths(item)[0], [item]);
 
   const offerPersent = useMemo(() => {
     if (item) {

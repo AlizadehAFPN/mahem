@@ -14,6 +14,7 @@ import {
 } from '../../../components';
 import {colors} from '../../../theme';
 import {numberWithCommas} from '../../../utiles';
+import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 import {useRoute} from '@react-navigation/native';
 
 export function SingleOfferScreen() {
@@ -24,9 +25,7 @@ export function SingleOfferScreen() {
     callInfoModal: false,
   });
 
-  const images = useMemo(() => {
-    return offer?.image1?.path ? [offer.image1.path] : [];
-  }, [offer]);
+  const images = useMemo(() => getLegacyImagePaths(offer), [offer]);
 
   const discountedPrice = useMemo(() => {
     if (offer?.originalPrice && offer?.discountPercent) {

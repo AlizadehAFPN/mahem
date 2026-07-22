@@ -8,23 +8,10 @@ import {
 import React, {useMemo} from 'react';
 import {Text} from '../text/text';
 import {colors} from '../../theme';
+import {getLegacyImagePaths} from '../../utiles/utiles_funcs';
 const {width} = Dimensions.get('window');
 export function RowProduct({product, onPress}) {
-  const img = useMemo(() => {
-    if (product) {
-      const imgs = Object.keys(product)
-        .filter(key => key.includes('image'))
-        .filter(elem => !!product[elem])
-        .map(elem => product[elem].path);
-      if (imgs?.length > 0) {
-        return imgs[0];
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }, [product]);
+  const img = useMemo(() => getLegacyImagePaths(product)[0], [product]);
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image

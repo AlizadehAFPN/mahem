@@ -17,6 +17,7 @@ import {
 import {colors} from '../../../theme';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {numberWithCommas, translations} from '../../../utiles';
+import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
@@ -105,18 +106,7 @@ export function SinlgeProduct() {
       setAd(data?.data);
     }
   }, [data]);
-  const images = useMemo(() => {
-    if (ad) {
-      // setAd(data?.data)
-      const imgs = Object.keys(ad)
-        .filter(item => item.includes('image'))
-        .filter(item => !!ad[item])
-        .map(item => ad[item].path);
-      return imgs;
-    } else {
-      return [];
-    }
-  }, [ad]);
+  const images = useMemo(() => getLegacyImagePaths(ad), [ad]);
   const isBookmarked = useMemo(() => {
     return !!bookmarks?.find(item => item.id === params?.ads?.id);
   }, [bookmarks]);
