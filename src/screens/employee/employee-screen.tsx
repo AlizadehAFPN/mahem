@@ -31,7 +31,7 @@ export function EmployeeScreen() {
   };
 
   return (
-    <Screen>
+    <Screen withoutScroll>
       <MainHeader title="آگهی‌ها" showLocation={true} />
       <FlatList
         data={categories}

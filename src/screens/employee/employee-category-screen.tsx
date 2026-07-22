@@ -25,7 +25,7 @@ export function EmployeeCategoryScreen() {
   };
 
   return (
-    <Screen>
+    <Screen withoutScroll>
       <MainHeader title={node?.title ?? ''} showLocation={true} />
       <FlatList
         data={subCategories}

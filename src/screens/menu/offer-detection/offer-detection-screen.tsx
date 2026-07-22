@@ -21,7 +21,7 @@ export function OfferDetectionScreen() {
   }, [data]);
 
   return (
-    <Screen>
+    <Screen withoutScroll>
       <MainHeader title="تخفیف یاب" showLocation={true} />
       <FlatList
         data={subCategories}
