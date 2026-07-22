@@ -1,23 +1,17 @@
 import {FlatList, StyleSheet, View} from 'react-native';
-import React, {useMemo} from 'react';
+import React from 'react';
 import {CategroyItem, Divider, MainHeader, Screen} from '../../components';
-import {useNavigation} from '@react-navigation/native';
-import {useQuery} from 'react-query';
-import {getAdsCategories} from '../../services';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {collectLeafCategoryIds} from '../../services';
 
-// Landing page of the employee tab — general-ad browsing by category, as
-// actual pushed pages (not a modal), mirroring OfferDetectionScreen's
-// category -> subcategory -> list flow. تخفیف‌یاب has its own tab/section,
-// so it's excluded here; بانک مشاغل is naturally excluded too since Jobs
-// aren't part of the GENERAL category tree getAdsCategories fetches.
-export function EmployeeScreen() {
+// Recursive step of the employee category browse — pushed again (same
+// route, new params) for every extra level a branch has, since category
+// tree depth varies (e.g. املاک goes a level deeper than استخدامی).
+export function EmployeeCategoryScreen() {
   const {navigate} = useNavigation();
-  const {data} = useQuery(['adsCategories'], getAdsCategories);
-
-  const categories = useMemo(
-    () => (data?.data ?? []).filter((c: any) => c.title !== 'تخفیف یاب'),
-    [data],
-  );
+  const {params} = useRoute();
+  const node = params?.node;
+  const subCategories = node?.sub_categories ?? [];
 
   const onPressCategory = (item: any) => {
     if (item.sub_categories?.length > 0) {
@@ -32,9 +26,9 @@ export function EmployeeScreen() {
 
   return (
     <Screen>
-      <MainHeader title="آگهی‌ها" showLocation={true} />
+      <MainHeader title={node?.title ?? ''} showLocation={true} />
       <FlatList
-        data={categories}
+        data={subCategories}
         style={{paddingHorizontal: 8}}
         ListHeaderComponent={
           <View>
@@ -43,7 +37,8 @@ export function EmployeeScreen() {
               item={{title: 'همه موارد'}}
               onPress={() =>
                 navigate('employeeAds' as never, {
-                  title: 'همه موارد',
+                  categoryIds: collectLeafCategoryIds(node),
+                  title: node?.title,
                 } as never)
               }
             />

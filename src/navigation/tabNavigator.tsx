@@ -2,7 +2,7 @@ import React from 'react';
 import {
   HomeScreen,
   SearchScreen,
-  EmployeeScreen,
+  EmployeeStack,
   MenuStack,
   CreateAdsStack,
 } from '../screens';
@@ -26,7 +26,7 @@ export function Dashboard() {
       <Tab.Screen
         name="employee"
         options={{unmountOnBlur: true}}
-        component={EmployeeScreen}
+        component={EmployeeStack}
       />
     </Tab.Navigator>
   );
