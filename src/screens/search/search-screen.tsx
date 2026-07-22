@@ -21,7 +21,8 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
-import {getAds} from '../../services';
+import {useQuery} from 'react-query';
+import {getAds, getAdsCategories} from '../../services';
 import {useDispatch, useSelector} from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {setFilters} from '../../stateManager/reducers/filters';
@@ -48,6 +49,14 @@ export function SearchScreen() {
   const effectiveCityId = city?.id ?? userCityId;
   const effectiveCategory = subSubCategory || subCategory || mainCategory;
 
+  // Browsing without a specific category (e.g. "همه آگهی‌ها") would
+  // otherwise mix تخفیف‌یاب's ads into the general list — it has its own
+  // dedicated section now, so exclude its subcategories here.
+  const {data: adsCategories} = useQuery(['adsCategories'], getAdsCategories);
+  const discountCategoryId = adsCategories?.data?.find(
+    (category: any) => category.title === 'تخفیف یاب',
+  )?.id;
+
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedSearchText(searchText), 300);
     return () => clearTimeout(timeout);
@@ -69,6 +78,7 @@ export function SearchScreen() {
       effectiveCityId,
       sort,
       onlyImages,
+      discountCategoryId,
     ],
     queryFn: ({pageParam = 1}) =>
       getAds({
@@ -76,6 +86,7 @@ export function SearchScreen() {
         limit: 20,
         search: debouncedSearchText || undefined,
         categoryId: effectiveCategory?.id,
+        excludeParentCategoryId: !effectiveCategory ? discountCategoryId : undefined,
         cityId: effectiveCityId,
         maxPrice: price,
         sort: sort || undefined,

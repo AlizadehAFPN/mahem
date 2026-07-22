@@ -34,19 +34,28 @@ export function HomeScreen() {
     () => getBanner(user.cityId),
     {enabled: !!user.cityId},
   );
-  const {data: estateAds, isFetching: isAdsFetching} = useQuery(
-    ['ads', user.cityId],
-    () => getAds({limit: 100, cityId: user.cityId}),
-    {enabled: !!user.cityId},
-  );
-
   // تخفیف‌یاب ads are Advertisements tagged with one of its subcategories,
   // never the parent category itself — resolve the parent's id first so
-  // parentCategoryId can pull every subcategory's ads in one query.
+  // parentCategoryId/excludeParentCategoryId can address every subcategory
+  // at once instead of one exact category.
   const {data: adsCategories} = useQuery(['adsCategories'], getAdsCategories);
   const discountCategory = adsCategories?.data?.find(
     (category: any) => category.title === 'تخفیف یاب',
   );
+
+  // Waits on discountCategory so a تخفیف‌یاب ad is never briefly (or
+  // permanently, if this never refetched) shown in the general row too.
+  const {data: estateAds, isFetching: isAdsFetching} = useQuery(
+    ['ads', user.cityId, discountCategory?.id],
+    () =>
+      getAds({
+        limit: 100,
+        cityId: user.cityId,
+        excludeParentCategoryId: discountCategory?.id,
+      }),
+    {enabled: !!user.cityId && !!discountCategory?.id},
+  );
+
   const {data: discountAds, isFetching: isDiscountsFetching} = useQuery(
     ['ads', 'discounts', user.cityId],
     () =>
