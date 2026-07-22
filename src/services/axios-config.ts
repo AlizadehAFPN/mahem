@@ -7,7 +7,12 @@ const baseURL = `${domainName}/api`;
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
-  // timeout: 3000,
+  // Generous enough for a photo upload over a slow mobile connection, but
+  // bounded — without this, a stalled request (bad file uri, dropped
+  // connection, etc.) hangs forever with no error and no way to recover
+  // short of restarting the app (e.g. create-ads-screen.tsx's upload
+  // mutation never calls onError, so its uploadingCount guard never clears).
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -82,9 +87,11 @@ axiosInstance.interceptors.response.use(
     try {
       // Plain axios, not axiosInstance: this call must not carry the
       // (expired) access token or re-enter this same interceptor.
-      const {data} = await axios.post(`${baseURL}/auth/refresh`, {
-        refreshToken,
-      });
+      const {data} = await axios.post(
+        `${baseURL}/auth/refresh`,
+        {refreshToken},
+        {timeout: 30000},
+      );
       store.dispatch(
         setUser({token: data.accessToken, refreshToken: data.refreshToken}),
       );
