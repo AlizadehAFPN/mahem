@@ -10,7 +10,7 @@ import {
   PrivacyScreen,
   UserPanelScreen,
 } from './other';
-import {OfferDetectionScreen, OfferMarketScreen} from './offer-detection';
+import {OfferDetectionScreen, OfferListScreen} from './offer-detection';
 
 const Stack = createNativeStackNavigator();
 export function MenuStack() {
@@ -19,7 +19,7 @@ export function MenuStack() {
       <Stack.Screen name="menu" component={MenuScreen} />
       <Stack.Screen name="jobsBank" component={JobsBankScreen} />
       <Stack.Screen name="offerDetection" component={OfferDetectionScreen} />
-      <Stack.Screen name="offerMarket" component={OfferMarketScreen} />
+      <Stack.Screen name="offerList" component={OfferListScreen} />
       <Stack.Screen name="privacy" component={PrivacyScreen} />
       <Stack.Screen name="aboutus" component={AboutUsScreen} />
       <Stack.Screen name="callus" component={CallUsScreen} />

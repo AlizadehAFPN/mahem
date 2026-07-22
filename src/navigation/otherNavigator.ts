@@ -2,17 +2,12 @@ import {
   ChatScreen,
   CitySelectionScreen,
   CodeInput,
-  CreateAddsPayScreen,
   CreateJobHelperScreen,
   CreateJobScreen,
-  CreateOfferMarketPay,
-  CreateOfferMarketScreen,
-  CreateOfferScreen,
   FilterScreen,
   RegisterScreen,
   SingleJobCategoryScreen,
   SingleJobScreen,
-  SingleOfferScreen,
   SinlgeProduct,
   UserPanelScreen,
   NotifScreen,
@@ -20,7 +15,6 @@ import {
 import {EditAdScreen} from '../screens/others/edit-ad/edit-ad-screen';
 import {EditProfile} from '../screens/others/editProfile/editProfile-screen';
 import {Settings} from '../screens/others/settings/settings-screen';
-import {UserOfferMarketScreen} from '../screens/others/user-offer-market';
 
 // Not authenticated yet.
 export const authRoutes = [
@@ -63,30 +57,6 @@ export const appRoutes = [
   {
     name: 'createJobHelper',
     component: CreateJobHelperScreen,
-  },
-  {
-    name: 'singleOffer',
-    component: SingleOfferScreen,
-  },
-  {
-    name: 'createOfferMarket',
-    component: CreateOfferMarketScreen,
-  },
-  {
-    name: 'createOfferMarketPay',
-    component: CreateOfferMarketPay,
-  },
-  {
-    name: 'userOfferMarketScreen',
-    component: UserOfferMarketScreen,
-  },
-  {
-    name: 'createOffer',
-    component: CreateOfferScreen,
-  },
-  {
-    name: 'createAddsPay',
-    component: CreateAddsPayScreen,
   },
   {
     name: 'userpanel',

@@ -15,14 +15,19 @@ import {Timer} from '../timer/timer';
 import {numberWithCommas} from '../../../utiles';
 
 export function OfferPriceDetails({item, ...prp}) {
-  const offerPersent = useMemo(() => {
-    if (item) {
-      return Math.round(
-        (1 - (item.price - item.price_with_discount) / item.price) * 100,
-      );
+  const offerPersent = item?.discountPercent ?? 0;
+  // expiresAt is an absolute ISO timestamp; Timer wants a countdown in
+  // seconds, and counts down locally from there rather than re-reading the
+  // clock, so it only needs the remaining duration once on mount.
+  const secondsRemaining = useMemo(() => {
+    if (!item?.expiresAt) {
+      return undefined;
     }
-    return 0;
-  }, [item]);
+    return Math.max(
+      0,
+      Math.round((new Date(item.expiresAt).getTime() - Date.now()) / 1000),
+    );
+  }, [item?.expiresAt]);
   if (!item) {
     return null;
   }
@@ -55,7 +60,7 @@ export function OfferPriceDetails({item, ...prp}) {
               }}
               size={12}
               color={colors.pallete.green}>
-              {numberWithCommas(item.price)}
+              {numberWithCommas(item.originalPrice)}
             </Text>
             <Text size={12} color={colors.pallete.grayText}>
               تومان
@@ -84,14 +89,14 @@ export function OfferPriceDetails({item, ...prp}) {
           height: 70,
           justifyContent: 'space-between',
         }}>
-        {item?.duration ? <Timer time={item?.duration} /> : <View />}
+        {secondsRemaining ? <Timer time={secondsRemaining} /> : <View />}
         <RNText>
           <Text>پرداختی شما</Text>
           <Text
             style={{paddingHorizontal: 10}}
             size={12}
             color={colors.pallete.green}>
-            {numberWithCommas(item.price_with_discount)}
+            {numberWithCommas(item.price)}
           </Text>
           <Text>تومان</Text>
         </RNText>

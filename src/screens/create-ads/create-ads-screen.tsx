@@ -20,6 +20,7 @@ import {
   DurationModal,
   EstateForm,
   MainHeader,
+  OfferForm,
   Row,
   Screen,
   TextField,
@@ -215,6 +216,8 @@ export function CreateAdsScreen() {
               subCategory={state.subCategory}
               subsubCategory={state.subsubCategory}
             />
+          ) : state?.mainCategory?.title === 'تخفیف یاب' ? (
+            <OfferForm send={state.send} onSend={hanldeCreateAd} />
           ) : (
             <CommonForm
               send={state.send}

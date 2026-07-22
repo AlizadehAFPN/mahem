@@ -19,15 +19,7 @@ import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 const {width} = Dimensions.get('window');
 export function GridOfferCard({item, onPress}) {
   const img = useMemo(() => getLegacyImagePaths(item)[0], [item]);
-
-  const offerPersent = useMemo(() => {
-    if (item) {
-      return Math.round(
-        (1 - (item.price - item.price_with_discount) / item.price) * 100,
-      );
-    }
-    return 0;
-  }, [item]);
+  const offerPersent = item?.discountPercent ?? 0;
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <Image
@@ -45,7 +37,7 @@ export function GridOfferCard({item, onPress}) {
       </View>
       <Row style={{justifyContent: 'space-around', paddingBottom: 8}}>
         <Text style={{textDecorationLine: 'line-through'}}>
-          {numberWithCommas(item.mainPrice)}
+          {numberWithCommas(item.originalPrice)}
         </Text>
         <CirleSlider
           radius={32}

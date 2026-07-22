@@ -4,6 +4,7 @@ import {
   GradiantHeader,
   ImageSlider,
   MainHeader,
+  OfferPriceDetails,
   Screen,
   Row,
   Button,
@@ -173,6 +174,7 @@ export function SinlgeProduct() {
               </Button>
             </Row>
           </View>
+          {!!ad?.discountPercent && <OfferPriceDetails item={ad} />}
           <View style={{padding: 16}}>
             {adsProps.map((item, index) => {
               return (

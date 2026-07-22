@@ -1,28 +1,47 @@
-import {StyleSheet, View} from 'react-native';
-import React from 'react';
-import {MainHeader, Screen, StoryBar} from '../../../components';
+import {FlatList, StyleSheet, View} from 'react-native';
+import React, {useMemo} from 'react';
+import {CategroyItem, Divider, MainHeader, Screen} from '../../../components';
 import {colors} from '../../../theme';
+import {useNavigation} from '@react-navigation/native';
+import {useQuery} from 'react-query';
+import {getAdsCategories} from '../../../services';
 
-// Only the store story-bar is backed by real data (`getAllStore`). There is
-// no "discount ad" concept in the backend schema — Advertisement has no
-// storeId/offer relation — so this screen no longer fetches a fake
-// category-17 ad list; browsing a store's own items happens via StoryBar →
-// offerMarket/userOfferMarketScreen.
+// تخفیف‌یاب is browsed by category (تخفیف آخر هفته، رستوران و کافی‌شاپ...),
+// same as every other ad category — see prisma/seed.ts, where "تخفیف یاب"
+// is seeded as a top-level GENERAL category with these exact subcategories.
 export function OfferDetectionScreen() {
+  const {navigate} = useNavigation();
+  const {data} = useQuery(['adsCategories'], getAdsCategories);
+
+  const subCategories = useMemo(() => {
+    const offerCategory = data?.data?.find(
+      (category: any) => category.title === 'تخفیف یاب',
+    );
+    return offerCategory?.sub_categories ?? [];
+  }, [data]);
+
   return (
     <Screen>
       <MainHeader title="تخفیف یاب" showLocation={true} />
-      <Screen>
-        <StoryBar />
-        <View style={styles.line} />
-      </Screen>
+      <FlatList
+        data={subCategories}
+        style={{paddingHorizontal: 8}}
+        ListHeaderComponent={<Divider height={8} />}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        keyExtractor={(item: any) => item.id}
+        renderItem={({item}) => (
+          <CategroyItem
+            item={item}
+            onPress={() => navigate('offerList' as never, {category: item})}
+          />
+        )}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  line: {
-    height: 1,
-    backgroundColor: colors.pallete.gray2,
+  separator: {
+    height: 8,
   },
 });
