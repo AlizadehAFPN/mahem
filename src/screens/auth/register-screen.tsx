@@ -1,4 +1,4 @@
-import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {Alert, View, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Button,
@@ -11,6 +11,10 @@ import {
 import {colors} from '../../theme';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {mobileValidation} from '../../utiles';
+import {
+  isSupportedImageType,
+  UNSUPPORTED_IMAGE_TYPE_MESSAGE,
+} from '../../utiles/utiles_funcs';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 import {setUser} from '../../stateManager/reducers/user';
@@ -145,7 +149,13 @@ export function RegisterScreen() {
         </Button>
       </View>
       <FilePickerModal
-        onSelectFile={file => setState(s => ({...s, profileImage: file}))}
+        onSelectFile={file => {
+          if (!isSupportedImageType(file.type)) {
+            Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+            return;
+          }
+          setState(s => ({...s, profileImage: file}));
+        }}
         visible={state.pickerModal}
         handleClose={() => setState(s => ({...s, pickerModal: false}))}
       />

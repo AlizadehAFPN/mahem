@@ -27,6 +27,10 @@ import {useMutation} from 'react-query';
 import {upload} from '../../../services';
 import {createJob, updateJob} from '../../../services/job';
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  isSupportedImageType,
+  UNSUPPORTED_IMAGE_TYPE_MESSAGE,
+} from '../../../utiles/utiles_funcs';
 
 const {width} = Dimensions.get('window');
 export function CreateJobScreen() {
@@ -193,7 +197,10 @@ export function CreateJobScreen() {
     setState(s => ({...s, filePickerModal: true, tempSelect: 'avatar'}));
   };
   const onSelectFile = file => {
-    console.log(file, 'file---');
+    if (!isSupportedImageType(file.type)) {
+      Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+      return;
+    }
     setState(s => ({...s, [s.tempSelect]: file}));
     const {fileName, type, uri} = file;
     const doc = {name: fileName, type, uri};

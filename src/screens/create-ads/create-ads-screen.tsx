@@ -31,6 +31,10 @@ import {useNavigation} from '@react-navigation/native';
 import {SelectAdsCategory} from '../../components';
 import {useMutation} from 'react-query';
 import {createAds, upload} from '../../services';
+import {
+  isSupportedImageType,
+  UNSUPPORTED_IMAGE_TYPE_MESSAGE,
+} from '../../utiles/utiles_funcs';
 
 export function CreateAdsScreen() {
   const {navigate} = useNavigation();
@@ -74,6 +78,10 @@ export function CreateAdsScreen() {
     image: {fileName: any; type: any; uri: any},
     index: number,
   ) => {
+    if (!isSupportedImageType(image.type)) {
+      Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+      return;
+    }
     setState(s => {
       const images = [...s.images];
       images[index] = image as any;

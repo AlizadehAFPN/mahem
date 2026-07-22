@@ -1,4 +1,4 @@
-import {View, StyleSheet, TouchableOpacity, Image, Share} from 'react-native';
+import {Alert, View, StyleSheet, TouchableOpacity, Image, Share} from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Button,
@@ -16,6 +16,10 @@ import {useMutation} from 'react-query';
 import {updateUser, upload} from '../../../services';
 import {RootState} from '../../../stateManager';
 import {setUser} from '../../../stateManager/reducers/user';
+import {
+  isSupportedImageType,
+  UNSUPPORTED_IMAGE_TYPE_MESSAGE,
+} from '../../../utiles/utiles_funcs';
 
 export function EditProfile() {
   const user = useSelector((s: RootState) => s.user);
@@ -36,6 +40,10 @@ export function EditProfile() {
 
   const {mutate: uploadMutate, isLoading: isUploading} = useMutation(upload);
   const onSelectAvatar = (file: {fileName: any; type: any; uri: any}) => {
+    if (!isSupportedImageType(file.type)) {
+      Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+      return;
+    }
     setState(s => ({...s, profileImage: file}));
     const {fileName, type, uri} = file;
     const form = new FormData();

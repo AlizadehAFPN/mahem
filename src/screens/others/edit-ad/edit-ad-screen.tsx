@@ -17,6 +17,10 @@ import {
   updateAds,
   upload,
 } from '../../../services';
+import {
+  isSupportedImageType,
+  UNSUPPORTED_IMAGE_TYPE_MESSAGE,
+} from '../../../utiles/utiles_funcs';
 
 // Reuses the exact same category-specific forms CreateAdsScreen uses (see
 // each form's `editItem` support) so every field collected at creation is
@@ -56,6 +60,10 @@ export function EditAdScreen() {
   );
 
   const handleSelectImage = (image: any, index: number) => {
+    if (!isSupportedImageType(image.type)) {
+      Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+      return;
+    }
     setState(s => {
       const images = [...s.images];
       images[index] = image;

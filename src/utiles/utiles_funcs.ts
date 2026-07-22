@@ -24,6 +24,24 @@ export function toEnglishDigits(value: string): string {
   });
 }
 
+const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+// The backend's upload endpoint only accepts jpeg/png/webp (see
+// uploads.controller.ts's FileTypeValidator) — iPhones save photos as HEIC
+// by default since iOS 11, so picking one straight from the library (as
+// opposed to a fresh camera shot, which this picker library re-encodes as
+// JPEG) hits that rejection as a raw, unhelpful 400 from the server. Catch
+// it client-side instead so the user gets an actionable message.
+export function isSupportedImageType(mimeType?: string): boolean {
+  if (!mimeType) {
+    return false;
+  }
+  return SUPPORTED_IMAGE_TYPES.includes(mimeType.toLowerCase());
+}
+
+export const UNSUPPORTED_IMAGE_TYPE_MESSAGE =
+  'فرمت این تصویر پشتیبانی نمی‌شود (مثلاً HEIC). لطفا یک عکس JPEG یا PNG انتخاب کنید، یا از دوربین اپلیکیشن استفاده کنید.';
+
 const IMAGE_FIELD_PATTERN = /^image(\d+)$/;
 
 // mapAdvertisement (and the store/job/offer equivalents) synthesize
