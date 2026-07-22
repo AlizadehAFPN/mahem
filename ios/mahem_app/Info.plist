@@ -30,7 +30,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>برای نمایش تخفیف‌های نزدیک شما روی نقشه و اطلاع‌رسانی تخفیف‌های اطراف، به موقعیت مکانی شما نیاز داریم.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

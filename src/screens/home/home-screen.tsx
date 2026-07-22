@@ -142,9 +142,7 @@ export function HomeScreen() {
         )}
         {discountAds?.data?.ads?.length > 0 && (
           <RowCategories
-            onPressMore={() =>
-              navigate('menuStack' as never, {screen: 'offerDetection'} as never)
-            }
+            onPressMore={() => navigate('discountMap' as never)}
             title={translate('findingDiscount')}
             showMoreLabel={translate('listContinue')}>
             <FlatList

@@ -14,6 +14,7 @@ import {
   CallInfo,
   ReportProblem,
   optionsTypes,
+  Rate,
 } from '../../../components';
 import {colors} from '../../../theme';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -29,6 +30,7 @@ import {
   getAdsCategories,
   getBookmarks,
   getSingleAds,
+  rateAd,
   removeBookmark,
 } from '../../../services';
 
@@ -61,6 +63,10 @@ export function SinlgeProduct() {
   const {mutate: removeBookmarkMutate} = useMutation(removeBookmark, {
     onSuccess: () => queryClient.invalidateQueries(['bookmarks']),
   });
+  const {mutate: rateMutate} = useMutation(
+    (value: number) => rateAd(ad.id, value),
+    {onSuccess: res => setAd((prev: any) => ({...prev, ...res.data}))},
+  );
   const {data} = useQuery(
     [`singleAd-${params?.ads?.id}`, params?.ads?.id],
     () => getSingleAds(params?.ads?.id),
@@ -193,6 +199,60 @@ export function SinlgeProduct() {
             </Row>
           </View>
           {!!ad?.discountPercent && <OfferPriceDetails item={ad} />}
+          {!!ad?.discountPercent && (
+            <View style={{paddingHorizontal: 16, paddingTop: 12}}>
+              <Row
+                style={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <Row style={{alignItems: 'center'}}>
+                  <Text size={15}>امتیاز شما:</Text>
+                  <View style={{width: 8}} />
+                  <Rate
+                    rate={ad?.myRating ?? 0}
+                    size={24}
+                    emptyColor={colors.pallete.gray3}
+                    onRate={value => rateMutate(value)}
+                  />
+                </Row>
+                {ad?.ratingCount > 0 && (
+                  <Text size={13} color={colors.pallete.grayText}>
+                    {Number(ad.ratingAvg).toFixed(1)} ({ad.ratingCount})
+                  </Text>
+                )}
+              </Row>
+
+              {Array.isArray(ad?.features) && ad.features.length > 0 && (
+                <View style={{marginTop: 12}}>
+                  <Text preset="bold" size={17}>
+                    ویژگی‌ها
+                  </Text>
+                  {ad.features.map((feature: string, index: number) => (
+                    <Row key={index} style={{marginTop: 4}}>
+                      <Text size={15}>• {feature}</Text>
+                    </Row>
+                  ))}
+                </View>
+              )}
+
+              {!!ad?.installment && (
+                <Text size={15} style={{marginTop: 12}}>
+                  امکان خرید اقساطی: دارد
+                </Text>
+              )}
+              {!!ad?.usagePeriodText && (
+                <Text size={15} style={{marginTop: 8}}>
+                  بازه استفاده: {ad.usagePeriodText}
+                </Text>
+              )}
+              {!!ad?.testPeriodText && (
+                <Text size={15} style={{marginTop: 8}}>
+                  مهلت تست: {ad.testPeriodText}
+                </Text>
+              )}
+            </View>
+          )}
           <View style={{padding: 16}}>
             {adsProps.map((item, index) => {
               return (

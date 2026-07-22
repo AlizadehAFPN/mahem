@@ -15,6 +15,11 @@ import {
 import {EditAdScreen} from '../screens/others/edit-ad/edit-ad-screen';
 import {EditProfile} from '../screens/others/editProfile/editProfile-screen';
 import {Settings} from '../screens/others/settings/settings-screen';
+import {
+  DiscountMapScreen,
+  NearbyDiscountsScreen,
+  DiscountAlertCategoriesScreen,
+} from '../screens/menu/offer-detection';
 
 // Not authenticated yet.
 export const authRoutes = [
@@ -85,5 +90,17 @@ export const appRoutes = [
   {
     name: 'editAd',
     component: EditAdScreen,
+  },
+  {
+    name: 'nearbyDiscounts',
+    component: NearbyDiscountsScreen,
+  },
+  {
+    name: 'discountMap',
+    component: DiscountMapScreen,
+  },
+  {
+    name: 'discountAlertCategories',
+    component: DiscountAlertCategoriesScreen,
   },
 ];

@@ -1,6 +1,12 @@
 import {FlatList, StyleSheet, View} from 'react-native';
-import React, {useMemo} from 'react';
-import {CategroyItem, Divider, MainHeader, Screen} from '../../../components';
+import React, {useMemo, useState} from 'react';
+import {
+  CategroyItem,
+  DiscountMenuSheet,
+  Divider,
+  MainHeader,
+  Screen,
+} from '../../../components';
 import {colors} from '../../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {useQuery} from 'react-query';
@@ -11,6 +17,7 @@ import {getAdsCategories} from '../../../services';
 // is seeded as a top-level GENERAL category with these exact subcategories.
 export function OfferDetectionScreen() {
   const {navigate} = useNavigation();
+  const [menu, setMenu] = useState(false);
   const {data} = useQuery(['adsCategories'], getAdsCategories);
 
   const subCategories = useMemo(() => {
@@ -22,7 +29,11 @@ export function OfferDetectionScreen() {
 
   return (
     <Screen withoutScroll>
-      <MainHeader title="تخفیف یاب" showLocation={true} />
+      <MainHeader
+        title="تخفیف یاب"
+        showLocation={true}
+        onMenuPress={() => setMenu(true)}
+      />
       <FlatList
         data={subCategories}
         style={{paddingHorizontal: 8}}
@@ -36,6 +47,7 @@ export function OfferDetectionScreen() {
           />
         )}
       />
+      <DiscountMenuSheet visible={menu} onClose={() => setMenu(false)} />
     </Screen>
   );
 }

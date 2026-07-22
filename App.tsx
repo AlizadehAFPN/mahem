@@ -17,6 +17,7 @@ import {LanguageProvider} from './src/Context/LanguageContext';
 import {getErrorMessage} from './src/utiles';
 import {ErrorBoundary} from './src/components/error-boundary/error-boundary';
 import {SocketBridge} from './src/components/socket-bridge/socket-bridge';
+import {NotificationsBridge} from './src/components/notifications-bridge/notifications-bridge';
 import {SplashScreen} from './src/screens/splash/splash-screen';
 
 // Create a client. Mutations that don't set their own `onError` fall back to
@@ -51,6 +52,7 @@ export default function App() {
             <Provider store={store}>
               <PersistGate loading={<SplashScreen />} persistor={persistor}>
                 <SocketBridge />
+                <NotificationsBridge />
                 <MainNavigator />
               </PersistGate>
             </Provider>

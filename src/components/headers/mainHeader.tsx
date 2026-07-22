@@ -25,8 +25,16 @@ interface Header {
   showLocation?: boolean;
   title: string;
   showNews?: boolean;
+  // When provided, a menu button is shown next to the city selector — used by
+  // the تخفیف‌یاب screens to open the discount options bottom sheet.
+  onMenuPress?: () => void;
 }
-export function MainHeader({showLocation, title, showNews}: Header) {
+export function MainHeader({
+  showLocation,
+  title,
+  showNews,
+  onMenuPress,
+}: Header) {
   const user = useSelector((s: RootState) => s.user);
   const [state, setState] = useState({
     modalVisible: false,
@@ -77,21 +85,28 @@ export function MainHeader({showLocation, title, showNews}: Header) {
         )}
       </Row>
 
-      {showLocation ? (
-        <TouchableOpacity ref={cityTriggerRef} onPress={toggleModalVisible}>
-          <Row style={{alignItems: 'flex-end'}}>
-            <Text color="white">{user.city}</Text>
-            <Ionicons color={'white'} name="location" size={30} />
-          </Row>
-          <CitySelectionMenu
-            onClose={toggleModalVisible}
-            visible={state.modalVisible}
-            anchor={anchor}
-          />
-        </TouchableOpacity>
-      ) : (
-        <View />
-      )}
+      <Row style={{alignItems: 'flex-end'}}>
+        {showLocation ? (
+          <TouchableOpacity ref={cityTriggerRef} onPress={toggleModalVisible}>
+            <Row style={{alignItems: 'flex-end'}}>
+              <Text color="white">{user.city}</Text>
+              <Ionicons color={'white'} name="location" size={30} />
+            </Row>
+            <CitySelectionMenu
+              onClose={toggleModalVisible}
+              visible={state.modalVisible}
+              anchor={anchor}
+            />
+          </TouchableOpacity>
+        ) : (
+          <View />
+        )}
+        {onMenuPress && (
+          <TouchableOpacity onPress={onMenuPress} style={styles.menuButton}>
+            <Ionicons color="white" name="options" size={26} />
+          </TouchableOpacity>
+        )}
+      </Row>
     </Row>
   );
 }
@@ -113,5 +128,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.pallete.red2,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  menuButton: {
+    marginLeft: 12,
+    paddingBottom: 2,
   },
 });

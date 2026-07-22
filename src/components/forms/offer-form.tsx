@@ -1,5 +1,6 @@
-import {Alert, View} from 'react-native';
+import {Alert, Switch, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {CitySelectModal} from '../modal/city-select-modal';
@@ -59,6 +60,11 @@ export function OfferForm({editItem, send, onSend}) {
             editItem.discountPercent != null
               ? String(editItem.discountPercent)
               : '',
+          features: Array.isArray(editItem.features) ? editItem.features : [],
+          featureInput: '',
+          installment: !!editItem.installment,
+          usagePeriodText: editItem.usagePeriodText ?? '',
+          testPeriodText: editItem.testPeriodText ?? '',
           city: editItem.city ?? '',
           cityModal: false,
           locationModal: false,
@@ -73,6 +79,11 @@ export function OfferForm({editItem, send, onSend}) {
           contact_info: '',
           originalPrice: '',
           discountPercent: '',
+          features: [] as string[],
+          featureInput: '',
+          installment: false,
+          usagePeriodText: '',
+          testPeriodText: '',
           city: '',
           cityModal: false,
           locationModal: false,
@@ -86,6 +97,24 @@ export function OfferForm({editItem, send, onSend}) {
           lng: undefined as number | undefined,
         },
   );
+
+  const addFeature = () => {
+    const value = state.featureInput.trim();
+    if (!value) {
+      return;
+    }
+    setState(s => ({
+      ...s,
+      features: [...s.features, value],
+      featureInput: '',
+    }));
+  };
+  const removeFeature = (index: number) => {
+    setState(s => ({
+      ...s,
+      features: s.features.filter((_: string, i: number) => i !== index),
+    }));
+  };
 
   const handleToggleDurationModal = () => {
     setState(s => ({...s, durationModal: !s.durationModal}));
@@ -116,6 +145,10 @@ export function OfferForm({editItem, send, onSend}) {
           city,
           originalPrice,
           discountPercent,
+          features,
+          installment,
+          usagePeriodText,
+          testPeriodText,
           lat,
           lng,
         } = state;
@@ -131,6 +164,10 @@ export function OfferForm({editItem, send, onSend}) {
           city_id: city?.id,
           originalPrice: Number(originalPrice),
           discountPercent: discount,
+          features,
+          installment,
+          usagePeriodText,
+          testPeriodText,
           expiresAt: durationToExpiresAt(),
           lat,
           lng,
@@ -233,6 +270,65 @@ export function OfferForm({editItem, send, onSend}) {
           onChangeText={text => setState(s => ({...s, description: text}))}
           placeholder="توضیحات"
         />
+        <Divider />
+        <UnderlineTextField
+          value={state.usagePeriodText}
+          onChangeText={text =>
+            setState(s => ({...s, usagePeriodText: text}))
+          }
+          placeholder="بازه تاریخ استفاده (اختیاری)"
+        />
+        <Divider />
+        <UnderlineTextField
+          value={state.testPeriodText}
+          onChangeText={text => setState(s => ({...s, testPeriodText: text}))}
+          placeholder="مهلت تست (اختیاری)"
+        />
+        <Divider />
+        <Row style={{justifyContent: 'space-between', paddingVertical: 8}}>
+          <Text size={15}>امکان خرید اقساطی</Text>
+          <Switch
+            value={state.installment}
+            onValueChange={v => setState(s => ({...s, installment: v}))}
+            trackColor={{false: colors.pallete.gray3, true: colors.pallete.green1}}
+            thumbColor={state.installment ? colors.pallete.green : '#f4f3f4'}
+          />
+        </Row>
+        <Divider />
+        <Row style={{alignItems: 'center'}}>
+          <View style={{flex: 1}}>
+            <UnderlineTextField
+              value={state.featureInput}
+              onChangeText={text =>
+                setState(s => ({...s, featureInput: text}))
+              }
+              placeholder="افزودن ویژگی (مثلاً گارانتی)"
+              onSubmitEditing={addFeature}
+              returnKeyType="done"
+            />
+          </View>
+          <Button onPress={addFeature}>
+            <Ionicons name="add-circle" size={32} color={colors.main} />
+          </Button>
+        </Row>
+        {state.features.map((feature: string, index: number) => (
+          <Row
+            key={`${feature}-${index}`}
+            style={{
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingVertical: 4,
+            }}>
+            <Text size={15}>• {feature}</Text>
+            <Button onPress={() => removeFeature(index)}>
+              <Ionicons
+                name="close-circle"
+                size={22}
+                color={colors.pallete.red2}
+              />
+            </Button>
+          </Row>
+        ))}
       </View>
       <CitySelectModal
         onSelect={city => setState(s => ({...s, city, cityModal: false}))}

@@ -4,6 +4,8 @@ export * from './axios-config';
 export * from './auth';
 export * from './common';
 export * from './ads';
+export * from './discounts';
+export * from './device';
 export * from './job';
 export * from './bookmarks';
 export * from './reports';
