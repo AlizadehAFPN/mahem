@@ -1,57 +1,63 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Image,
-  Text as RNText,
-  Dimensions,
-} from 'react-native';
+import {StyleSheet, TouchableOpacity, View, Image} from 'react-native';
 import React, {useMemo} from 'react';
 import {colors} from '../../../theme';
 import {CirleSlider} from '../../cicle-slider/circle-slider';
-import {OfferPriceDetails} from './offer-price-details';
-import {Rate} from '../../rating/rate';
 import {Row} from '../../row/row';
 import {Text} from '../../text/text';
 import {numberWithCommas} from '../../../utiles';
 import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 
-const {width} = Dimensions.get('window');
+// Grid card for browsing تخفیف‌یاب by category (see OfferListScreen) — the
+// richer OfferPriceDetails (timer, "پرداختی شما" breakdown) lives on the ad
+// detail page; this is the compact 2-column version, just enough to compare
+// offers at a glance: image, title, discount ring, discounted price, and
+// the struck-through original.
 export function GridOfferCard({item, onPress}) {
   const img = useMemo(() => getLegacyImagePaths(item)[0], [item]);
   const offerPersent = item?.discountPercent ?? 0;
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
-      <Image
-        style={{
-          width: width / 2,
-          height: 105,
-          marginLeft: -8,
-          resizeMode: 'cover',
-          ...styles.shadow,
-        }}
-        source={img ? {uri: img} : require('../../../assets/images/empty.webp')}
-      />
-      <View style={{paddingHorizontal: 8}}>
-        <Text size={15}>{item.title}</Text>
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.container}
+      activeOpacity={0.85}>
+      <View style={styles.imageWrap}>
+        <Image
+          style={styles.image}
+          source={
+            img ? {uri: img} : require('../../../assets/images/empty.webp')
+          }
+        />
       </View>
-      <Row style={{justifyContent: 'space-around', paddingBottom: 8}}>
-        <Text style={{textDecorationLine: 'line-through'}}>
-          {numberWithCommas(item.originalPrice)}
+      <View style={styles.body}>
+        <Text numberOfLines={1} preset="bold" size={15}>
+          {item.title}
         </Text>
-        <CirleSlider
-          radius={32}
-          value={offerPersent}
-          activeStrokeColor={colors.main}
-          activeStrokeSecondaryColor={colors.pallete.lightRed}
-          inActiveStrokeColor={colors.pallete.lightRed}>
-          <Text style={{lineHeight: 20}}>{offerPersent}%</Text>
-          <Text color="rgba(0,0,0,.5)" style={{lineHeight: 20}}>
-            تخفیف
-          </Text>
-        </CirleSlider>
-        <Text>{numberWithCommas(item.price)}</Text>
-      </Row>
+        <Row style={styles.priceRow}>
+          <CirleSlider
+            radius={24}
+            value={offerPersent}
+            activeStrokeColor={colors.main}
+            activeStrokeSecondaryColor={colors.pallete.lightRed}
+            inActiveStrokeColor={colors.pallete.lightRed}>
+            <Text size={11} preset="bold" color={colors.main}>
+              ٪{offerPersent}
+            </Text>
+          </CirleSlider>
+          <View style={styles.priceTexts}>
+            <Text size={14} preset="bold" color={colors.main}>
+              {numberWithCommas(item.price)} تومان
+            </Text>
+            {!!item.originalPrice && (
+              <Text
+                size={11}
+                color={colors.pallete.gray2}
+                style={styles.strikePrice}>
+                {numberWithCommas(item.originalPrice)} تومان
+              </Text>
+            )}
+          </View>
+        </Row>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -59,52 +65,40 @@ export function GridOfferCard({item, onPress}) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: 'white',
-    borderColor: colors.pallete.gray2,
+    borderWidth: 1,
+    borderColor: colors.pallete.gray1,
+  },
+  imageWrap: {
+    width: '100%',
+    aspectRatio: 16 / 10,
+    backgroundColor: colors.pallete.gray1,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  line: {
-    height: 1.5,
-    backgroundColor: colors.pallete.gray2,
-    width: 70,
-    transform: [{rotate: '-15deg'}],
-    // marginTop: -20,
-    position: 'absolute',
-    // top:0,
-    bottom: 10,
-    left: 10,
+  image: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
-  locationBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 8,
+  body: {
+    padding: 8,
   },
-  badge: {
-    height: 18,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0,0,0,.3)',
-    paddingHorizontal: 5,
-    alignItems: 'center',
+  priceRow: {
+    marginTop: 8,
+    justifyContent: 'flex-end',
   },
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  priceTexts: {
+    marginRight: 8,
+    alignItems: 'flex-end',
+  },
+  strikePrice: {
+    textDecorationLine: 'line-through',
+    marginTop: 2,
   },
 });
