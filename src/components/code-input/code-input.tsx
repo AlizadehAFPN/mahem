@@ -7,6 +7,7 @@ import {
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 import {colors} from '../../theme';
+import {toEnglishDigits} from '../../utiles/utiles_funcs';
 export function CodeFields(props) {
   const {value, setValue, cellcount} = props;
   // const [value, setValue] = useState('');
@@ -22,7 +23,7 @@ export function CodeFields(props) {
       {...propse}
       // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
       value={value}
-      onChangeText={setValue}
+      onChangeText={text => setValue(toEnglishDigits(text))}
       cellCount={cellcount}
       rootStyle={styles.codeFieldRoot}
       keyboardType="number-pad"

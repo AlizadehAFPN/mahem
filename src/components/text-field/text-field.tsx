@@ -11,6 +11,10 @@ import {colors, normalFont} from '../../theme';
 import {Text} from '../text/text';
 import {Row} from '../row/row';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {toEnglishDigits} from '../../utiles/utiles_funcs';
+
+const NUMERIC_KEYBOARD_TYPES = ['number-pad', 'numeric', 'decimal-pad', 'phone-pad'];
+const NUMERIC_INPUT_MODES = ['numeric', 'decimal', 'tel'];
 // the base styling for the container
 const CONTAINER: ViewStyle = {
   // paddingVertical: spacing[3],
@@ -129,6 +133,7 @@ export function TextField(props: TextFieldProps) {
     extra,
     error,
     borderColor,
+    onChangeText,
     ...rest
   } = props;
 
@@ -136,6 +141,15 @@ export function TextField(props: TextFieldProps) {
   const inputStyles = [INPUT, inputStyleOverride];
   const actualPlaceholder = placeholder;
   const border = borderColor || colors.darkGray;
+  // Every numeric field in the app goes through this one component, so
+  // normalizing Persian/Arabic-Indic digits to English here (rather than in
+  // each screen) means it's handled everywhere at once — see toEnglishDigits.
+  const isNumeric =
+    (!!rest.keyboardType && NUMERIC_KEYBOARD_TYPES.includes(rest.keyboardType)) ||
+    (!!rest.inputMode && NUMERIC_INPUT_MODES.includes(rest.inputMode));
+  const handleChangeText = isNumeric
+    ? (text: string) => onChangeText?.(toEnglishDigits(text))
+    : onChangeText;
   return (
     <View>
       <View
@@ -167,6 +181,7 @@ export function TextField(props: TextFieldProps) {
           }}
           onBlur={() => setFocused(false)}
           {...rest}
+          onChangeText={handleChangeText}
         />
       </View>
       {error && (
