@@ -1,19 +1,12 @@
-import {
-  Image,
-  StyleSheet,
-  View,
-  Text as RNText,
-  Dimensions,
-  Linking,
-} from 'react-native';
+import {Image, View, Linking} from 'react-native';
 import React from 'react';
 import {Divider, MainHeader, Screen, Text, Row} from '../../../components';
 import {colors} from '../../../theme';
-const {width} = Dimensions.get('window');
+
 export function CallUsScreen() {
   return (
     <Screen withoutScroll>
-      <MainHeader title="درباره ما" />
+      <MainHeader title="تماس با ما" showBack />
       <View
         style={{
           width: '100%',
@@ -74,7 +67,7 @@ export function CallUsScreen() {
         <Text size={17}>
           {' '}
           در صورت ایجاد مزاحمت بـرای شما، می توانید با مراجعه به سایت پلیس فـتا
-          به آدرس www.cyberpolis.ir از اطلاعـات تماس پلیس فتای محل سکونت خود
+          به آدرس www.cyberpolice.ir از اطلاعـات تماس پلیس فتای محل سکونت خود
           آگاه شوید و موضـوع را از آن طریق پیگیری کنید.
         </Text>
         <Divider />
@@ -91,5 +84,3 @@ export function CallUsScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({});

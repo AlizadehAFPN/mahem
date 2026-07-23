@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  Linking,
   StyleSheet,
   Switch,
   TouchableOpacity,
@@ -16,7 +17,6 @@ import {useLanguage} from '../../../Context/LanguageContext';
 import {useMutation} from 'react-query';
 import {logout, updateUser} from '../../../services';
 import {removeUser, setUserCity} from '../../../stateManager/reducers/user';
-import {setFilters} from '../../../stateManager/reducers/filters';
 import {RootState} from '../../../stateManager';
 
 export function Settings() {
@@ -46,7 +46,6 @@ export function Settings() {
       },
     );
     dispatch(setUserCity({city: item.title, cityId: item.id}));
-    dispatch(setFilters({city: undefined}));
     setCityModalVisible(false);
   };
   const onExit = () => {
@@ -61,7 +60,7 @@ export function Settings() {
 
   return (
     <Screen withoutScroll style={{flex: 1}}>
-      <MainHeader title={translate('setting')} />
+      <MainHeader title={translate('setting')} showBack />
       <View
         style={{
           width: '100%',
@@ -137,7 +136,13 @@ export function Settings() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={{marginTop: 32, paddingHorizontal: 16}}>
+      <TouchableOpacity
+        onPress={() =>
+          Linking.openURL(
+            'https://cafebazaar.ir/app/com.turner.asmajormayhem?l=en',
+          )
+        }
+        style={{marginTop: 32, paddingHorizontal: 16}}>
         <Text style={{fontSize: 16}}>{translate('rateMahem')}</Text>
       </TouchableOpacity>
 

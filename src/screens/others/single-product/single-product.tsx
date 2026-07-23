@@ -35,6 +35,13 @@ import {
 } from '../../../services';
 
 const images = [require('../../../assets/images/products/productSlider1.png')];
+// Frosted look for the nav bar so it reads as an overlay on the hero image
+// rather than an opaque bar sitting above it (the previous solid white-white
+// gradient hid the top of the photo instead of blending with it).
+const GLASS_HEADER_GRADIENT = [
+  'rgba(255,255,255,0.55)',
+  'rgba(255,255,255,0.15)',
+];
 const productProps = [
   {label: 'متراژ(متر مربع)', value: '120'},
   {label: 'رهن', value: 100000000, type: 'price'},
@@ -54,6 +61,10 @@ export function SinlgeProduct() {
   const [ad, setAd] = useState(params?.ads);
   const currentUser = useSelector(s => s.user);
   const isOwnAd = ad?.userId && ad.userId === currentUser?.id;
+  // A تخفیف‌یاب listing always carries a discount percent; the generic
+  // attribute list is replaced with the boxed ویژگی‌ها/توضیحات layout for it.
+  const isOffer = !!ad?.discountPercent;
+  const offerFeatures: string[] = Array.isArray(ad?.features) ? ad.features : [];
   const queryClient = useQueryClient();
   const {data: bookmarksData} = useQuery(['bookmarks'], getBookmarks);
   const bookmarks = bookmarksData?.data;
@@ -152,18 +163,51 @@ export function SinlgeProduct() {
         <GradiantHeader
           isBookmarked={isBookmarked}
           onBookMark={onBookMark}
-          title={data?.data?.category_id?.title}
-          colors={undefined}
+          title={isOffer ? 'تخفیف یاب' : data?.data?.category_id?.title}
+          colors={isOffer ? GLASS_HEADER_GRADIENT : undefined}
+          iconColor={isOffer ? 'white' : undefined}
           onCreatePress={undefined}
         />
       </View>
       <Screen unsafe style={{paddingBottom: insets.bottom + 90}}>
         <View>
-          <ImageSlider images={images} autoPlay={false} loop={false} />
-          <View style={styles.topDetail}>
+          <View>
+            <ImageSlider images={images} autoPlay={false} loop={false} />
+            {isOffer && (
+              <View style={styles.ratingOverlay}>
+                <Rate
+                  rate={ad?.myRating ?? 0}
+                  size={20}
+                  emptyColor="white"
+                  onRate={value => rateMutate(value)}
+                />
+              </View>
+            )}
+          </View>
+          <View style={[styles.topDetail, isOffer && styles.topDetailOffer]}>
             <Text preset="bold" size={20}>
               {ad?.title}
             </Text>
+            {isOffer && !!ad?.store && (
+              <Button
+                onPress={() => navigate('storeProfile', {storeId: ad.store.id})}>
+                <Row style={{alignItems: 'center', marginTop: 6}}>
+                  <View style={styles.storeLogoDot}>
+                    {ad.store.logo ? (
+                      <Image
+                        source={{uri: ad.store.logo}}
+                        style={StyleSheet.absoluteFill}
+                      />
+                    ) : (
+                      <Entypo name="shop" size={12} color={colors.pallete.grayText} />
+                    )}
+                  </View>
+                  <Text size={13} color={colors.pallete.grayText} style={{marginRight: 6}}>
+                    فروشگاه {ad.store.name}
+                  </Text>
+                </Row>
+              </Button>
+            )}
             {ad?.approvalStatus && ad.approvalStatus !== 'APPROVED' && (
               <View
                 style={[
@@ -198,78 +242,82 @@ export function SinlgeProduct() {
               </Button>
             </Row>
           </View>
-          {!!ad?.discountPercent && <OfferPriceDetails item={ad} />}
-          {!!ad?.discountPercent && (
-            <View style={{paddingHorizontal: 16, paddingTop: 12}}>
-              <Row
-                style={{
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Row style={{alignItems: 'center'}}>
-                  <Text size={15}>امتیاز شما:</Text>
-                  <View style={{width: 8}} />
-                  <Rate
-                    rate={ad?.myRating ?? 0}
-                    size={24}
-                    emptyColor={colors.pallete.gray3}
-                    onRate={value => rateMutate(value)}
-                  />
-                </Row>
-                {ad?.ratingCount > 0 && (
-                  <Text size={13} color={colors.pallete.grayText}>
-                    {Number(ad.ratingAvg).toFixed(1)} ({ad.ratingCount})
-                  </Text>
+          {isOffer ? (
+            <>
+              <OfferPriceDetails item={ad} />
+
+              <View style={{paddingHorizontal: 16, paddingTop: 14}}>
+                {(offerFeatures.length > 0 || !!ad?.installment) && (
+                  <View style={styles.section}>
+                    <View style={styles.sectionLabel}>
+                      <Text preset="bold" size={14} color="white">
+                        ویژگی‌ها
+                      </Text>
+                    </View>
+                    <View style={styles.sectionBox}>
+                      {!!ad?.installment && (
+                        <Text size={15} style={styles.sectionLine}>
+                          • امکان خرید اقساطی
+                        </Text>
+                      )}
+                      {offerFeatures.map((feature: string, index: number) => (
+                        <Text key={index} size={15} style={styles.sectionLine}>
+                          • {feature}
+                        </Text>
+                      ))}
+                    </View>
+                  </View>
                 )}
-              </Row>
 
-              {Array.isArray(ad?.features) && ad.features.length > 0 && (
-                <View style={{marginTop: 12}}>
-                  <Text preset="bold" size={17}>
-                    ویژگی‌ها
-                  </Text>
-                  {ad.features.map((feature: string, index: number) => (
-                    <Row key={index} style={{marginTop: 4}}>
-                      <Text size={15}>• {feature}</Text>
-                    </Row>
-                  ))}
-                </View>
-              )}
-
-              {!!ad?.installment && (
-                <Text size={15} style={{marginTop: 12}}>
-                  امکان خرید اقساطی: دارد
-                </Text>
-              )}
-              {!!ad?.usagePeriodText && (
-                <Text size={15} style={{marginTop: 8}}>
-                  بازه استفاده: {ad.usagePeriodText}
-                </Text>
-              )}
-              {!!ad?.testPeriodText && (
-                <Text size={15} style={{marginTop: 8}}>
-                  مهلت تست: {ad.testPeriodText}
-                </Text>
-              )}
+                {(!!ad?.description ||
+                  !!ad?.usagePeriodText ||
+                  !!ad?.testPeriodText) && (
+                  <View style={styles.section}>
+                    <View style={styles.sectionLabel}>
+                      <Text preset="bold" size={14} color="white">
+                        توضیحات
+                      </Text>
+                    </View>
+                    <View style={styles.sectionBox}>
+                      {!!ad?.description && (
+                        <Text size={15} style={styles.sectionLine}>
+                          {ad.description}
+                        </Text>
+                      )}
+                      {!!ad?.usagePeriodText && (
+                        <Text size={15} style={styles.sectionLine}>
+                          {ad.usagePeriodText}
+                        </Text>
+                      )}
+                      {!!ad?.testPeriodText && (
+                        <Text size={15} style={styles.sectionLine}>
+                          {ad.testPeriodText}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                )}
+              </View>
+            </>
+          ) : (
+            <View style={{padding: 16}}>
+              {adsProps.map((item, index) => {
+                return (
+                  <Row key={index} style={{marginVertical: 2}}>
+                    <Text size={17} style={{width: 120, textAlign: 'left'}}>
+                      {item.label}:
+                    </Text>
+                    <Divider style={{width: 40}} />
+                    <Text size={17}>
+                      {item.type == 'price'
+                        ? `${numberWithCommas(item.value)} تومان`
+                        : item.value}
+                    </Text>
+                  </Row>
+                );
+              })}
             </View>
           )}
-          <View style={{padding: 16}}>
-            {adsProps.map((item, index) => {
-              return (
-                <Row key={index} style={{marginVertical: 2}}>
-                  <Text size={17} style={{width: 120, textAlign: 'left'}}>
-                    {item.label}:
-                  </Text>
-                  <Divider style={{width: 40}} />
-                  <Text size={17}>
-                    {item.type == 'price'
-                      ? `${numberWithCommas(item.value)} تومان`
-                      : item.value}
-                  </Text>
-                </Row>
-              );
-            })}
-          </View>
         </View>
 
         <ProductLocation
@@ -303,7 +351,11 @@ export function SinlgeProduct() {
             </Text>
           </Row>
         </Button>
-        {!isOwnAd && (
+        {/* `chatEnabled` (see ContactInfoCard) defaults to true for new ads
+            and is undefined on ads posted before that field existed —
+            either way, chat only actually hides when the owner explicitly
+            turned it off. */}
+        {!isOwnAd && ad?.chatEnabled !== false && (
           <>
             <Divider style={{width: 30}} />
             <Button
@@ -341,6 +393,58 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
     padding: 16,
+  },
+  // For تخفیف‌یاب the title sits on white and the gray price bar
+  // (OfferPriceDetails) flows flush beneath it, matching the design.
+  topDetailOffer: {
+    backgroundColor: 'white',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    paddingBottom: 8,
+  },
+  ratingOverlay: {
+    position: 'absolute',
+    left: 8,
+    bottom: 8,
+    flexDirection: 'row',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  storeLogoDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: colors.pallete.gray1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  section: {
+    marginTop: 20,
+  },
+  // A tab that straddles the box's top edge: pulled down with a negative
+  // margin so half its height sits over the box and half floats above it,
+  // and given zIndex so it renders in front of (not hidden behind) the box.
+  sectionLabel: {
+    alignSelf: 'flex-end',
+    zIndex: 1,
+    marginBottom: -14,
+    backgroundColor: colors.pallete.gray2,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  sectionBox: {
+    backgroundColor: colors.pallete.gray1,
+    borderRadius: 8,
+    padding: 12,
+    paddingTop: 20,
+  },
+  sectionLine: {
+    lineHeight: 24,
+    marginBottom: 2,
   },
   statusBanner: {
     marginTop: 8,

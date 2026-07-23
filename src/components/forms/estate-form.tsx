@@ -72,7 +72,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
           title: '',
           contact_info: '',
           email: '',
-          chatEnabled: false,
+          chatEnabled: true,
           hideEmail: false,
           area: '',
           rooms: '',

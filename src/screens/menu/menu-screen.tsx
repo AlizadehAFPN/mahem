@@ -12,14 +12,17 @@ import {MainHeader, Screen, Text} from '../../components';
 import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
+import {useQuery} from 'react-query';
 import {setFilters} from '../../stateManager/reducers/filters';
 import {removeUser} from '../../stateManager/reducers/user';
 import {RootState} from '../../stateManager';
+import {getAdsCategories} from '../../services';
 const {width} = Dimensions.get('window');
 
 export function MenuScreen() {
   const {navigate} = useNavigation();
   const user = useSelector((s: RootState) => s.user);
+  const {data: categoriesData} = useQuery(['adsCategories'], getAdsCategories);
 
   const menu = [
     {
@@ -45,6 +48,14 @@ export function MenuScreen() {
       title: 'آگهی ها',
       icon: require('../../assets/images/icons/ads.png'),
       name: 'search',
+    },
+    {
+      title: 'استخدامی',
+      icon: require('../../assets/images/icons/employee.png'),
+      name: 'search',
+      // Resolved lazily in handlePressItem (categoriesData isn't ready on
+      // first render) — see the isJobsShortcut branch there.
+      isJobsShortcut: true,
     },
     {
       title: 'مدیریت آگهی ها',
@@ -99,8 +110,22 @@ export function MenuScreen() {
           setFilters({
             mainCategory: {title: 'تمام آگهی ها'},
             subCategory: undefined,
-            subsubCategory: undefined,
+            subSubCategory: undefined,
             allAds: true,
+          }),
+        );
+        return navigate(item.name as never);
+      }
+      if (item.isJobsShortcut) {
+        const jobsCategory = (categoriesData?.data ?? []).find(
+          (c: any) => c.title === 'استخدامی',
+        );
+        dispatch(
+          setFilters({
+            mainCategory: jobsCategory,
+            subCategory: undefined,
+            subSubCategory: undefined,
+            allAds: false,
           }),
         );
         return navigate(item.name as never);

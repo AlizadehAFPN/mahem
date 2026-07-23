@@ -137,6 +137,14 @@ export function UserPanelScreen() {
               </TouchableOpacity>
               <Row style={{paddingHorizontal: 16, marginTop: 4}}>
                 <Button
+                  onPress={() => navigate('adViewStats', {advertisementId: item.id})}
+                  style={styles.rowActionButton}>
+                  <Text size={13} color={colors.text}>
+                    آمار بازدید
+                  </Text>
+                </Button>
+                <Divider style={{width: 10}} />
+                <Button
                   onPress={() => onEditAd(item)}
                   style={styles.rowActionButton}>
                   <Text size={13} color={colors.main}>

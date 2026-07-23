@@ -5,8 +5,10 @@ import {useMutation, useQueryClient} from 'react-query';
 import {getNotifications, markNotificationRead} from '../../../services';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
 import {NewsComp} from './NewsComp';
+import {useNavigation} from '@react-navigation/native';
 
 export function NotifScreen() {
+  const {navigate} = useNavigation<any>();
   const queryClient = useQueryClient();
   const {
     items: notifications,
@@ -26,7 +28,7 @@ export function NotifScreen() {
 
   return (
     <Screen withoutScroll style={{flex: 1}}>
-      <MainHeader title="پیام ها" />
+      <MainHeader title="پیام ها" showBack />
       <FlatList
         data={notifications}
         onEndReached={onEndReached}
@@ -44,6 +46,7 @@ export function NotifScreen() {
               if (!item.isRead) {
                 markReadMutate(item.id);
               }
+              navigate('notifDetail', {item});
             }}
           />
         )}

@@ -79,7 +79,7 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           description: '',
           contact_info: '',
           email: '',
-          chatEnabled: false,
+          chatEnabled: true,
           hideEmail: false,
           originalPrice: '',
           discountPercent: '',

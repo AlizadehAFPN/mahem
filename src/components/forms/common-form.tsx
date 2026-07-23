@@ -57,7 +57,7 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           description: '',
           contact_info: '',
           email: '',
-          chatEnabled: false,
+          chatEnabled: true,
           hideEmail: false,
           adsType: '',
           education: '',

@@ -20,10 +20,15 @@ export function GradiantHeader({
   onCreatePress,
   onBookMark,
   isBookmarked = false,
+  iconColor = 'black',
+  // Text shared via the share icon — falls back to `title` since every
+  // caller already passes one, rather than a fixed string written for the
+  // real-estate screen this header started on.
+  shareText,
 }) {
   const {goBack} = useNavigation();
   const onShare = () => {
-    SocialShare('اپارتمان ۱۲۰ متری در گنبد کاووس');
+    SocialShare(shareText || title || 'ماهم');
   };
   const onBookMarkPress = () => {
     onBookMark && onBookMark();
@@ -36,14 +41,18 @@ export function GradiantHeader({
       end={{x: 0, y: 0}}>
       <Button onPress={goBack}>
         <Row>
-          <MaterialIcons color="black" size={25} name="keyboard-arrow-right" />
-          <Text color="black">{title}</Text>
+          <MaterialIcons
+            color={iconColor}
+            size={25}
+            name="keyboard-arrow-right"
+          />
+          <Text color={iconColor}>{title}</Text>
         </Row>
       </Button>
       {details ? (
         <Row>
           <Button onPress={onShare}>
-            <Octicons size={20} name="share-android" color="black" />
+            <Octicons size={20} name="share-android" color={iconColor} />
           </Button>
           <Divider style={{width: 5}} />
           <Button onPress={onBookMarkPress}>
@@ -54,7 +63,7 @@ export function GradiantHeader({
                 name="moon"
               />
             ) : (
-              <Ionicons size={20} name="moon-outline" color="black" />
+              <Ionicons size={20} name="moon-outline" color={iconColor} />
             )}
           </Button>
         </Row>

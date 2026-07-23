@@ -76,7 +76,7 @@ export function ReportProblem({visible, onClose, advertisementId}) {
             <TextField
               inputStyle={{textAlign: 'right'}}
               preset="underline"
-              placeholder="موبایل"
+              placeholder="شماره موبایل"
               inputMode="tel"
               value={state.phone}
               onChangeText={text => setState(s => ({...s, phone: text}))}

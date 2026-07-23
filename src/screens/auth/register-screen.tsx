@@ -68,6 +68,7 @@ export function RegisterScreen() {
           // shows it on screen so the code is testable without checking logs.
           navigate('codeInput', {
             mobile: state.mobile,
+            username: state.username,
             profileImage: state.profileImage,
             otpCode: response?.code,
           });

@@ -64,7 +64,7 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           description: '',
           contact_info: '',
           email: '',
-          chatEnabled: false,
+          chatEnabled: true,
           hideEmail: false,
           product_year: '',
           operation_amount: '',

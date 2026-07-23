@@ -15,10 +15,17 @@ import {
 import {EditAdScreen} from '../screens/others/edit-ad/edit-ad-screen';
 import {EditProfile} from '../screens/others/editProfile/editProfile-screen';
 import {Settings} from '../screens/others/settings/settings-screen';
+import {AdViewStatsScreen} from '../screens/others/ad-view-stats/ad-view-stats-screen';
+import {NoInternetScreen} from '../screens/others/no-internet/no-internet-screen';
+import {NotifDetailScreen} from '../screens/others/notif/notif-detail-screen';
 import {
   DiscountMapScreen,
   NearbyDiscountsScreen,
   DiscountAlertCategoriesScreen,
+  StoreTermsScreen,
+  CreateStoreScreen,
+  MyStoreScreen,
+  StoreProfileScreen,
 } from '../screens/menu/offer-detection';
 
 // Not authenticated yet.
@@ -92,6 +99,18 @@ export const appRoutes = [
     component: EditAdScreen,
   },
   {
+    name: 'adViewStats',
+    component: AdViewStatsScreen,
+  },
+  {
+    name: 'noInternet',
+    component: NoInternetScreen,
+  },
+  {
+    name: 'notifDetail',
+    component: NotifDetailScreen,
+  },
+  {
     name: 'nearbyDiscounts',
     component: NearbyDiscountsScreen,
   },
@@ -102,5 +121,21 @@ export const appRoutes = [
   {
     name: 'discountAlertCategories',
     component: DiscountAlertCategoriesScreen,
+  },
+  {
+    name: 'storeTerms',
+    component: StoreTermsScreen,
+  },
+  {
+    name: 'createStore',
+    component: CreateStoreScreen,
+  },
+  {
+    name: 'myStore',
+    component: MyStoreScreen,
+  },
+  {
+    name: 'storeProfile',
+    component: StoreProfileScreen,
   },
 ];

@@ -181,6 +181,19 @@ export const getSingleAds = (id: string) => {
     .then(res => ({data: mapAdvertisement(res.data)}));
 };
 
+// Owner-only "تراز بازدید" stats: lifetime total, a 22-day daily trend, and
+// a viewer gender split (see AdvertisementsService.getViewStats).
+export interface AdViewStats {
+  total: number;
+  daily: {date: string; count: number}[];
+  genderBreakdown: {male: number; female: number};
+}
+export const getAdViewStats = (id: string) => {
+  return axiosInstance
+    .get<AdViewStats>(`/advertisements/${id}/view-stats`)
+    .then(res => ({data: res.data}));
+};
+
 export const getMyAds = (query?: any) => {
   return axiosInstance
     .get('/advertisements/mine', {params: normalizeListQuery(query)})

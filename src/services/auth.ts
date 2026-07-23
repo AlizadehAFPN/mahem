@@ -4,8 +4,9 @@ import {setUser} from '../stateManager/reducers/user';
 
 // Sends/mocks an OTP code to `data.mobile`. Note: `data.username` (collected
 // on the register screen) has no home here — the new backend only takes a
-// mobile number at this step; username is set later via updateUser/PATCH
-// /users/me. The register screen's caller never reads this resolved value.
+// mobile number at this step; the register screen carries it through
+// navigation instead, and code-input.tsx sets it via updateUser/PATCH
+// /users/me once OTP verification yields an access token.
 export const register = (data: {mobile: string; username?: string}) => {
   return axiosInstance
     .post('/auth/otp/request', {mobile: data.mobile})

@@ -46,6 +46,24 @@ export function CodeInput() {
     });
   };
 
+  // The username typed on the register screen only reaches the backend
+  // here — register()'s POST /auth/otp/request never accepts it (see
+  // auth.ts), and there was previously no call anywhere that persisted it,
+  // so every new account silently kept the backend's default/empty
+  // username. Runs independently of uploadProfileImageIfAny() (parallel,
+  // not merged into the same updateUser call) so a slow/failed avatar
+  // upload can't also block the username from being saved.
+  const persistUsernameIfAny = () => {
+    const username = params?.username;
+    if (!username) {
+      return;
+    }
+    updateUserMutate(
+      {username},
+      {onSuccess: () => dispatch(setUser({username}))},
+    );
+  };
+
   const handleNext = () => {
     const isValid = handleValidation();
     if (isValid) {
@@ -57,6 +75,7 @@ export function CodeInput() {
           // reactively — no explicit navigate needed.
           dispatch(setUser(data.data));
           uploadProfileImageIfAny();
+          persistUsernameIfAny();
         },
       });
     }
