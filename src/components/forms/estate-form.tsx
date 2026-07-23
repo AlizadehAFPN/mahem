@@ -149,20 +149,23 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
           // رهن و اجاره listings collect rehn/ejare instead of a single
           // price (see the رهن و اجاره conditional in the render below);
           // both ride into `attributes` since neither is a known top-level
-          // field (see ads.ts's createAds).
+          // field (see ads.ts's createAds). Sent as numbers (not the raw
+          // string state) so the backend's range filters (minArea/maxArea,
+          // minRehn/maxRehn, etc. — plain Prisma JSON gte/lte on the stored
+          // value) compare numerically instead of lexicographically.
           price,
-          rehn,
-          ejare,
+          rehn: rehn !== '' ? Number(rehn) : undefined,
+          ejare: ejare !== '' ? Number(ejare) : undefined,
           convertible,
           documentType,
           rooms,
-          product_year,
+          product_year: product_year !== '' ? Number(product_year) : undefined,
           contact_info,
           email,
           chatEnabled,
           hideEmail,
           ad_type: adsType,
-          area,
+          area: area !== '' ? Number(area) : undefined,
           features,
           lat,
           lng,

@@ -42,14 +42,34 @@ export function SearchScreen() {
     minPrice,
     maxPrice,
     onlyImages,
-    city,
+    lat,
+    lng,
+    rooms,
+    minArea,
+    maxArea,
+    minProductYear,
+    maxProductYear,
+    minOperationAmount,
+    maxOperationAmount,
+    minRehn,
+    maxRehn,
+    minEjare,
+    maxEjare,
+    isPersonalSeller,
+    hasSuburb,
+    brand,
+    adType,
+    contractType,
+    education,
   } = useSelector((s: RootState) => s.filter);
   const userCityId = useSelector((s: RootState) => s.user.cityId);
-  // No explicit filter override picked yet → default to the globally
-  // selected city, so results are always city-scoped rather than showing
-  // every city until the user opens the filter screen.
-  const effectiveCityId = city?.id ?? userCityId;
   const effectiveCategory = subSubCategory || subCategory || mainCategory;
+  // A location filter (see FilterScreen's "تعیین موقعیت") opts into
+  // near-me ranking, which only ever matches ads that themselves have
+  // coordinates — everything else stays scoped to the account's city
+  // (see ads.ts's createAds cityId fallback), matching how ad-posting
+  // dropped the per-ad city picker in favor of the account-wide city.
+  const hasLocationFilter = lat !== undefined && lng !== undefined;
 
   const {
     items: ads,
@@ -64,11 +84,29 @@ export function SearchScreen() {
       'ads',
       debouncedSearchText,
       effectiveCategory?.id,
-      effectiveCityId,
+      hasLocationFilter ? lat : userCityId,
+      hasLocationFilter ? lng : undefined,
       sort,
       onlyImages,
       minPrice,
       maxPrice,
+      rooms,
+      minArea,
+      maxArea,
+      minProductYear,
+      maxProductYear,
+      minOperationAmount,
+      maxOperationAmount,
+      minRehn,
+      maxRehn,
+      minEjare,
+      maxEjare,
+      isPersonalSeller,
+      hasSuburb,
+      brand,
+      adType,
+      contractType,
+      education,
     ],
     queryFn: ({pageParam = 1}) =>
       getAds({
@@ -76,11 +114,30 @@ export function SearchScreen() {
         limit: 20,
         search: debouncedSearchText || undefined,
         categoryId: effectiveCategory?.id,
-        cityId: effectiveCityId,
+        ...(hasLocationFilter
+          ? {lat, lng, radiusKm: 10}
+          : {cityId: userCityId}),
         minPrice,
         maxPrice,
         sort: sort || undefined,
         onlyImages: onlyImages || undefined,
+        rooms,
+        minArea,
+        maxArea,
+        minProductYear,
+        maxProductYear,
+        minOperationAmount,
+        maxOperationAmount,
+        minRehn,
+        maxRehn,
+        minEjare,
+        maxEjare,
+        isPersonalSeller,
+        hasSuburb,
+        brand,
+        adType,
+        contractType,
+        education,
       }),
     selectItems: page => page?.data?.ads,
   });
@@ -108,8 +165,8 @@ export function SearchScreen() {
     dispatch(setFilters({minPrice: undefined, maxPrice: undefined}));
   };
 
-  const onRemoveFilterCity = () => {
-    dispatch(setFilters({city: undefined}));
+  const onRemoveFilterLocation = () => {
+    dispatch(setFilters({lat: undefined, lng: undefined}));
   };
   const onRemoveFilterOnlyImages = () => {
     dispatch(setFilters({onlyImages: false}));
@@ -210,16 +267,16 @@ export function SearchScreen() {
                   <Text>فقط عکس دارها</Text>
                 </View>
               )}
-              {city !== undefined && (
+              {hasLocationFilter && (
                 <View style={styles.badge}>
-                  <Button onPress={onRemoveFilterCity}>
+                  <Button onPress={onRemoveFilterLocation}>
                     <AntDesign
                       size={20}
                       style={{marginRight: 5}}
                       name="closecircleo"
                     />
                   </Button>
-                  <Text>{city?.title}</Text>
+                  <Text>نزدیک موقعیت انتخابی</Text>
                 </View>
               )}
             </ScrollView>

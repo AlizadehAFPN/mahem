@@ -11,11 +11,6 @@ interface Category {
   [key: string]: unknown;
 }
 
-interface City {
-  id: string;
-  title: string;
-}
-
 // Matches the backend's AdvertisementSort enum (find-advertisements.dto.ts)
 // so it can be passed straight through to GET /advertisements.
 type SortOrder = 'new' | 'old' | 'price_asc' | 'price_desc' | 'most_viewed' | '';
@@ -28,7 +23,31 @@ interface filterState {
   onlyImages: boolean;
   minPrice?: number | string;
   maxPrice?: number | string;
-  city?: City;
+  // "تعیین موقعیت" (FilterScreen) — an explicit near-me override; when
+  // unset, search-screen.tsx falls back to the account's city (see
+  // ads.ts's createAds cityId fallback), same as ad-posting.
+  lat?: number;
+  lng?: number;
+  // Category-specific attribute filters (see FilterScreen / backend's
+  // FindAdvertisementsDto) — all optional, shown only for the relevant
+  // category.
+  rooms?: string;
+  minArea?: number;
+  maxArea?: number;
+  minProductYear?: number;
+  maxProductYear?: number;
+  minOperationAmount?: number;
+  maxOperationAmount?: number;
+  minRehn?: number;
+  maxRehn?: number;
+  minEjare?: number;
+  maxEjare?: number;
+  isPersonalSeller?: boolean;
+  hasSuburb?: boolean;
+  brand?: string;
+  adType?: string;
+  contractType?: string;
+  education?: string;
   allAds: boolean;
 }
 
@@ -38,9 +57,27 @@ const initialState: filterState = {
   subSubCategory: undefined,
   sort: '',
   onlyImages: false,
-  city: undefined,
   minPrice: undefined,
   maxPrice: undefined,
+  lat: undefined,
+  lng: undefined,
+  rooms: undefined,
+  minArea: undefined,
+  maxArea: undefined,
+  minProductYear: undefined,
+  maxProductYear: undefined,
+  minOperationAmount: undefined,
+  maxOperationAmount: undefined,
+  minRehn: undefined,
+  maxRehn: undefined,
+  minEjare: undefined,
+  maxEjare: undefined,
+  isPersonalSeller: undefined,
+  hasSuburb: undefined,
+  brand: undefined,
+  adType: undefined,
+  contractType: undefined,
+  education: undefined,
   allAds: false,
 };
 

@@ -121,8 +121,12 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           email,
           chatEnabled,
           hideEmail,
-          operation_amount,
-          product_year,
+          // Sent as numbers (not the raw string state) so the backend's
+          // minOperationAmount/maxOperationAmount and minProductYear/
+          // maxProductYear range filters compare numerically.
+          operation_amount:
+            operation_amount !== '' ? Number(operation_amount) : undefined,
+          product_year: product_year !== '' ? Number(product_year) : undefined,
           is_cash,
           ad_type: adsType,
           brand,

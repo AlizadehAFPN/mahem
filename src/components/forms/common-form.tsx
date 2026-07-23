@@ -40,6 +40,8 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           chatEnabled: !!editItem.chatEnabled,
           hideEmail: !!editItem.hideEmail,
           adsType: editItem.ad_type ?? '',
+          education: editItem.education ?? '',
+          contractType: editItem.contractType ?? '',
           price: editItem.price != null ? String(editItem.price) : '',
           acceptance: true,
           selectCategoryModal: false,
@@ -58,6 +60,8 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           chatEnabled: false,
           hideEmail: false,
           adsType: '',
+          education: '',
+          contractType: '',
           price: '',
           acceptance: false,
           selectCategoryModal: false,
@@ -79,6 +83,8 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           description,
           price,
           adsType,
+          education,
+          contractType,
           contact_info,
           email,
           chatEnabled,
@@ -96,6 +102,7 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           chatEnabled,
           hideEmail,
           ad_type: adsType,
+          ...(isJobListing ? {education, contractType} : {}),
           lat,
           lng,
         });
@@ -139,6 +146,32 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
             value={state.adsType}
           />
         </Button>
+        {isJobListing && (
+          <>
+            <Divider />
+            <Button
+              onPress={() =>
+                setState(s => ({...s, optionModal: true, optionType: 'education'}))
+              }>
+              <UnderlineTextField
+                editable={false}
+                placeholder="میزان تحصیلات"
+                value={state.education}
+              />
+            </Button>
+            <Divider />
+            <Button
+              onPress={() =>
+                setState(s => ({...s, optionModal: true, optionType: 'contractType'}))
+              }>
+              <UnderlineTextField
+                editable={false}
+                placeholder="نوع قرارداد"
+                value={state.contractType}
+              />
+            </Button>
+          </>
+        )}
         {mainCategory && (
           <>
             <Divider />
