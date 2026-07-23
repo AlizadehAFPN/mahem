@@ -1,6 +1,7 @@
 import axiosInstance from './axios-config';
 import store from '../stateManager';
 import {normalizeListQuery} from './normalize-query';
+import {upload} from './common';
 
 // Builds the { title, sub_categories: [...] } tree the category picker
 // expects, from the new backend's flat list of { id, name, parentId }.
@@ -73,6 +74,7 @@ export function mapAdvertisement(ad: any) {
     contact_info: ad.contactInfo,
     category_id: ad.category && {...ad.category, title: ad.category.name},
     city: ad.city && {...ad.city, title: ad.city.name},
+    store: ad.store ?? undefined,
   };
 }
 
@@ -93,6 +95,7 @@ export const createAds = (data: any) => {
     contact_info,
     lat,
     lng,
+    store_id,
     ...rest
   } = data;
   const images: string[] = [];
@@ -118,10 +121,45 @@ export const createAds = (data: any) => {
       images: images.filter(Boolean),
       ...(lat !== undefined && lat !== '' ? {lat: Number(lat)} : {}),
       ...(lng !== undefined && lng !== '' ? {lng: Number(lng)} : {}),
+      ...(store_id ? {storeId: store_id} : {}),
       ...(Object.keys(attributes).length > 0 ? {attributes} : {}),
     })
     .then(res => ({data: mapAdvertisement(res.data)}));
 };
+
+// Shared by CreateAdsDetailsScreen (free categories, uploads+creates
+// immediately) and CreateAdsPaymentScreen (fee-required categories, defers
+// this until "پرداخت" is tapped — see Category.adFeeToman) so the
+// image-upload-then-create sequence isn't duplicated between the two.
+// `images` is the 5-slot array from AdsImageSelection (each slot either ''
+// or a {uri, fileName, type} picker ref); uploads happen one at a time,
+// only for slots that were actually filled.
+export async function createAdsWithImages(
+  images: any[],
+  payload: Record<string, any>,
+  onUploadingChange?: (indexes: number[]) => void,
+) {
+  const imageData: Record<string, any> = {};
+  const uploadingIndexes: number[] = [];
+  for (let index = 0; index < images.length; index++) {
+    const image = images[index];
+    if (image?.uri) {
+      uploadingIndexes.push(index);
+      onUploadingChange?.([...uploadingIndexes]);
+      const form = new FormData();
+      form.append('file', {
+        name: image.fileName,
+        type: image.type,
+        uri: image.uri,
+      } as any);
+      const uploaded = await upload(form);
+      imageData[`image_${index + 1}`] = uploaded?.data?.id;
+      uploadingIndexes.splice(uploadingIndexes.indexOf(index), 1);
+      onUploadingChange?.([...uploadingIndexes]);
+    }
+  }
+  return createAds({...payload, ...imageData});
+}
 
 export const getAds = (query: any) => {
   return axiosInstance

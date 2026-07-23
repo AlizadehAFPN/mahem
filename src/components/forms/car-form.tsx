@@ -3,7 +3,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {Checkbox} from '../checkbox/checkbox';
-import {CitySelectModal} from '../modal/city-select-modal';
+import {ContactInfoCard} from './contact-info-card';
 import {CreateAdsHeader} from '../headers/create-ads-header';
 import {Divider} from '../divider/divider';
 import {DurationModal} from '../modal/duration-modal';
@@ -35,6 +35,9 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           title: editItem.title ?? '',
           description: editItem.description ?? '',
           contact_info: editItem.contact_info ?? '',
+          email: editItem.email ?? '',
+          chatEnabled: !!editItem.chatEnabled,
+          hideEmail: !!editItem.hideEmail,
           product_year:
             editItem.product_year != null ? String(editItem.product_year) : '',
           operation_amount:
@@ -48,9 +51,7 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           features: editItem.features ?? '',
           usage: '',
           adsType: editItem.ad_type ?? '',
-          carAdsCreator: boolToLabel(editItem.by_person, 'شخصی', 'شرکتی'),
-          city: editItem.city ?? '',
-          cityModal: false,
+          carAdsCreator: boolToLabel(editItem.by_person, 'شخصی', 'شرکت'),
           selectCategoryModal: false,
           optionType: '',
           optionModal: false,
@@ -62,6 +63,9 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           title: '',
           description: '',
           contact_info: '',
+          email: '',
+          chatEnabled: false,
+          hideEmail: false,
           product_year: '',
           operation_amount: '',
           price: '',
@@ -72,8 +76,6 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           usage: '',
           adsType: '',
           carAdsCreator: '',
-          city: '',
-          cityModal: false,
           selectCategoryModal: false,
           optionType: '',
           optionModal: false,
@@ -93,7 +95,9 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           price,
           adsType,
           contact_info,
-          city,
+          email,
+          chatEnabled,
+          hideEmail,
           brand,
           chassi,
           features,
@@ -114,7 +118,9 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           description,
           price,
           contact_info,
-          city_id: city?.id,
+          email,
+          chatEnabled,
+          hideEmail,
           operation_amount,
           product_year,
           is_cash,
@@ -133,13 +139,10 @@ export function CarForm({subCategory, editItem, send, onSend}) {
   }, [send]);
   const handleValidation = () => {
     let isValid = true;
-    const {title, city, contact_info, price} = state;
+    const {title, contact_info} = state;
     if (!title) {
       isValid = false;
       Alert.alert('عنوان را وارد کنید');
-    } else if (!city) {
-      isValid = false;
-      Alert.alert('شهر را وارد کنید');
     } else if (!contact_info) {
       isValid = false;
       Alert.alert('اطلاعات تماس را وارد کنید');
@@ -255,25 +258,19 @@ export function CarForm({subCategory, editItem, send, onSend}) {
         />
 
         <Divider />
-        <UnderlineTextField
-          value={state.contact_info}
-          onChangeText={text => setState(s => ({...s, contact_info: text}))}
-          placeholder="اطلاعات تماس"
-          keyboardType="number-pad"
+        <ContactInfoCard
+          value={{
+            contact_info: state.contact_info,
+            email: state.email,
+            chatEnabled: state.chatEnabled,
+            hideEmail: state.hideEmail,
+          }}
+          onChange={contact => setState(s => ({...s, ...contact}))}
         />
-        <Divider />
-        <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
-          <UnderlineTextField
-            placeholder="شهر"
-            value={state?.city?.title}
-            editable={false}
-          />
-        </Button>
-
         <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            placeholder="موقعیت روی نقشه (اختیاری)"
+            placeholder="تعیین موقعیت (اختیاری)"
             value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
             editable={false}
           />
@@ -286,11 +283,6 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           placeholder="توضیحات"
         />
       </View>
-      <CitySelectModal
-        onSelect={city => setState(s => ({...s, city, cityModal: false}))}
-        visible={state.cityModal}
-        onClose={() => setState(s => ({...s, cityModal: false}))}
-      />
       <LocationSelectModal
         visible={state.locationModal}
         onClose={() => setState(s => ({...s, locationModal: false}))}

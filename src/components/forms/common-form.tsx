@@ -3,7 +3,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {Checkbox} from '../checkbox/checkbox';
-import {CitySelectModal} from '../modal/city-select-modal';
+import {ContactInfoCard} from './contact-info-card';
 import {CreateAdsHeader} from '../headers/create-ads-header';
 import {Divider} from '../divider/divider';
 import {DurationModal} from '../modal/duration-modal';
@@ -36,10 +36,11 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           title: editItem.title ?? '',
           description: editItem.description ?? '',
           contact_info: editItem.contact_info ?? '',
-          city: editItem.city ?? '',
+          email: editItem.email ?? '',
+          chatEnabled: !!editItem.chatEnabled,
+          hideEmail: !!editItem.hideEmail,
           adsType: editItem.ad_type ?? '',
           price: editItem.price != null ? String(editItem.price) : '',
-          cityModal: false,
           acceptance: true,
           selectCategoryModal: false,
           durationModal: false,
@@ -53,10 +54,11 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           title: '',
           description: '',
           contact_info: '',
-          city: '',
+          email: '',
+          chatEnabled: false,
+          hideEmail: false,
           adsType: '',
           price: '',
-          cityModal: false,
           acceptance: false,
           selectCategoryModal: false,
           durationModal: false,
@@ -78,7 +80,9 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           price,
           adsType,
           contact_info,
-          city,
+          email,
+          chatEnabled,
+          hideEmail,
           lat,
           lng,
         } = state;
@@ -88,7 +92,9 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           description,
           price,
           contact_info,
-          city_id: city?.id,
+          email,
+          chatEnabled,
+          hideEmail,
           ad_type: adsType,
           lat,
           lng,
@@ -100,16 +106,13 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
   }, [send]);
   const handleValidation = () => {
     let isValid = true;
-    const {title, city, contact_info, price} = state;
+    const {title, contact_info, price} = state;
     if (!title) {
       isValid = false;
       Alert.alert('عنوان را وارد کنید');
     } else if (!price && !isJobListing) {
       isValid = false;
       Alert.alert('قیمت را وارد کنید');
-    } else if (!city) {
-      isValid = false;
-      Alert.alert('شهر را وارد کنید');
     } else if (!contact_info) {
       isValid = false;
       Alert.alert('اطلاعات تماس را وارد کنید');
@@ -148,27 +151,21 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
               keyboardType="number-pad"
             />
             <Divider />
-            <UnderlineTextField
-              value={state.contact_info}
-              onChangeText={text => setState(s => ({...s, contact_info: text}))}
-              placeholder="اطلاعات تماس"
-              keyboardType="number-pad"
+            <ContactInfoCard
+              value={{
+                contact_info: state.contact_info,
+                email: state.email,
+                chatEnabled: state.chatEnabled,
+                hideEmail: state.hideEmail,
+              }}
+              onChange={contact => setState(s => ({...s, ...contact}))}
             />
           </>
         )}
         <Divider />
-        <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
-          <UnderlineTextField
-            placeholder="شهر"
-            value={state?.city?.title}
-            editable={false}
-          />
-        </Button>
-
-        <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            placeholder="موقعیت روی نقشه (اختیاری)"
+            placeholder="تعیین موقعیت (اختیاری)"
             value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
             editable={false}
           />
@@ -181,11 +178,6 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           placeholder="توضیحات"
         />
       </View>
-      <CitySelectModal
-        onSelect={city => setState(s => ({...s, city, cityModal: false}))}
-        visible={state.cityModal}
-        onClose={() => setState(s => ({...s, cityModal: false}))}
-      />
       <LocationSelectModal
         visible={state.locationModal}
         onClose={() => setState(s => ({...s, locationModal: false}))}

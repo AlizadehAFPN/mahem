@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
-import {CitySelectModal} from '../modal/city-select-modal';
+import {ContactInfoCard} from './contact-info-card';
 import {Divider} from '../divider/divider';
 import {DurationModal} from '../modal/duration-modal';
 import {LocationSelectModal} from '../modal/location-select-modal';
@@ -47,13 +47,16 @@ function remainingDuration(expiresAt?: string | null) {
   };
 }
 
-export function OfferForm({editItem, send, onSend}) {
+export function OfferForm({editItem, send, onSend, storeId}) {
   const [state, setState] = useState(() =>
     editItem
       ? {
           title: editItem.title ?? '',
           description: editItem.description ?? '',
           contact_info: editItem.contact_info ?? '',
+          email: editItem.email ?? '',
+          chatEnabled: !!editItem.chatEnabled,
+          hideEmail: !!editItem.hideEmail,
           originalPrice:
             editItem.originalPrice != null ? String(editItem.originalPrice) : '',
           discountPercent:
@@ -65,8 +68,6 @@ export function OfferForm({editItem, send, onSend}) {
           installment: !!editItem.installment,
           usagePeriodText: editItem.usagePeriodText ?? '',
           testPeriodText: editItem.testPeriodText ?? '',
-          city: editItem.city ?? '',
-          cityModal: false,
           locationModal: false,
           durationModal: false,
           duration: remainingDuration(editItem.expiresAt),
@@ -77,6 +78,9 @@ export function OfferForm({editItem, send, onSend}) {
           title: '',
           description: '',
           contact_info: '',
+          email: '',
+          chatEnabled: false,
+          hideEmail: false,
           originalPrice: '',
           discountPercent: '',
           features: [] as string[],
@@ -84,8 +88,6 @@ export function OfferForm({editItem, send, onSend}) {
           installment: false,
           usagePeriodText: '',
           testPeriodText: '',
-          city: '',
-          cityModal: false,
           locationModal: false,
           durationModal: false,
           duration: {
@@ -142,7 +144,9 @@ export function OfferForm({editItem, send, onSend}) {
           title,
           description,
           contact_info,
-          city,
+          email,
+          chatEnabled,
+          hideEmail,
           originalPrice,
           discountPercent,
           features,
@@ -161,7 +165,9 @@ export function OfferForm({editItem, send, onSend}) {
           description,
           price,
           contact_info,
-          city_id: city?.id,
+          email,
+          chatEnabled,
+          hideEmail,
           originalPrice: Number(originalPrice),
           discountPercent: discount,
           features,
@@ -171,6 +177,7 @@ export function OfferForm({editItem, send, onSend}) {
           expiresAt: durationToExpiresAt(),
           lat,
           lng,
+          ...(storeId ? {store_id: storeId} : {}),
         });
       } else {
         onSend(false);
@@ -180,7 +187,7 @@ export function OfferForm({editItem, send, onSend}) {
 
   const handleValidation = () => {
     let isValid = true;
-    const {title, city, contact_info, originalPrice, discountPercent} = state;
+    const {title, contact_info, originalPrice, discountPercent} = state;
     if (!title) {
       isValid = false;
       Alert.alert('عنوان را وارد کنید');
@@ -190,9 +197,6 @@ export function OfferForm({editItem, send, onSend}) {
     } else if (!discountPercent) {
       isValid = false;
       Alert.alert('درصد تخفیف را وارد کنید');
-    } else if (!city) {
-      isValid = false;
-      Alert.alert('شهر را وارد کنید');
     } else if (!contact_info) {
       isValid = false;
       Alert.alert('اطلاعات تماس را وارد کنید');
@@ -206,14 +210,14 @@ export function OfferForm({editItem, send, onSend}) {
         <UnderlineTextField
           value={state.title}
           onChangeText={text => setState(s => ({...s, title: text}))}
-          placeholder="عنوان تخفیف (حداقل ۱۰ حرف)"
+          placeholder="عنوان آگهی (حداقل ۱۰ حرف)"
         />
         <Divider />
         <UnderlineTextField
           value={state.originalPrice}
           onChangeText={text => setState(s => ({...s, originalPrice: text}))}
           keyboardType="number-pad"
-          placeholder="قیمت قبل از تخفیف"
+          placeholder="قیمت اصلی"
         />
         <Divider />
         <UnderlineTextField
@@ -242,24 +246,19 @@ export function OfferForm({editItem, send, onSend}) {
           )}
         </Button>
         <Divider />
-        <UnderlineTextField
-          value={state.contact_info}
-          onChangeText={text => setState(s => ({...s, contact_info: text}))}
-          placeholder="اطلاعات تماس"
-          keyboardType="number-pad"
+        <ContactInfoCard
+          value={{
+            contact_info: state.contact_info,
+            email: state.email,
+            chatEnabled: state.chatEnabled,
+            hideEmail: state.hideEmail,
+          }}
+          onChange={contact => setState(s => ({...s, ...contact}))}
         />
-        <Divider />
-        <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
-          <UnderlineTextField
-            placeholder="شهر"
-            value={state?.city?.title}
-            editable={false}
-          />
-        </Button>
         <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            placeholder="موقعیت روی نقشه (اختیاری)"
+            placeholder="تعیین موقعیت (اختیاری)"
             value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
             editable={false}
           />
@@ -330,11 +329,6 @@ export function OfferForm({editItem, send, onSend}) {
           </Row>
         ))}
       </View>
-      <CitySelectModal
-        onSelect={city => setState(s => ({...s, city, cityModal: false}))}
-        visible={state.cityModal}
-        onClose={() => setState(s => ({...s, cityModal: false}))}
-      />
       <LocationSelectModal
         visible={state.locationModal}
         onClose={() => setState(s => ({...s, locationModal: false}))}

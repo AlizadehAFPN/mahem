@@ -3,7 +3,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {Checkbox} from '../checkbox/checkbox';
-import {CitySelectModal} from '../modal/city-select-modal';
+import {ContactInfoCard} from './contact-info-card';
 import {CreateAdsHeader} from '../headers/create-ads-header';
 import {Divider} from '../divider/divider';
 import {DurationModal} from '../modal/duration-modal';
@@ -39,18 +39,26 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
       ? {
           title: editItem.title ?? '',
           contact_info: editItem.contact_info ?? '',
+          email: editItem.email ?? '',
+          chatEnabled: !!editItem.chatEnabled,
+          hideEmail: !!editItem.hideEmail,
           area: editItem.area != null ? String(editItem.area) : '',
+          rooms: editItem.rooms ?? '',
+          product_year:
+            editItem.product_year != null ? String(editItem.product_year) : '',
           adsType: editItem.ad_type ?? '',
-          adsCreator: boolToLabel(editItem.by_person, 'شخصی', 'املاک'),
+          adsCreator: boolToLabel(editItem.by_person, 'شخصی', 'مشاور املاک'),
           description: editItem.description ?? '',
           floor: editItem.floor ?? '',
           elevator: boolToLabel(editItem.elevator, 'دارد', 'ندارد'),
           parking: boolToLabel(editItem.parking, 'دارد', 'ندارد'),
           suburb: boolToLabel(editItem.suburbs, 'هست', 'نیست'),
           price: editItem.price != null ? String(editItem.price) : '',
+          rehn: editItem.rehn != null ? String(editItem.rehn) : '',
+          ejare: editItem.ejare != null ? String(editItem.ejare) : '',
+          convertible: !!editItem.convertible,
+          documentType: editItem.documentType ?? '',
           features: editItem.features ?? '',
-          city: editItem.city ?? '',
-          cityModal: false,
           acceptance: true,
           selectCategoryModal: false,
           durationModal: false,
@@ -63,7 +71,12 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
       : {
           title: '',
           contact_info: '',
+          email: '',
+          chatEnabled: false,
+          hideEmail: false,
           area: '',
+          rooms: '',
+          product_year: '',
           adsType: '',
           adsCreator: '',
           description: '',
@@ -72,9 +85,11 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
           parking: '',
           suburb: '',
           price: '',
+          rehn: '',
+          ejare: '',
+          convertible: false,
+          documentType: '',
           features: '',
-          city: '',
-          cityModal: false,
           acceptance: false,
           selectCategoryModal: false,
           durationModal: false,
@@ -98,9 +113,17 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
           elevator,
           description,
           price,
+          rehn,
+          ejare,
+          convertible,
+          documentType,
+          rooms,
+          product_year,
           adsType,
           contact_info,
-          city,
+          email,
+          chatEnabled,
+          hideEmail,
           adsCreator,
           area,
           features,
@@ -123,9 +146,21 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
           elevator: tempEelevator,
           by_person,
           description,
+          // رهن و اجاره listings collect rehn/ejare instead of a single
+          // price (see the رهن و اجاره conditional in the render below);
+          // both ride into `attributes` since neither is a known top-level
+          // field (see ads.ts's createAds).
           price,
+          rehn,
+          ejare,
+          convertible,
+          documentType,
+          rooms,
+          product_year,
           contact_info,
-          city_id: city?.id,
+          email,
+          chatEnabled,
+          hideEmail,
           ad_type: adsType,
           area,
           features,
@@ -139,13 +174,10 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
   }, [send]);
   const handleValidation = () => {
     let isValid = true;
-    const {title, city, contact_info} = state;
+    const {title, contact_info} = state;
     if (!title) {
       isValid = false;
       Alert.alert('عنوان را وارد کنید');
-    } else if (!city) {
-      isValid = false;
-      Alert.alert('شهر را وارد کنید');
     } else if (!contact_info) {
       isValid = false;
       Alert.alert('اطلاعات تماس را وارد کنید');
@@ -165,6 +197,17 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
         {!subCategory?.title?.includes('عقد مشارکت') && (
           <>
             <Divider />
+            <Button
+              onPress={() =>
+                setState(s => ({...s, optionModal: true, optionType: 'rooms'}))
+              }>
+              <UnderlineTextField
+                editable={false}
+                placeholder="تعداد اتاق"
+                value={state.rooms}
+              />
+            </Button>
+            <Divider />
             <UnderlineTextField
               value={state.area}
               onChangeText={text => setState(s => ({...s, area: text}))}
@@ -172,15 +215,51 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
               placeholder="متراژ (متر مربع)"
             />
             <Divider />
-            {/* <Button onPress={() => setState(s => ({ ...s, optionModal: true, optionType: 'price' }))}> */}
             <UnderlineTextField
-              value={state.price}
-              onChangeText={text => setState(s => ({...s, price: text}))}
+              value={state.product_year}
+              onChangeText={text =>
+                setState(s => ({...s, product_year: text}))
+              }
               keyboardType="number-pad"
-              placeholder="قیمت"
-              // editable={false}
+              placeholder="سال ساخت"
             />
-            {/* </Button> */}
+            <Divider />
+            {/* رهن و اجاره مسکونی/اداری needs separate رهن/اجاره amounts
+                instead of one price (Figma "ثبت آگهی – اجاره مسکونی3") —
+                every other estate subcategory keeps the single price field. */}
+            {subCategory?.title?.includes('رهن و اجاره') ? (
+              <>
+                <UnderlineTextField
+                  value={state.rehn}
+                  onChangeText={text => setState(s => ({...s, rehn: text}))}
+                  keyboardType="number-pad"
+                  placeholder="رهن را وارد کنید (به تومان)"
+                />
+                <Divider />
+                <UnderlineTextField
+                  value={state.ejare}
+                  onChangeText={text => setState(s => ({...s, ejare: text}))}
+                  keyboardType="number-pad"
+                  placeholder="اجاره را وارد کنید (به تومان)"
+                />
+                <Divider />
+                <Checkbox
+                  value={state.convertible}
+                  onToggle={() =>
+                    setState(s => ({...s, convertible: !s.convertible}))
+                  }
+                  style={{flexDirection: 'row', alignSelf: 'center'}}
+                  text="قابلیت تبدیل رهن به اجاره"
+                />
+              </>
+            ) : (
+              <UnderlineTextField
+                value={state.price}
+                onChangeText={text => setState(s => ({...s, price: text}))}
+                keyboardType="number-pad"
+                placeholder="قیمت"
+              />
+            )}
             <Divider />
             <Button
               onPress={() =>
@@ -211,6 +290,18 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                 value={state.adsCreator}
               />
             </Button>
+            {subCategory?.title?.includes('اداری و تجاری') && (
+              <>
+                <Divider />
+                <UnderlineTextField
+                  value={state.documentType}
+                  onChangeText={text =>
+                    setState(s => ({...s, documentType: text}))
+                  }
+                  placeholder="سند اداری"
+                />
+              </>
+            )}
           </>
         )}
 
@@ -222,25 +313,19 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
         />
 
         <Divider />
-        <UnderlineTextField
-          value={state.contact_info}
-          onChangeText={text => setState(s => ({...s, contact_info: text}))}
-          placeholder="اطلاعات تماس"
-          keyboardType="number-pad"
+        <ContactInfoCard
+          value={{
+            contact_info: state.contact_info,
+            email: state.email,
+            chatEnabled: state.chatEnabled,
+            hideEmail: state.hideEmail,
+          }}
+          onChange={contact => setState(s => ({...s, ...contact}))}
         />
-        <Divider />
-        <Button onPress={() => setState(s => ({...s, cityModal: true}))}>
-          <UnderlineTextField
-            placeholder="شهر"
-            value={state?.city?.title}
-            editable={false}
-          />
-        </Button>
-
         <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            placeholder="موقعیت روی نقشه (اختیاری)"
+            placeholder="تعیین موقعیت (اختیاری)"
             value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
             editable={false}
           />
@@ -317,11 +402,6 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
           </>
         )}
       </View>
-      <CitySelectModal
-        onSelect={city => setState(s => ({...s, city, cityModal: false}))}
-        visible={state.cityModal}
-        onClose={() => setState(s => ({...s, cityModal: false}))}
-      />
       <LocationSelectModal
         visible={state.locationModal}
         onClose={() => setState(s => ({...s, locationModal: false}))}
