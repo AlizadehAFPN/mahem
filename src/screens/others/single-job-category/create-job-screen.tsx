@@ -94,7 +94,7 @@ export function CreateJobScreen() {
           uploadedLogo: undefined,
         },
   );
-  const {goBack} = useNavigation();
+  const {goBack, navigate} = useNavigation<any>();
 
   const {mutate} = useMutation(upload);
   const {mutate: jobMutate, isLoading} = useMutation(
@@ -296,6 +296,13 @@ export function CreateJobScreen() {
             </Text>
           </TouchableOpacity>
         </Row>
+        <Row style={{paddingHorizontal: 8, justifyContent: 'flex-end'}}>
+          <TouchableOpacity onPress={() => navigate('jobCategoryGuide')}>
+            <Text style={{fontSize: 12, color: colors.main}}>
+              راهنمای انتخاب صنف
+            </Text>
+          </TouchableOpacity>
+        </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
             <Text style={{...styles.itemText}}>شماره ثبت</Text>
@@ -327,7 +334,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>تلفن</Text>
+            <Text style={{...styles.itemText}}>تلفن همراه</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>

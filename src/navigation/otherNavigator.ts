@@ -18,6 +18,7 @@ import {Settings} from '../screens/others/settings/settings-screen';
 import {AdViewStatsScreen} from '../screens/others/ad-view-stats/ad-view-stats-screen';
 import {NoInternetScreen} from '../screens/others/no-internet/no-internet-screen';
 import {NotifDetailScreen} from '../screens/others/notif/notif-detail-screen';
+import {JobCategoryGuideScreen} from '../screens/others/single-job-category/job-category-guide-screen';
 import {
   DiscountMapScreen,
   NearbyDiscountsScreen,
@@ -109,6 +110,10 @@ export const appRoutes = [
   {
     name: 'notifDetail',
     component: NotifDetailScreen,
+  },
+  {
+    name: 'jobCategoryGuide',
+    component: JobCategoryGuideScreen,
   },
   {
     name: 'nearbyDiscounts',
