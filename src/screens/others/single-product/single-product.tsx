@@ -363,6 +363,7 @@ export function SinlgeProduct() {
                 navigate('chat', {
                   title: data?.data?.title,
                   advertisementId: data?.data?.id,
+                  avatar: data?.data?.user?.avatar,
                 })
               }
               style={styles.button}>

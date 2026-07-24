@@ -27,6 +27,7 @@ export function ChatItem({item}) {
         navigate('chat', {
           title: item?.advertisement?.title,
           conversationId: item?.id,
+          avatar: counterparty?.avatar,
         })
       }
       style={styles.container}>
@@ -39,13 +40,17 @@ export function ChatItem({item}) {
           </Text>
           <Image
             style={{
-              resizeMode: 'contain',
+              resizeMode: counterparty?.avatar ? 'cover' : 'contain',
               marginLeft: -30,
               height: 45,
               width: 45,
               borderRadius: 12,
             }}
-            source={require('../../../assets/images/userMarketAvatar.png')}
+            source={
+              counterparty?.avatar
+                ? {uri: counterparty.avatar}
+                : require('../../../assets/images/logo.png')
+            }
           />
         </Row>
       </Row>

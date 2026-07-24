@@ -80,11 +80,12 @@ export function ChatScreen() {
   const mappedMessages = messages.map(message => ({
     ...message,
     me: message.senderId === user?.id,
+    avatar: message.senderId === user?.id ? user?.avatar : params?.avatar,
   }));
 
   return (
     <Screen withoutScroll style={{paddingBottom: insents.bottom}}>
-      <ChatHeader title={params?.title} />
+      <ChatHeader title={params?.title} avatar={params?.avatar} />
       <View style={{flex: 1}}>
         <FlatList
           data={mappedMessages}

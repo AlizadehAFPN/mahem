@@ -20,15 +20,18 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useSelector} from 'react-redux';
 import {deleteAds, getConversations, getMyAds} from '../../../services';
 import {formatRelativeTime} from '../../../utiles/utiles_funcs';
+import {RootState} from '../../../stateManager';
 
 export function UserPanelScreen() {
   const [state, setState] = useState({
     adsMode: true,
   });
-  const {goBack, navigate} = useNavigation();
+  const {goBack, navigate} = useNavigation<any>();
   const queryClient = useQueryClient();
+  const user = useSelector((s: RootState) => s.user);
 
   const {data: myAds} = useQuery('myAds', getMyAds);
   const {mutate: deleteAdMutate} = useMutation(deleteAds, {
@@ -58,12 +61,19 @@ export function UserPanelScreen() {
         </TouchableOpacity>
       </Row>
       <View style={styles.avatarCon}>
-        <View style={styles.avatar}>
+        <TouchableOpacity
+          style={styles.avatar}
+          onPress={() => navigate('editProfile')}>
           <Image
             style={{width: '100%', height: '100%'}}
-            source={require('../../../assets/images/userav1.png')}
+            source={
+              user?.avatar
+                ? {uri: user.avatar}
+                : require('../../../assets/images/logo.png')
+            }
+            resizeMode={user?.avatar ? 'cover' : 'contain'}
           />
-        </View>
+        </TouchableOpacity>
         <Text size={20}>پنل مدیریت کاربر</Text>
       </View>
       {state.adsMode ? (

@@ -24,7 +24,12 @@ export function Message({message, index}) {
         }}>
         <Image
           style={{...styles.avatar}}
-          source={require('../../assets/images/userMarketAvatar.png')}
+          resizeMode={message.avatar ? 'cover' : 'contain'}
+          source={
+            message.avatar
+              ? {uri: message.avatar}
+              : require('../../assets/images/logo.png')
+          }
         />
       </View>
     </View>

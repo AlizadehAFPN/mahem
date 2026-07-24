@@ -9,9 +9,10 @@ import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 interface ChatHeaderProps {
   title?: string;
+  avatar?: string;
   onCreatePress?: () => void;
 }
-export function ChatHeader({title, onCreatePress}: ChatHeaderProps) {
+export function ChatHeader({title, avatar, onCreatePress}: ChatHeaderProps) {
   const {goBack} = useNavigation();
   return (
     <View style={styles.continer}>
@@ -37,7 +38,12 @@ export function ChatHeader({title, onCreatePress}: ChatHeaderProps) {
               borderRadius: 30,
               overflow: 'hidden',
             }}
-            source={require('../../assets/images/userMarketAvatar.png')}
+            resizeMode={avatar ? 'cover' : 'contain'}
+            source={
+              avatar
+                ? {uri: avatar}
+                : require('../../assets/images/logo.png')
+            }
           />
           <Divider style={{width: 5}} />
           <Text size={17} color="white">

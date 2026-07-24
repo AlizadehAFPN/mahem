@@ -18,12 +18,15 @@ import {colors} from '../../../theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import {useQuery} from 'react-query';
+import {useSelector} from 'react-redux';
 import {getBookmarks} from '../../../services';
+import {RootState} from '../../../stateManager';
 
 export function BookmarkScreen() {
   const {goBack, navigate} = useNavigation();
   const {data, isLoading, isError} = useQuery(['bookmarks'], getBookmarks);
   const bookmarks = data?.data;
+  const user = useSelector((s: RootState) => s.user);
   return (
     <Screen withoutScroll>
       <Row style={styles.header}>
@@ -35,7 +38,12 @@ export function BookmarkScreen() {
         <View style={styles.avatar}>
           <Image
             style={{width: '100%', height: '100%'}}
-            source={require('../../../assets/images/userav1.png')}
+            source={
+              user?.avatar
+                ? {uri: user.avatar}
+                : require('../../../assets/images/logo.png')
+            }
+            resizeMode={user?.avatar ? 'cover' : 'contain'}
           />
         </View>
         <Text size={20}>پنل نشان شده کاربر</Text>
