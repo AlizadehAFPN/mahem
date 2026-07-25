@@ -1,18 +1,19 @@
 import {FlatList, StyleSheet, View} from 'react-native';
 import React, {useMemo} from 'react';
+import {useTranslation} from 'react-i18next';
 import {CategroyItem, Divider, MainHeader, Screen} from '../../components';
 import {useNavigation} from '@react-navigation/native';
-import {useQuery} from 'react-query';
-import {getAdsCategories} from '../../services';
+import {useAdsCategories} from '../../hooks/use-cached-categories';
 
 // Landing page of the employee tab — general-ad browsing by category, as
 // actual pushed pages (not a modal), mirroring OfferDetectionScreen's
 // category -> subcategory -> list flow. تخفیف‌یاب has its own tab/section,
 // so it's excluded here; بانک مشاغل is naturally excluded too since Jobs
-// aren't part of the GENERAL category tree getAdsCategories fetches.
+// aren't part of the GENERAL category tree useAdsCategories fetches.
 export function EmployeeScreen() {
+  const {t} = useTranslation();
   const {navigate} = useNavigation();
-  const {data} = useQuery(['adsCategories'], getAdsCategories);
+  const {data} = useAdsCategories();
 
   const categories = useMemo(
     () => (data?.data ?? []).filter((c: any) => c.title !== 'تخفیف یاب'),
@@ -32,7 +33,7 @@ export function EmployeeScreen() {
 
   return (
     <Screen withoutScroll>
-      <MainHeader title="آگهی‌ها" showLocation={true} />
+      <MainHeader title={t('search.adsTitle')} showLocation={true} />
       <FlatList
         data={categories}
         style={{paddingHorizontal: 8}}
@@ -40,10 +41,10 @@ export function EmployeeScreen() {
           <View>
             <Divider height={8} />
             <CategroyItem
-              item={{title: 'همه موارد'}}
+              item={{title: t('common.allItems')}}
               onPress={() =>
                 navigate('employeeAds' as never, {
-                  title: 'همه موارد',
+                  title: t('common.allItems'),
                 } as never)
               }
             />

@@ -7,10 +7,12 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useMemo} from 'react';
+import {useTranslation} from 'react-i18next';
 import {getLegacyImagePaths, numberWithCommas} from '../../utiles/utiles_funcs';
 import {colors} from '../../theme';
 const {width} = Dimensions.get('window');
 export function GridProduct({product, onPress}) {
+  const {t} = useTranslation();
   // Advertisements carry images via the synthesized image1/image2... fields
   // (see getLegacyImagePaths); Jobs have no such thing, just plain
   // banner/logo URLs, so fall back to those for بانک مشاغل's home-screen row.
@@ -34,7 +36,7 @@ export function GridProduct({product, onPress}) {
       </Text>
       {!!price && (
         <Text numberOfLines={1} style={styles.price}>
-          {numberWithCommas(price)} تومان
+          {numberWithCommas(price)} {t('common.toman')}
         </Text>
       )}
     </TouchableOpacity>

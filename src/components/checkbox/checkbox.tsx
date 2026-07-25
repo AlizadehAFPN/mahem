@@ -33,6 +33,10 @@ const FILL: ViewStyle = {
 };
 
 const LABEL: TextStyle = {paddingHorizontal: 8, fontSize: 17};
+const LABEL_LINK: TextStyle = {
+  color: colors.main,
+  textDecorationLine: 'underline',
+};
 
 export function Checkbox(props: CheckboxProps) {
   const numberOfLines = props.multiline ? 0 : 1;
@@ -58,12 +62,18 @@ export function Checkbox(props: CheckboxProps) {
         : colors.pallete.gray2,
     },
   ];
-  const textStyle = [LABEL, props.labelStyle];
+  const textStyle = [LABEL, props.onTextPress && LABEL_LINK, props.labelStyle];
   const onPress = props.disabled
     ? null
     : props.onToggle
     ? () => props.onToggle && props.onToggle(!props.value)
     : null;
+
+  const label = (
+    <Text numberOfLines={numberOfLines} style={textStyle}>
+      {props.text}
+    </Text>
+  );
 
   return (
     <TouchableOpacity
@@ -76,9 +86,11 @@ export function Checkbox(props: CheckboxProps) {
           {props.value && <IonIcon name="checkmark" color="white" size={16} />}
         </View>
       </View>
-      <Text numberOfLines={numberOfLines} style={textStyle}>
-        {props.text}
-      </Text>
+      {props.onTextPress ? (
+        <TouchableOpacity onPress={props.onTextPress}>{label}</TouchableOpacity>
+      ) : (
+        label
+      )}
     </TouchableOpacity>
   );
 }

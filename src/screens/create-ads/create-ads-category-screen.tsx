@@ -2,17 +2,19 @@ import {ActivityIndicator, FlatList, StyleSheet, TouchableOpacity} from 'react-n
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
-import {useQuery} from 'react-query';
+import {useTranslation} from 'react-i18next';
 import {MainHeader, Screen, Text} from '../../components';
-import {getAdsCategories} from '../../services';
 import {colors} from '../../theme';
+import {useAdsCategories} from '../../hooks/use-cached-categories';
+import {localizeCategory} from '../../i18n/display-maps';
 
 // "ثبت آگهی - 0" (Figma): the wizard's root step — pick one of the 10 top
 // -level categories. Matches the design's row styling exactly (#EEEEEE
 // background, #707070 1px border, 5px radius, 52px height, 2px gap).
 export function CreateAdsCategoryScreen() {
+  const {t} = useTranslation();
   const {navigate} = useNavigation<any>();
-  const {data} = useQuery(['addsCategory'], getAdsCategories);
+  const {data} = useAdsCategories();
   const categories = data?.data ?? [];
 
   const onPressCategory = (category: any) => {
@@ -25,7 +27,7 @@ export function CreateAdsCategoryScreen() {
 
   return (
     <Screen withoutScroll>
-      <MainHeader title="ثبت آگهی" />
+      <MainHeader title={t('createAds.postAd')} />
       {!data ? (
         <ActivityIndicator style={{marginTop: 24}} color={colors.main} />
       ) : (
@@ -43,7 +45,7 @@ export function CreateAdsCategoryScreen() {
                 color={colors.text}
                 style={styles.chevron}
               />
-              <Text style={styles.rowText}>{item.title}</Text>
+              <Text style={styles.rowText}>{localizeCategory(item.title)}</Text>
             </TouchableOpacity>
           )}
         />

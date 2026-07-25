@@ -46,4 +46,10 @@ export interface CheckboxProps {
   labelStyle?: TextStyle;
 
   checkedColor?: string;
+
+  /**
+   * If provided, the label text becomes its own touch target (e.g. a link
+   * to a terms/rules screen) instead of just toggling the checkbox.
+   */
+  onTextPress?: () => void;
 }

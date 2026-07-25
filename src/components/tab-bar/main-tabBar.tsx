@@ -2,16 +2,16 @@ import React, {FunctionComponent} from 'react';
 import {
   View,
   TouchableOpacity,
-  StyleSheet,
+  // StyleSheet,
   Dimensions,
-  Platform,
+  // Platform,
 } from 'react-native';
 import {colors} from '../../theme';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import {StackActions} from 'react-navigation';
+import {CommonActions} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const {width, height} = Dimensions.get('window');
@@ -45,9 +45,6 @@ export const MainTabBar: FunctionComponent = ({
         return null;
     }
   };
-  if (state.index == 2 && !state.routes[2]?.state?.index) {
-    return null;
-  }
   return (
     <View style={{zIndex: 0}}>
       <View
@@ -58,7 +55,7 @@ export const MainTabBar: FunctionComponent = ({
           paddingVertical: 10,
           elevation: 10,
           backgroundColor: colors.main,
-          paddingBottom: Platform.OS == 'ios' ? insets.bottom : 10,
+          paddingBottom: insets.bottom,
         }}>
         {state.routes.map((route, index) => {
           const {options} = descriptors[route.key];
@@ -78,18 +75,48 @@ export const MainTabBar: FunctionComponent = ({
               canPreventDefault: true,
             });
 
-            if (!event.defaultPrevented) {
-              const navTarget =
-                route.name == 'home'
-                  ? 'menuStack'
-                  : route.name == 'menuStack'
-                  ? 'home'
-                  : route.name;
-              navigation.navigate({name: navTarget, merge: true});
-              // The `merge: true` option makes sure that the params inside the tab screen are preserved
-              // navigation.navigate({ name: route.name, merge: true });
-              // navigation.dispatch(StackActions.popToTop());
+            if (event.defaultPrevented) {
+              return;
             }
+
+            const navTarget =
+              route.name == 'home'
+                ? 'menuStack'
+                : route.name == 'menuStack'
+                ? 'home'
+                : route.name;
+
+            // `index`/`isFocused` above are keyed by this button's own slot
+            // (route.name), not navTarget — home/menuStack swap their icons
+            // vs. their underlying tab, so "is the tab this button leads to
+            // already showing" has to be checked against navTarget instead.
+            const isTargetFocused =
+              state.routes[state.index].name === navTarget;
+            const nestedState = state.routes.find(r => r.name === navTarget)
+              ?.state as
+              | {index: number; key: string; routes: {name: string}[]}
+              | undefined;
+
+            // Re-tapping the tab you're already on pops its nested stack
+            // back to its first screen (standard bottom-tab behavior).
+            // Switching in from a different tab (the branch below, via
+            // `merge: true`) always preserves whatever screen was left open
+            // there — nothing to do for tabs with no nested stack history
+            // (home/search) or ones that already reset on every focus via
+            // `unmountOnBlur` (newAdvertising/employee).
+            if (isTargetFocused && nestedState && nestedState.index > 0) {
+              navigation.dispatch({
+                ...CommonActions.reset({
+                  index: 0,
+                  routes: [{name: nestedState.routes[0].name}],
+                }),
+                target: nestedState.key,
+              });
+              return;
+            }
+
+            // The `merge: true` option makes sure that the params inside the tab screen are preserved
+            navigation.navigate({name: navTarget, merge: true});
           };
 
           const onLongPress = () => {
@@ -103,7 +130,6 @@ export const MainTabBar: FunctionComponent = ({
               <TouchableOpacity
                 activeOpacity={1}
                 style={{
-                  flex: 3,
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
@@ -154,30 +180,30 @@ export const MainTabBar: FunctionComponent = ({
   );
 };
 
-const styles = StyleSheet.create({
-  indicator: {
-    position: 'absolute',
-    top: -20,
-    width: 55,
-    height: 4,
-    borderBottomEndRadius: 5,
-    borderBottomStartRadius: 5,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  triangle: {
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid',
-    borderLeftWidth: 8,
-    borderRightWidth: 8,
-    borderTopWidth: 10,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: 'white',
-    marginTop: 8,
-    // borderRadius:2
-  },
-});
+// const styles = StyleSheet.create({
+//   indicator: {
+//     position: 'absolute',
+//     top: -20,
+//     width: 55,
+//     height: 4,
+//     borderBottomEndRadius: 5,
+//     borderBottomStartRadius: 5,
+//     backgroundColor: 'white',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   triangle: {
+//     width: 0,
+//     height: 0,
+//     backgroundColor: 'transparent',
+//     borderStyle: 'solid',
+//     borderLeftWidth: 8,
+//     borderRightWidth: 8,
+//     borderTopWidth: 10,
+//     borderLeftColor: 'transparent',
+//     borderRightColor: 'transparent',
+//     borderTopColor: 'white',
+//     marginTop: 8,
+//     // borderRadius:2
+//   },
+// });

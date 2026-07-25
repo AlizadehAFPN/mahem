@@ -1,4 +1,5 @@
 export * from './call-info';
+export * from './contact-info-modal';
 export * from './mainModal';
 export * from './report-problems';
 export * from './job-clasess-modal';

@@ -6,6 +6,7 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {MainModal} from '../modal/mainModal';
 import {colors} from '../../theme';
 import {Text} from '../text/text';
@@ -29,6 +30,10 @@ interface PickerProps {
   // anything at all, and see everything under that branch.
   allowSelectParent?: boolean;
   allItemsLabel?: string;
+  // Optional display-only localizer for each row's label (e.g. localizeOption
+  // for backend option values). The stored value passed to onSelect stays the
+  // canonical (Persian) `item`, so only what the user sees is translated.
+  localizeLabel?: (value: string) => string;
 }
 
 // Shared single-select list/tree picker backing CityPicker, CategoryPicker,
@@ -45,10 +50,14 @@ export function Picker({
   getChildren,
   searchable = false,
   allowSelectParent = false,
-  allItemsLabel = 'همه موارد',
+  allItemsLabel,
+  localizeLabel,
 }: PickerProps) {
+  const {t} = useTranslation();
   const [path, setPath] = useState<any[]>([]);
   const [query, setQuery] = useState('');
+  const displayLabel = (value: any) =>
+    localizeLabel ? localizeLabel(String(value ?? '')) : value;
 
   useEffect(() => {
     if (!visible) {
@@ -62,7 +71,7 @@ export function Picker({
   const visibleItems =
     query && currentLevel
       ? currentLevel.filter(item =>
-          String(item[labelField] ?? '')
+          String(displayLabel(item[labelField]) ?? '')
             .toLowerCase()
             .includes(query.toLowerCase()),
         )
@@ -93,23 +102,24 @@ export function Picker({
           <UnderlineTextField
             value={query}
             onChangeText={setQuery}
-            placeholder="جست‌وجو"
+            placeholder={t('common.search')}
           />
         )}
         <FlatList
           data={visibleItems || []}
           keyExtractor={(item, index) => String(item?.[valueField] ?? index)}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
           renderItem={({item}) => (
             <TouchableOpacity
               onPress={() => onPressItem(item)}
               style={styles.item}>
-              <Text>{item[labelField]}</Text>
+              <Text size={14}>{displayLabel(item[labelField])}</Text>
             </TouchableOpacity>
           )}
           ListHeaderComponent={
             allowSelectParent && !query ? (
               <TouchableOpacity onPress={onSelectAll} style={styles.item}>
-                <Text preset="bold">{allItemsLabel}</Text>
+                <Text preset="bold">{allItemsLabel ?? t('common.allItems')}</Text>
               </TouchableOpacity>
             ) : null
           }
@@ -123,10 +133,10 @@ export function Picker({
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 10,
     marginBottom: 4,
     borderColor: colors.pallete.gray2,
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
     paddingTop: 16,
     backgroundColor: colors.pallete.gray1,
     maxHeight: height * 0.75,
@@ -136,8 +146,12 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   item: {
-    height: 50,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: colors.pallete.gray3,
   },
 });

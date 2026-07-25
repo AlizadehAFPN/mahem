@@ -1,12 +1,14 @@
 import {Image, View, Linking} from 'react-native';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {Divider, MainHeader, Screen, Text, Row} from '../../../components';
 import {colors} from '../../../theme';
 
 export function CallUsScreen() {
+  const {t} = useTranslation();
   return (
     <Screen withoutScroll>
-      <MainHeader title="تماس با ما" showBack />
+      <MainHeader title={t('menu.contactUs')} showBack />
       <View
         style={{
           width: '100%',
@@ -19,13 +21,10 @@ export function CallUsScreen() {
         />
       </View>
       <Screen unsafe style={{paddingHorizontal: 15}}>
-        <Text size={17}>
-          جهت پیشنـهاد یا انتقاد و یا از وجـود مشکلی در اپلیکیشن ماهـم می توانید
-          به روش های زیـر ما را یاری نمـایید.
-        </Text>
+        <Text size={17}>{t('info.contactIntro')}</Text>
         <Divider />
         <Row style={{justifyContent: 'space-between'}}>
-          <Text size={17}>ایدی تلگرام</Text>
+          <Text size={17}>{t('info.telegramId')}</Text>
           <Text
             size={17}
             onPress={() => Linking.openURL('http://t.me/Mahem_App')}>
@@ -33,7 +32,7 @@ export function CallUsScreen() {
           </Text>
         </Row>
         <Row style={{justifyContent: 'space-between'}}>
-          <Text size={17}>آدرس ایمیل</Text>
+          <Text size={17}>{t('info.emailAddress')}</Text>
           <Text
             size={17}
             onPress={() =>
@@ -45,7 +44,7 @@ export function CallUsScreen() {
           </Text>
         </Row>
         <Row style={{justifyContent: 'space-between'}}>
-          <Text size={17}>ایدی اینستاگرام</Text>
+          <Text size={17}>{t('info.instagramId')}</Text>
           <Text
             size={17}
             onPress={() =>
@@ -59,24 +58,15 @@ export function CallUsScreen() {
           </Text>
         </Row>
         <Divider />
-        <Text size={17}>
-          تیم مدیریت و پشتیبانی ماهم در حال حاضر در تهران اقامت دارند و اقـدامات
-          لازمه جهت انتقال دفتر به شـهر گنبد کاووس در دست اقـدام بوده و آدرس
-          دقیق دفتر در گنبد کاووس اعلام خواهـد شد.
-        </Text>
-        <Text size={17}>
-          {' '}
-          در صورت ایجاد مزاحمت بـرای شما، می توانید با مراجعه به سایت پلیس فـتا
-          به آدرس www.cyberpolice.ir از اطلاعـات تماس پلیس فتای محل سکونت خود
-          آگاه شوید و موضـوع را از آن طریق پیگیری کنید.
-        </Text>
+        <Text size={17}>{t('info.officeNotice')}</Text>
+        <Text size={17}> {t('info.cyberpoliceNotice')}</Text>
         <Divider />
         <Row style={{justifyContent: 'space-between'}}>
-          <Text size={17}>پلیس فتا گنبد کاووس</Text>
+          <Text size={17}>{t('info.cyberpoliceGonbad')}</Text>
           <Text size={17}>017-21833453</Text>
         </Row>
         <Row style={{justifyContent: 'space-between'}}>
-          <Text size={17}>پلیس فتا گرگان</Text>
+          <Text size={17}>{t('info.cyberpoliceGorgan')}</Text>
           <Text size={17}>017-21822972</Text>
         </Row>
         <Divider height={50} />

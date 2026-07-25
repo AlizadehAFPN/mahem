@@ -9,13 +9,21 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {useDispatch} from 'react-redux';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useDispatch, useSelector} from 'react-redux';
+import {useMutation, useQueryClient} from 'react-query';
+import {RootState} from '../../stateManager';
 import {setUserCity} from '../../stateManager/reducers/user';
 import {setFilters} from '../../stateManager/reducers/filters';
-import {getCities, updateUser} from '../../services';
+import {updateUser} from '../../services';
+import {useCities, CITIES_QUERY_KEY} from '../../hooks/use-cached-cities';
+import {ATTRIBUTE_OPTIONS_QUERY_KEY} from '../../hooks/use-cached-attribute-options';
+import {
+  ADS_CATEGORIES_QUERY_KEY,
+  JOB_CATEGORIES_QUERY_KEY,
+} from '../../hooks/use-cached-categories';
 import {Text} from '../text/text';
 import {colors} from '../../theme';
+import {localizeCity} from '../../i18n/display-maps';
 
 const {width: screenWidth} = Dimensions.get('window');
 const DROPDOWN_WIDTH = Math.min(220, screenWidth * 0.6);
@@ -44,7 +52,12 @@ export function CitySelectionMenu({
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const {mutate} = useMutation(updateUser);
-  const {data} = useQuery(['cities'], getCities, {enabled: visible});
+  const {data} = useCities();
+  const cachedCategories = useSelector((s: RootState) => s.categories);
+  const cachedAttributeOptions = useSelector(
+    (s: RootState) => s.attributeOptions,
+  );
+  const cachedCities = useSelector((s: RootState) => s.cities);
   const translateY = useRef(new Animated.Value(-12)).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -74,6 +87,29 @@ export function CitySelectionMenu({
     // from the server for the new city instead of a stale previous-city
     // cache lingering around.
     queryClient.clear();
+    // categories/attribute-options/cities aren't city-scoped — re-prime them
+    // from the persisted copy right away so the clear() above doesn't undo
+    // the whole point of *SyncBridge (every screen would otherwise cold-fetch
+    // them again the moment it next renders).
+    if (cachedCategories.adsCategories) {
+      queryClient.setQueryData(ADS_CATEGORIES_QUERY_KEY, {
+        data: cachedCategories.adsCategories,
+      });
+    }
+    if (cachedCategories.jobCategories) {
+      queryClient.setQueryData(JOB_CATEGORIES_QUERY_KEY, {
+        data: cachedCategories.jobCategories,
+      });
+    }
+    if (cachedAttributeOptions.optionsByGroup) {
+      queryClient.setQueryData(
+        ATTRIBUTE_OPTIONS_QUERY_KEY,
+        cachedAttributeOptions.optionsByGroup,
+      );
+    }
+    if (cachedCities.cities) {
+      queryClient.setQueryData(CITIES_QUERY_KEY, {data: cachedCities.cities});
+    }
     dispatch(setUserCity({city: city.title, cityId: city.id}));
     dispatch(setFilters({city: undefined}));
     onClose();
@@ -116,7 +152,7 @@ export function CitySelectionMenu({
             <TouchableOpacity
               style={styles.item}
               onPress={() => onSelectCity(item)}>
-              <Text>{item.title}</Text>
+              <Text>{localizeCity(item.title)}</Text>
             </TouchableOpacity>
           )}
         />

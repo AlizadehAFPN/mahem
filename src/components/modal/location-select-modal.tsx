@@ -1,5 +1,7 @@
 import {Modal, StyleSheet, View} from 'react-native';
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {SelectLocation} from '../map-components/select-location';
 import {Button} from '../button/button';
 import {Text} from '../text/text';
@@ -21,9 +23,11 @@ export function LocationSelectModal({
   onClose,
   onSelect,
 }: LocationSelectModalProps) {
+  const {t} = useTranslation();
   const [pending, setPending] = useState<{lat: number; lng: number} | null>(
     null,
   );
+  const insets = useSafeAreaInsets();
 
   const handleConfirm = () => {
     if (pending) {
@@ -35,23 +39,23 @@ export function LocationSelectModal({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={styles.container}>
+      <View style={[styles.container, {paddingTop: insets.top}]}>
         <Text preset="bold" size={16} style={{textAlign: 'center', padding: 12}}>
-          روی نقشه، موقعیت دقیق آگهی را انتخاب کنید
+          {t('map.selectHint')}
         </Text>
         <SelectLocation
           style={styles.map}
           onSelect={(lat: number, lng: number) => setPending({lat, lng})}
         />
-        <Row style={styles.footer}>
+        <Row style={[styles.footer, {paddingBottom: insets.bottom + 16}]}>
           <Button style={styles.cancelButton} onPress={onClose}>
-            <Text>انصراف</Text>
+            <Text>{t('common.cancel')}</Text>
           </Button>
           <Button
             style={pending ? styles.confirmButton : styles.confirmButtonDisabled}
             disabled={!pending}
             onPress={handleConfirm}>
-            <Text color="white">تایید موقعیت</Text>
+            <Text color="white">{t('map.confirmLocation')}</Text>
           </Button>
         </Row>
       </View>

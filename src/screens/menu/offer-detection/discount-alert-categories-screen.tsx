@@ -1,5 +1,6 @@
 import {FlatList, StyleSheet, Switch, View} from 'react-native';
 import React, {useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useQuery, useMutation, useQueryClient} from 'react-query';
 import {
   DiscountMenuSheet,
@@ -11,20 +12,22 @@ import {
 } from '../../../components';
 import {
   DiscountAlerts,
-  getAdsCategories,
   getDiscountAlerts,
   setDiscountAlerts,
 } from '../../../services';
 import {colors} from '../../../theme';
+import {useAdsCategories} from '../../../hooks/use-cached-categories';
+import {localizeCategory} from '../../../i18n/display-maps';
 
 // "اطلاع از تخفیف‌های نزدیک من" (screenshot 5): a toggle list of تخفیف‌یاب
 // subcategories. Turning one on subscribes the user to nearby-discount push
 // alerts for that category; the full set is saved on every change.
 export function DiscountAlertCategoriesScreen() {
+  const {t} = useTranslation();
   const [menu, setMenu] = useState(false);
   const queryClient = useQueryClient();
 
-  const {data: cats} = useQuery(['adsCategories'], getAdsCategories);
+  const {data: cats} = useAdsCategories();
   const subCategories = useMemo(
     () =>
       cats?.data?.find((c: any) => c.title === 'تخفیف یاب')?.sub_categories ??
@@ -32,10 +35,11 @@ export function DiscountAlertCategoriesScreen() {
     [cats],
   );
 
-  const {data: alerts, isLoading, isError} = useQuery(
-    ['discountAlerts'],
-    getDiscountAlerts,
-  );
+  const {
+    data: alerts,
+    isLoading,
+    isError,
+  } = useQuery(['discountAlerts'], getDiscountAlerts);
   const [selected, setSelected] = useState<string[]>([]);
   useEffect(() => {
     if (alerts) {
@@ -56,16 +60,23 @@ export function DiscountAlertCategoriesScreen() {
     mutate(next);
   };
 
+  const allOn =
+    subCategories.length > 0 && selected.length === subCategories.length;
+  const toggleAll = () => {
+    const next = allOn ? [] : subCategories.map((c: any) => c.id);
+    setSelected(next);
+    mutate(next);
+  };
+
   return (
     <Screen withoutScroll>
       <MainHeader
-        title="اطلاع از تخفیف‌های نزدیک"
+        title={t('home.discountFinder')}
         showLocation
+        showBack
         onMenuPress={() => setMenu(true)}
       />
-      <Text style={styles.hint}>
-        دسته‌هایی که می‌خواهید از تخفیف‌های نزدیکشان باخبر شوید را روشن کنید.
-      </Text>
+      <Text style={styles.hint}>{t('offers.alertsHint')}</Text>
       <FlatList
         data={subCategories}
         style={{paddingHorizontal: 16}}
@@ -73,13 +84,37 @@ export function DiscountAlertCategoriesScreen() {
         ItemSeparatorComponent={() => (
           <Divider style={styles.separator} height={1} />
         )}
+        ListHeaderComponent={
+          subCategories.length > 0 ? (
+            <>
+              <View style={styles.row}>
+                <Text size={16} preset="bold">
+                  {t('offers.allDiscounts')}
+                </Text>
+                <Switch
+                  value={allOn}
+                  onValueChange={toggleAll}
+                  trackColor={{
+                    false: colors.pallete.gray3,
+                    true: colors.pallete.green1,
+                  }}
+                  thumbColor={allOn ? colors.pallete.green : '#f4f3f4'}
+                />
+              </View>
+              <Divider style={styles.separator} height={1} />
+            </>
+          ) : null
+        }
         renderItem={({item}: {item: any}) => (
           <View style={styles.row}>
-            <Text size={16}>{item.title}</Text>
+            <Text size={16}>{localizeCategory(item.title)}</Text>
             <Switch
               value={selected.includes(item.id)}
               onValueChange={() => toggle(item.id)}
-              trackColor={{false: colors.pallete.gray3, true: colors.pallete.green1}}
+              trackColor={{
+                false: colors.pallete.gray3,
+                true: colors.pallete.green1,
+              }}
               thumbColor={
                 selected.includes(item.id) ? colors.pallete.green : '#f4f3f4'
               }
@@ -90,7 +125,7 @@ export function DiscountAlertCategoriesScreen() {
           <ListState
             isLoading={isLoading}
             isError={isError}
-            emptyMessage="دسته‌ای برای تخفیف‌یاب تعریف نشده است"
+            emptyMessage={t('offers.noCategoriesDefined')}
           />
         }
       />

@@ -11,6 +11,7 @@ import React, {useState} from 'react';
 import {
   Button,
   Divider,
+  ListFooter,
   ListState,
   Row,
   Screen,
@@ -21,15 +22,18 @@ import {
 import {colors} from '../../../theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {getAllJobs} from '../../../services/job';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
 import {useDebouncedValue} from '../../../hooks/use-debounced-value';
 import {getJobCategoryIcon} from '../../../utiles';
+import {localizeCategory} from '../../../i18n/display-maps';
 
 const {width} = Dimensions.get('window');
 export function SingleJobCategoryScreen() {
+  const {t} = useTranslation();
   const {goBack, navigate} = useNavigation();
   const {params} = useRoute();
   const [searchText, setSearchText] = useState('');
@@ -39,6 +43,8 @@ export function SingleJobCategoryScreen() {
     items: jobs,
     isLoading,
     isError,
+    isFetchingNextPage,
+    hasNextPage,
     onEndReached,
   } = usePaginatedList({
     queryKey: ['categoryJobs', params?.category?.id, debouncedSearchText],
@@ -64,28 +70,33 @@ export function SingleJobCategoryScreen() {
         />
       </View>
       <View style={styles.titleBar}>
-        <Text style={{textAlign: 'center'}} size={17}>
-          {category?.title}
+        <Text style={{textAlign: 'right'}} size={17}>
+          {localizeCategory(category?.title)}
         </Text>
-        <Divider />
+        <Divider height={12} />
         <Row
           style={{
             width: '100%',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <Button onPress={goBack}>
-            <MaterialIcons size={25} name="keyboard-arrow-right" />
-          </Button>
+          <Fontisto size={20} name="search" color={colors.pallete.gray2} />
           <TextField
             onChangeText={text => setSearchText(text)}
             inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
             style={{flex: 1, height: 20, width: width - 172}}
-            placeholder="جستجو برای"
+            placeholder={t('jobs.searchPlaceholder')}
             preset="underline"
             borderColor={colors.pallete.red2}
           />
-          <Fontisto size={25} name="search" />
+          <Button onPress={goBack}>
+            <MaterialIcons
+              style={{transform: [{rotate: '-90deg'}]}}
+              size={22}
+              name="keyboard-arrow-down"
+              color={colors.pallete.gray2}
+            />
+          </Button>
         </Row>
       </View>
       <FlatList
@@ -95,7 +106,7 @@ export function SingleJobCategoryScreen() {
           <ListState
             isLoading={isLoading}
             isError={isError}
-            emptyMessage="هیچ موردی پیدا نشد"
+            emptyMessage={t('jobs.noResults')}
           />
         }
         data={jobs}
@@ -110,9 +121,23 @@ export function SingleJobCategoryScreen() {
           );
         }}
         ListHeaderComponent={
-          <TableRow header item={['ردیف', 'نام واحد', 'مدیریت', 'تلفن']} />
+          <TableRow
+            header
+            item={[
+              t('jobs.colRow'),
+              t('jobs.unitName'),
+              t('jobs.manager'),
+              t('jobs.colPhone'),
+            ]}
+          />
         }
-        ListFooterComponent={<Divider height={40} />}
+        ListFooterComponent={
+          <ListFooter
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            itemCount={jobs.length}
+          />
+        }
       />
       <View style={styles.addContainer}>
         <TouchableOpacity

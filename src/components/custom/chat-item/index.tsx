@@ -5,17 +5,20 @@ import {Text} from '../../text/text';
 import {Row} from '../../row/row';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+import type {TFunction} from 'i18next';
 
-function formatRelativeTime(iso?: string) {
+function formatRelativeTime(t: TFunction, iso?: string) {
   if (!iso) return '';
   const diffMs = Date.now() - new Date(iso).getTime();
   const hours = Math.floor(diffMs / 3600000);
-  if (hours < 1) return 'چند دقیقه پیش';
-  if (hours < 24) return `${hours} ساعت پیش`;
-  return `${Math.floor(hours / 24)} روز پیش`;
+  if (hours < 1) return t('time.fewMinutesAgo');
+  if (hours < 24) return t('time.hoursAgo', {value: hours});
+  return t('time.daysAgo', {value: Math.floor(hours / 24)});
 }
 
 export function ChatItem({item}) {
+  const {t} = useTranslation();
   const {navigate} = useNavigation();
   const user = useSelector(s => s.user);
   const isBuyer = item?.buyerId === user?.id;
@@ -55,7 +58,7 @@ export function ChatItem({item}) {
         </Row>
       </Row>
       <Text style={{marginBottom: 10}} size={12} color={colors.pallete.blue}>
-        {formatRelativeTime(item?.lastMessageAt)}
+        {formatRelativeTime(t, item?.lastMessageAt)}
       </Text>
     </TouchableOpacity>
   );

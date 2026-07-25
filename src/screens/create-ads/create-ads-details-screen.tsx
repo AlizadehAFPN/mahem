@@ -1,7 +1,9 @@
 import {Alert, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {
+  Button,
   CarForm,
   Checkbox,
   CommonForm,
@@ -12,6 +14,7 @@ import {
   Screen,
   SelectAdsCategory,
   Text,
+  UnderlineTextField,
 } from '../../components';
 import {boldFont, colors} from '../../theme';
 import {createAdsWithImages} from '../../services';
@@ -30,6 +33,7 @@ import {
 // components — this screen just supplies the full-page chrome + submit
 // wiring Figma shows around them.
 export function CreateAdsDetailsScreen() {
+  const {t} = useTranslation();
   const {navigate, goBack} = useNavigation<any>();
   const {params} = useRoute<any>();
   const path: any[] = params?.path ?? [];
@@ -39,6 +43,7 @@ export function CreateAdsDetailsScreen() {
   const [mainCategory, setMainCategory] = useState<any>(
     presetMainCategory ?? path[0] ?? '',
   );
+  const isJobListing = mainCategory?.title === 'استخدامی';
   const [subCategory, setSubCategory] = useState<any>(path[1] ?? '');
   const [subsubCategory, setSubsubCategory] = useState<any>(path[2] ?? '');
 
@@ -57,8 +62,8 @@ export function CreateAdsDetailsScreen() {
   ) => {
     if (!isSupportedImageType(image.type)) {
       Alert.alert(
-        'فرمت تصویر پشتیبانی نمی‌شود',
-        UNSUPPORTED_IMAGE_TYPE_MESSAGE,
+        t('common.imageFormatUnsupported'),
+        UNSUPPORTED_IMAGE_TYPE_MESSAGE(),
       );
       return;
     }
@@ -77,6 +82,10 @@ export function CreateAdsDetailsScreen() {
   };
 
   const onSendPress = () => {
+    if (!state.acceptance) {
+      Alert.alert(t('createAds.mustAcceptTerms'));
+      return;
+    }
     setState(s => ({...s, send: `send-${Date.now()}`}));
   };
   const onToggleSelectCategory = () => {
@@ -92,7 +101,7 @@ export function CreateAdsDetailsScreen() {
       return;
     }
     if (!mainCategory) {
-      Alert.alert('دسته بندی را انتخاب کنید');
+      Alert.alert(t('createAds.selectCategory'));
       return;
     }
     const categoryId = (subsubCategory || subCategory || mainCategory)?.id;
@@ -120,7 +129,7 @@ export function CreateAdsDetailsScreen() {
       navigate('createAdsFinal');
     } catch (e) {
       setState(s => ({...s, isSubmitting: false, uploadingIndexes: []}));
-      Alert.alert('خطا', 'ثبت آگهی با خطا مواجه شد.');
+      Alert.alert(t('common.error'), t('createAds.submitError'));
     }
   };
 
@@ -154,14 +163,26 @@ export function CreateAdsDetailsScreen() {
         style={{flex: 1, backgroundColor: 'white'}}
         keyboardShouldPersistTaps="handled">
         <View style={styles.form}>
-          <TouchableOpacity
-            disabled={!!presetMainCategory}
-            onPress={onToggleSelectCategory}
-            style={styles.groupField}>
-            <Text style={styles.groupText}>
-              {mainCategory ? groupTitle : 'انتخاب گروه'}
-            </Text>
-          </TouchableOpacity>
+          {isJobListing ? (
+            <Button
+              disabled={!!presetMainCategory}
+              onPress={onToggleSelectCategory}>
+              <UnderlineTextField
+                editable={false}
+                placeholder={t('createAds.category')}
+                value={mainCategory ? groupTitle : ''}
+              />
+            </Button>
+          ) : (
+            <TouchableOpacity
+              disabled={!!presetMainCategory}
+              onPress={onToggleSelectCategory}
+              style={styles.groupField}>
+              <Text style={styles.groupText}>
+                {mainCategory ? groupTitle : t('createAds.selectGroup')}
+              </Text>
+            </TouchableOpacity>
+          )}
           <Divider />
 
           {mainCategory?.title === 'وسایل نقلیه' ? (
@@ -202,8 +223,9 @@ export function CreateAdsDetailsScreen() {
               onToggle={() =>
                 setState(s => ({...s, acceptance: !s.acceptance}))
               }
+              onTextPress={() => navigate('privacy')}
               style={{flexDirection: 'row', alignSelf: 'center'}}
-              text="با قوانین و شرایط موافقم"
+              text={t('createAds.acceptTerms')}
             />
           </View>
         </View>

@@ -8,49 +8,54 @@ import {
   Share,
 } from 'react-native';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {MainHeader, Screen, Text} from '../../components';
 import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
-import {useQuery} from 'react-query';
 import {setFilters} from '../../stateManager/reducers/filters';
 import {removeUser} from '../../stateManager/reducers/user';
 import {RootState} from '../../stateManager';
-import {getAdsCategories} from '../../services';
+import {useAdsCategories} from '../../hooks/use-cached-categories';
 const {width} = Dimensions.get('window');
 
 export function MenuScreen() {
+  const {t} = useTranslation();
   const {navigate} = useNavigation();
   const user = useSelector((s: RootState) => s.user);
-  const {data: categoriesData} = useQuery(['adsCategories'], getAdsCategories);
+  const {data: categoriesData} = useAdsCategories();
 
   const menu = [
     {
-      title: 'بانک مشاغل',
+      title: t('home.jobsBank'),
       icon: require('../../assets/images/icons/jobsBank.png'),
       name: 'jobsBank',
     },
     {
-      title: 'تخفیف یاب',
+      title: t('home.discountFinder'),
       icon: require('../../assets/images/icons/offerfinder.png'),
       name: 'offerDetection',
     },
     {
-      title: user?.username + ' خوش آمدید',
+      title: t('menu.welcome', {username: user?.username ?? ''}),
       icon: require('../../assets/images/icons/novinfar.png'),
     },
     {
-      title: 'قوانین',
+      title: t('menu.rules'),
       icon: require('../../assets/images/icons/tearms.png'),
       name: 'privacy',
     },
     {
-      title: 'آگهی ها',
+      title: t('home.ads'),
       icon: require('../../assets/images/icons/ads.png'),
       name: 'search',
+      // Distinguishes this "all ads" shortcut from the استخدامی one below
+      // (both navigate to `search`) without relying on the display title,
+      // which changes with the app language.
+      isAllAdsShortcut: true,
     },
     {
-      title: 'استخدامی',
+      title: t('home.hiring'),
       icon: require('../../assets/images/icons/employee.png'),
       name: 'search',
       // Resolved lazily in handlePressItem (categoriesData isn't ready on
@@ -58,32 +63,32 @@ export function MenuScreen() {
       isJobsShortcut: true,
     },
     {
-      title: 'مدیریت آگهی ها',
+      title: t('menu.manageAds'),
       icon: require('../../assets/images/icons/adsmanagment.png'),
       name: 'userpanel',
     },
     {
-      title: 'اشتراک گزاری',
+      title: t('menu.share'),
       icon: require('../../assets/images/icons/sharing.png'),
       name: 'share',
     },
     {
-      title: 'آگهی نشان شده',
+      title: t('menu.bookmarks'),
       icon: require('../../assets/images/icons/bookmarks.png'),
       name: 'bookmark',
     },
     {
-      title: 'درباره ما',
+      title: t('menu.aboutUs'),
       icon: require('../../assets/images/icons/aboutus.png'),
       name: 'aboutus',
     },
     {
-      title: 'تنظمیات',
+      title: t('settings.title'),
       icon: require('../../assets/images/icons/settings.png'),
       name: 'settings',
     },
     {
-      title: 'تماس با ما',
+      title: t('menu.contactUs'),
       icon: require('../../assets/images/icons/accountUs.png'),
       name: 'callus',
     },
@@ -105,10 +110,10 @@ export function MenuScreen() {
         });
         return;
       }
-      if (item.title === 'آگهی ها') {
+      if (item.isAllAdsShortcut) {
         dispatch(
           setFilters({
-            mainCategory: {title: 'تمام آگهی ها'},
+            mainCategory: {title: t('menu.allAdsCategory')},
             subCategory: undefined,
             subSubCategory: undefined,
             allAds: true,

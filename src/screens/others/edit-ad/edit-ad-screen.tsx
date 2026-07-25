@@ -9,14 +9,11 @@ import {
   Screen,
 } from '../../../components';
 import {colors} from '../../../theme';
-import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {useTranslation} from 'react-i18next';
+import {useMutation, useQueryClient} from 'react-query';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {
-  findMainCategory,
-  getAdsCategories,
-  updateAds,
-  upload,
-} from '../../../services';
+import {findMainCategory, updateAds, upload} from '../../../services';
+import {useAdsCategories} from '../../../hooks/use-cached-categories';
 import {
   isSupportedImageType,
   UNSUPPORTED_IMAGE_TYPE_MESSAGE,
@@ -27,12 +24,13 @@ import {
 // also editable here — the previous version of this screen only exposed
 // title/price/contact/description and had no image management at all.
 export function EditAdScreen() {
+  const {t} = useTranslation();
   const {goBack} = useNavigation();
   const {params} = useRoute();
   const ad = params?.ad;
   const queryClient = useQueryClient();
 
-  const {data: categoriesData} = useQuery(['adsCategories'], getAdsCategories);
+  const {data: categoriesData} = useAdsCategories();
   const mainCategory = useMemo(
     () => findMainCategory(categoriesData?.data ?? [], ad?.category_id?.id),
     [categoriesData, ad?.category_id?.id],
@@ -57,18 +55,27 @@ export function EditAdScreen() {
         // pull-to-refresh or app restart.
         queryClient.invalidateQueries(['ads']);
         queryClient.invalidateQueries([`singleAd-${ad?.id}`, ad?.id]);
-        goBack();
+        // Editing title/description/price/images/category/city resets the ad
+        // to PENDING on the backend for re-review (see advertisements.service
+        // .ts CONTENT_FIELDS) without touching paymentStatus — an already
+        // fee-paid ad stays paid, no repeat payment needed.
+        Alert.alert(t('jobs.editedTitle'), t('editAd.editedBody'), [
+          {text: t('common.ok'), onPress: goBack},
+        ]);
       },
       onError: () => {
         setState(s => ({...s, isSubmitting: false}));
-        Alert.alert('خطا', 'ذخیره تغییرات با خطا مواجه شد.');
+        Alert.alert(t('common.error'), t('editAd.saveError'));
       },
     },
   );
 
   const handleSelectImage = (image: any, index: number) => {
     if (!isSupportedImageType(image.type)) {
-      Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+      Alert.alert(
+        t('common.imageFormatUnsupported'),
+        UNSUPPORTED_IMAGE_TYPE_MESSAGE(),
+      );
       return;
     }
     setState(s => {
@@ -130,7 +137,7 @@ export function EditAdScreen() {
       }
     } catch (e) {
       setState(s => ({...s, isSubmitting: false, uploadingIndexes: []}));
-      Alert.alert('خطا در آپلود تصویر', 'لطفا دوباره تلاش کنید');
+      Alert.alert(t('editAd.imageUploadError'), t('editAd.pleaseTryAgain'));
       return;
     }
 
@@ -144,7 +151,7 @@ export function EditAdScreen() {
   return (
     <Screen withoutScroll>
       <CreateAdsHeader
-        title="ویرایش آگهی"
+        title={t('editAd.title')}
         onCreatePress={onSendPress}
         onSelectImage={handleSelectImage}
         onRemoveImage={handleRemoveImage}

@@ -4,6 +4,7 @@ export * from './axios-config';
 export * from './auth';
 export * from './common';
 export * from './ads';
+export * from './categories';
 export * from './discounts';
 export * from './device';
 export * from './job';
@@ -12,6 +13,7 @@ export * from './reports';
 export * from './notifications';
 export * from './chat';
 export * from './attribute-options';
+export * from './stores';
 
 export async function handleRequest<T>(
   request: Promise<AxiosResponse<T>>,

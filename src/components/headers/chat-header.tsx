@@ -7,12 +7,14 @@ import {Divider} from '../divider/divider';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next';
 interface ChatHeaderProps {
   title?: string;
   avatar?: string;
   onCreatePress?: () => void;
 }
 export function ChatHeader({title, avatar, onCreatePress}: ChatHeaderProps) {
+  const {t} = useTranslation();
   const {goBack} = useNavigation();
   return (
     <View style={styles.continer}>
@@ -47,7 +49,7 @@ export function ChatHeader({title, avatar, onCreatePress}: ChatHeaderProps) {
           />
           <Divider style={{width: 5}} />
           <Text size={17} color="white">
-            {title || 'کاربر ماهم'}
+            {title || t('chat.mahemUser')}
           </Text>
         </Row>
 

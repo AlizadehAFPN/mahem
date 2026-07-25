@@ -16,8 +16,8 @@ function mapJob(item: any) {
 // job_category_id), cityId (from city_id, falls back to the current user's
 // city), salary, contact-info fields (manager/phone/registerCode/mobile/fax/
 // address/telegram/instagram/email — registerCode mapped from the form's
-// snake_case register_code), and banner/logo (uploaded image URLs). Dropped:
-// lat, lng (no home in the new schema).
+// snake_case register_code), banner/logo (uploaded image URLs), and lat/lng
+// (set via the map location picker).
 export const createJob = (data: any) => {
   const salary =
     data.salary !== undefined && data.salary !== ''
@@ -42,6 +42,8 @@ export const createJob = (data: any) => {
       email: data.email,
       banner: data.banner,
       logo: data.logo,
+      lat: data.lat,
+      lng: data.lng,
     })
     .then(res => ({data: mapJob(res.data)}));
 };
@@ -70,12 +72,23 @@ export const updateJob = (id: string, data: any) => {
       email: data.email,
       banner: data.banner,
       logo: data.logo,
+      lat: data.lat,
+      lng: data.lng,
     })
     .then(res => ({data: mapJob(res.data)}));
 };
 
 export const deleteJob = (id: string) => {
   return axiosInstance.delete(`/jobs/${id}`);
+};
+
+// "تمدید صنف": flags the job posting as awaiting a new manual bank-transfer
+// confirmation; expiresAt only actually moves once an admin confirms the
+// payment in mahem-admin — mirrors renewStore/renewAds.
+export const renewJob = (id: string) => {
+  return axiosInstance
+    .post(`/jobs/${id}/renew`)
+    .then(res => ({data: mapJob(res.data)}));
 };
 
 export const getMyJobs = (query?: any) => {

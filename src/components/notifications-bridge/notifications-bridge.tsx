@@ -5,6 +5,7 @@ import {useQueryClient} from 'react-query';
 import {RootState} from '../../stateManager';
 import {registerDeviceToken, updateMyLocation} from '../../services';
 import {getCurrentPosition} from '../../utiles';
+import i18n from '../../i18n';
 
 // Renders nothing. While the user is signed in it (1) obtains FCM permission,
 // registers this device's push token with the backend, and keeps it fresh on
@@ -47,7 +48,7 @@ export function NotificationsBridge() {
         }
 
         unsubscribeOnMessage = messaging().onMessage(async (msg: any) => {
-          const title = msg?.notification?.title ?? 'تخفیف جدید';
+          const title = msg?.notification?.title ?? i18n.t('notifications.newDiscount');
           const body = msg?.notification?.body ?? '';
           Alert.alert(title, body);
           queryClient.invalidateQueries(['notifications']);

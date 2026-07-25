@@ -1,39 +1,47 @@
 import {Image, StyleSheet, View, Alert} from 'react-native';
-import React, {useState} from 'react';
+import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {Button, Screen, Text} from '../../components';
 import {createAdsWithImages} from '../../services';
 import {colors} from '../../theme';
+import {localizeCategory} from '../../i18n/display-maps';
 
 // "ثبت آگهی- استخدامی2" (Figma): the fee step shown only for
 // استخدامی/تخفیف‌یاب ads (see Category.adFeeToman) — reached from
 // CreateAdsDetailsScreen once the form is valid, carrying the already
-// -validated `payload`/`images`. Same "no real payment gateway, an admin
-// confirms the bank transfer manually" pattern as StoreTermsScreen: tapping
-// "پرداخت" creates the ad right here (it lands with paymentStatus PENDING).
+// -validated `payload`/`images`. There's still no real payment provider
+// behind this (mahem-backend just wants the ad to land paymentStatus
+// PENDING for an admin to confirm by hand — see BankGatewayScreen), but
+// tapping "پرداخت" now sends the user through that fake bank gateway first
+// instead of creating the ad on the spot, so the flow at least looks like a
+// real checkout.
 export function CreateAdsPaymentScreen() {
-  const {navigate} = useNavigation<any>();
+  const {t} = useTranslation();
+  const {navigate, goBack} = useNavigation<any>();
   const {params} = useRoute<any>();
   const {images, payload, mainCategory} = params ?? {};
-  const [submitting, setSubmitting] = useState(false);
 
-  const onPay = async () => {
-    if (submitting) {
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await createAdsWithImages(images ?? [], payload ?? {});
-      setSubmitting(false);
-      navigate('createAdsFinal');
-    } catch (e) {
-      setSubmitting(false);
-      Alert.alert('خطا', 'ثبت آگهی با خطا مواجه شد. لطفا دوباره تلاش کنید');
-    }
+  const onPay = () => {
+    navigate('bankGateway', {
+      amount: mainCategory?.adFeeToman,
+      description: t('createAds.payDescription', {
+        category: localizeCategory(mainCategory?.title ?? ''),
+      }),
+      onSuccess: async () => {
+        try {
+          await createAdsWithImages(images ?? [], payload ?? {});
+          goBack();
+          navigate('createAdsFinal');
+        } catch (e) {
+          Alert.alert(t('common.error'), t('createAds.submitErrorRetry'));
+        }
+      },
+    });
   };
 
   return (
-    <Screen withoutScroll>
+    <Screen withoutScroll bottomSafeAreaColor={colors.main}>
       <View style={styles.header}>
         <Image
           source={require('../../assets/images/logo.png')}
@@ -43,15 +51,15 @@ export function CreateAdsPaymentScreen() {
       </View>
       <View style={styles.body}>
         <Text style={styles.paragraph}>
-          ثبت در زیر مجموعه استخدامی و تخفیف یاب رایگان نیست.
+          {t('createAds.feeNotFree')}
         </Text>
         <Text preset="bold" size={17} color={colors.main} style={styles.fee}>
-          هزینه ثبت {mainCategory?.adFeeToman} تومان
+          {t('createAds.feeAmount', {amount: mainCategory?.adFeeToman})}
         </Text>
       </View>
-      <Button style={styles.payButton} onPress={onPay} loading={submitting}>
+      <Button style={styles.payButton} onPress={onPay}>
         <Text color="white" size={17}>
-          پرداخت
+          {t('createAds.pay')}
         </Text>
       </Button>
     </Screen>

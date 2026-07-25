@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {MainModal} from './mainModal';
 import {colors} from '../../theme';
 import {Text} from '../text/text';
@@ -17,6 +18,7 @@ import {cities} from '../../utiles';
 
 const {width, height} = Dimensions.get('window');
 export function DurationModal({visible, onClose, onSelect, onChangeText}) {
+  const {t} = useTranslation();
   const [state, setState] = useState({
     minutes: '',
     houres: '',
@@ -34,7 +36,7 @@ export function DurationModal({visible, onClose, onSelect, onChangeText}) {
           <Row style={{justifyContent: 'space-around'}}>
             <View style={styles.item}>
               <Text size={12} color={colors.pallete.grayText}>
-                دقیقه
+                {t('common.minute')}
               </Text>
               <TextField
                 value={state.minutes}
@@ -45,7 +47,7 @@ export function DurationModal({visible, onClose, onSelect, onChangeText}) {
             </View>
             <View style={styles.item}>
               <Text size={12} color={colors.pallete.grayText}>
-                ساعت
+                {t('common.hour')}
               </Text>
               <TextField
                 value={state.houres}
@@ -56,7 +58,7 @@ export function DurationModal({visible, onClose, onSelect, onChangeText}) {
             </View>
             <View style={styles.item}>
               <Text size={12} color={colors.pallete.grayText}>
-                روز
+                {t('common.day')}
               </Text>
               <TextField
                 value={state.days}

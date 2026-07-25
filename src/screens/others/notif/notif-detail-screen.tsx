@@ -1,5 +1,6 @@
 import {ScrollView, StyleSheet} from 'react-native';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {MainHeader, Screen, Text} from '../../../components';
 import {colors} from '../../../theme';
 import {useRoute} from '@react-navigation/native';
@@ -13,12 +14,13 @@ function formatDate(iso?: string) {
 // 2-line-truncated preview (NewsComp); this is the full-text view reached
 // by tapping one.
 export function NotifDetailScreen() {
+  const {t} = useTranslation();
   const {params} = useRoute<any>();
   const item = params?.item;
 
   return (
     <Screen withoutScroll>
-      <MainHeader title={item?.title ?? 'پیام'} showBack />
+      <MainHeader title={item?.title ?? t('notif.messageFallback')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
         <Text size={13} color={colors.pallete.grayText} style={styles.date}>
           {formatDate(item?.createdAt)}

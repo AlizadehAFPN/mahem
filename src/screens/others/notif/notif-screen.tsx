@@ -1,6 +1,7 @@
 import {FlatList} from 'react-native';
 import React from 'react';
-import {ListState, MainHeader, Screen} from '../../../components';
+import {useTranslation} from 'react-i18next';
+import {ListFooter, ListState, MainHeader, Screen} from '../../../components';
 import {useMutation, useQueryClient} from 'react-query';
 import {getNotifications, markNotificationRead} from '../../../services';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
@@ -8,12 +9,15 @@ import {NewsComp} from './NewsComp';
 import {useNavigation} from '@react-navigation/native';
 
 export function NotifScreen() {
+  const {t} = useTranslation();
   const {navigate} = useNavigation<any>();
   const queryClient = useQueryClient();
   const {
     items: notifications,
     isLoading,
     isError,
+    isFetchingNextPage,
+    hasNextPage,
     onEndReached,
   } = usePaginatedList({
     queryKey: ['notifications'],
@@ -28,7 +32,7 @@ export function NotifScreen() {
 
   return (
     <Screen withoutScroll style={{flex: 1}}>
-      <MainHeader title="پیام ها" showBack />
+      <MainHeader title={t('notif.title')} showBack />
       <FlatList
         data={notifications}
         onEndReached={onEndReached}
@@ -36,7 +40,7 @@ export function NotifScreen() {
           <ListState
             isLoading={isLoading}
             isError={isError}
-            emptyMessage="پیامی برای شما ثبت نشده است"
+            emptyMessage={t('notif.empty')}
           />
         }
         renderItem={({item}) => (
@@ -50,6 +54,13 @@ export function NotifScreen() {
             }}
           />
         )}
+        ListFooterComponent={
+          <ListFooter
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            itemCount={notifications.length}
+          />
+        }
       />
     </Screen>
   );

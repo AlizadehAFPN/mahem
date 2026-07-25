@@ -18,6 +18,9 @@ import {getErrorMessage} from './src/utiles';
 import {ErrorBoundary} from './src/components/error-boundary/error-boundary';
 import {SocketBridge} from './src/components/socket-bridge/socket-bridge';
 import {NotificationsBridge} from './src/components/notifications-bridge/notifications-bridge';
+import {CategoriesSyncBridge} from './src/components/categories-sync-bridge/categories-sync-bridge';
+import {AttributeOptionsSyncBridge} from './src/components/attribute-options-sync-bridge/attribute-options-sync-bridge';
+import {CitiesSyncBridge} from './src/components/cities-sync-bridge/cities-sync-bridge';
 import {SplashScreen} from './src/screens/splash/splash-screen';
 
 // Create a client. Mutations that don't set their own `onError` fall back to
@@ -53,6 +56,9 @@ export default function App() {
               <PersistGate loading={<SplashScreen />} persistor={persistor}>
                 <SocketBridge />
                 <NotificationsBridge />
+                <CategoriesSyncBridge />
+                <AttributeOptionsSyncBridge />
+                <CitiesSyncBridge />
                 <MainNavigator />
               </PersistGate>
             </Provider>

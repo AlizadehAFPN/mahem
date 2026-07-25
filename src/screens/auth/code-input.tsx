@@ -1,5 +1,6 @@
 import {View, StyleSheet} from 'react-native';
 import React, {useCallback, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   Screen,
   Text,
@@ -16,6 +17,7 @@ import {sendActivationCode, updateUser, upload} from '../../services';
 import {setUser} from '../../stateManager/reducers/user';
 
 export function CodeInput() {
+  const {t} = useTranslation();
   const dispatch = useDispatch();
   const {params} = useRoute();
   const [state, setState] = useState({
@@ -95,7 +97,7 @@ export function CodeInput() {
           preset="default"
           size={20}
           color="white">
-          لطفا برای تکمیل ثبت نام در ماهم کد فعال سازی ارسال شده را وارد نمایید.
+          {t('auth.codeIntro')}
         </Text>
         {params?.otpCode ? (
           <Text
@@ -103,7 +105,7 @@ export function CodeInput() {
             preset="default"
             size={18}
             color="white">
-            کد تست: {params.otpCode}
+            {t('auth.testCode', {code: params.otpCode})}
           </Text>
         ) : null}
       </View>
@@ -117,7 +119,7 @@ export function CodeInput() {
               width: '100%',
             }}
             labelStyle={{color: 'black', fontSize: 17, marginTop: -5}}
-            label="کد تایید"
+            label={t('auth.verificationCode')}
             inputMode="tel"
             // error={state.code}
             onChangeText={text => setState(s => ({...s, code: text}))}
@@ -139,7 +141,7 @@ export function CodeInput() {
               : colors.pallete.gray1,
           }}>
           <Text color={enableButton() ? 'white' : 'black'} size={20}>
-            تایید نهایی
+            {t('auth.finalConfirm')}
           </Text>
         </Button>
       </View>

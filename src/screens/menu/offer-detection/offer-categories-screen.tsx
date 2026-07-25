@@ -1,11 +1,9 @@
 import {FlatList, StyleSheet, View} from 'react-native';
 import React, {useMemo} from 'react';
+import {useTranslation} from 'react-i18next';
 import {CategroyItem, Divider, MainHeader, Screen} from '../../../components';
 import {useNavigation} from '@react-navigation/native';
-import {useQuery} from 'react-query';
-import {getAdsCategories} from '../../../services';
-
-const ALL_DISCOUNTS_ITEM = {id: 'all', title: 'همه تخفیف‌ها'};
+import {useAdsCategories} from '../../../hooks/use-cached-categories';
 
 // "دسته‌بندی" from the تخفیف‌یاب hub sheet: "همه تخفیف‌ها" (categories.png
 // design) plus the list of تخفیف‌یاب subcategories (تخفیف آخر هفته، رستوران و
@@ -13,19 +11,21 @@ const ALL_DISCOUNTS_ITEM = {id: 'all', title: 'همه تخفیف‌ها'};
 // tapping "همه تخفیف‌ها" opens the same all-discounts feed as the landing
 // screen (OfferDetectionScreen).
 export function OfferCategoriesScreen() {
+  const {t} = useTranslation();
   const {navigate} = useNavigation<any>();
-  const {data} = useQuery(['adsCategories'], getAdsCategories);
+  const {data} = useAdsCategories();
 
   const rows = useMemo(() => {
     const offerCategory = data?.data?.find(
       (category: any) => category.title === 'تخفیف یاب',
     );
-    return [ALL_DISCOUNTS_ITEM, ...(offerCategory?.sub_categories ?? [])];
-  }, [data]);
+    const allDiscountsItem = {id: 'all', title: t('offers.allDiscounts')};
+    return [allDiscountsItem, ...(offerCategory?.sub_categories ?? [])];
+  }, [data, t]);
 
   return (
     <Screen withoutScroll>
-      <MainHeader title="تخفیف یاب" showLocation showBack />
+      <MainHeader title={t('home.discountFinder')} showLocation showBack />
       <FlatList
         data={rows}
         style={{paddingHorizontal: 8}}

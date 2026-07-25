@@ -14,19 +14,28 @@ import {
 } from 'redux-persist';
 import userReducer from './reducers/user';
 import filterReducer from './reducers/filters';
+import categoriesReducer from './reducers/categories';
+import attributeOptionsReducer from './reducers/attribute-options';
+import citiesReducer from './reducers/cities';
 // ...
 
 const rootReducer = combineReducers({
   user: userReducer,
   filter: filterReducer,
+  categories: categoriesReducer,
+  attributeOptions: attributeOptionsReducer,
+  cities: citiesReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  // Only auth/profile state survives an app restart. Search filters are
+  // Only auth/profile state and the rarely-changing reference data cached
+  // by the *SyncBridge components (categories, attribute options, cities —
+  // see reducers/categories.ts, reducers/attribute-options.ts,
+  // reducers/cities.ts) survive an app restart. Search filters are
   // ephemeral UI state and shouldn't outlive the session they were set in.
-  whitelist: ['user'],
+  whitelist: ['user', 'categories', 'attributeOptions', 'cities'],
 };
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

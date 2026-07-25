@@ -1,6 +1,7 @@
 export const pallete = {
   red: '#CC0000',
   red2: '#EC0D0D',
+  red3: '#E40000',
   gray1: '#EEEEEE',
   gray2: '#707070',
   green: '#14CC00',

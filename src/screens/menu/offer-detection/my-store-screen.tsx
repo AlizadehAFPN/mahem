@@ -10,6 +10,7 @@ import React, {useMemo} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import {useQuery, useQueryClient, useMutation} from 'react-query';
 import {
@@ -22,15 +23,16 @@ import {
   Screen,
   Text,
 } from '../../../components';
-import {
-  getAdsCategories,
-  getMyAds,
-  getMyStore,
-  renewStore,
-} from '../../../services';
+import {getMyAds, getMyStore, renewStore} from '../../../services';
 import {colors} from '../../../theme';
+import {useAdsCategories} from '../../../hooks/use-cached-categories';
 
 const {width} = Dimensions.get('window');
+
+// Mirrors STORE_FEE_TOMAN in store-terms-screen.tsx — Store has no fee
+// amount stored in the backend (see Store model), so this is purely a
+// client-side display figure for the payment gateway screen.
+const STORE_FEE_TOMAN = 300000;
 
 // A readable dark scrim works over any background (plain gray placeholder
 // or an actual cover photo) — the lighter glass gradient only reads over a
@@ -43,11 +45,12 @@ const READABLE_HEADER_GRADIENT = ['rgba(0,0,0,0.45)', 'rgba(0,0,0,0.45)'];
 // a grid of the store's own discount ads (including its own pending/
 // rejected ones, unlike the public store profile).
 export function MyStoreScreen() {
+  const {t} = useTranslation();
   const {navigate, goBack} = useNavigation<any>();
   const queryClient = useQueryClient();
 
   const {data: store, isLoading} = useQuery(['myStore'], getMyStore);
-  const {data: cats} = useQuery(['adsCategories'], getAdsCategories);
+  const {data: cats} = useAdsCategories();
   const discountCategory = useMemo(
     () => cats?.data?.find((c: any) => c.title === 'تخفیف یاب'),
     [cats],
@@ -69,14 +72,26 @@ export function MyStoreScreen() {
     {
       onSuccess: () => {
         queryClient.invalidateQueries(['myStore']);
-        Alert.alert(
-          'درخواست تمدید ثبت شد',
-          'پس از تایید پرداخت توسط مدیریت، اشتراک فروشگاه شما تمدید می‌شود.',
-        );
+        Alert.alert(t('store.renewRequested'), t('store.renewRequestedBody'));
       },
-      onError: () => Alert.alert('خطا', 'ثبت درخواست تمدید با خطا مواجه شد'),
+      onError: () => Alert.alert(t('common.error'), t('store.renewError')),
     },
   );
+
+  // Same test-payment-gateway detour as store creation (StoreTermsScreen) —
+  // the actual renewal (subscriptionExpiresAt push-out) only happens once
+  // an admin confirms the payment in mahem-admin (see renew()'s doc comment
+  // above).
+  const onRenewPress = () => {
+    navigate('bankGateway', {
+      amount: STORE_FEE_TOMAN,
+      description: t('store.renewDescription', {name: store?.name ?? ''}),
+      onSuccess: async () => {
+        goBack();
+        renew();
+      },
+    });
+  };
 
   // MyStoreScreen lives in the root AppStack (a sibling of the "dashboard"
   // screen), while createAdsDetails is nested two levels deep: AppStack ->
@@ -122,7 +137,7 @@ export function MyStoreScreen() {
                   name="keyboard-arrow-right"
                 />
                 <Text color="white" size={17}>
-                  تخفیف یاب
+                  {t('home.discountFinder')}
                 </Text>
               </Row>
             </Button>
@@ -140,13 +155,13 @@ export function MyStoreScreen() {
             color={colors.pallete.gray3}
           />
           <Text style={{marginTop: 12, textAlign: 'center'}}>
-            شما هنوز فروشگاهی ثبت نکرده‌اید
+            {t('store.noStoreYet')}
           </Text>
           <Button
             style={styles.createStoreButton}
             onPress={() => navigate('createStore')}>
             <Text color="white" size={15}>
-              ثبت فروشگاه
+              {t('store.createStore')}
             </Text>
           </Button>
         </View>
@@ -156,7 +171,7 @@ export function MyStoreScreen() {
 
   const subscriptionLabel = () => {
     if (store.paymentStatus === 'PENDING') {
-      return 'در انتظار تایید پرداخت';
+      return t('store.pendingPayment');
     }
     if (store.subscriptionExpiresAt) {
       const expired = new Date(store.subscriptionExpiresAt) < new Date();
@@ -164,15 +179,15 @@ export function MyStoreScreen() {
         'fa-IR',
       );
       return expired
-        ? `اشتراک منقضی شده (${date})`
-        : `اشتراک تا ${date} فعال است`;
+        ? t('store.subscriptionExpired', {date})
+        : t('store.subscriptionActiveUntil', {date});
     }
     return '';
   };
 
   return (
     <Screen withoutScroll>
-      <MainHeader title="تخفیف یاب" showLocation />
+      <MainHeader title={t('home.discountFinder')} showLocation />
       <View style={{flex: 1}}>
         <View style={styles.overlayNav}>
           <GradiantHeader
@@ -228,13 +243,19 @@ export function MyStoreScreen() {
               </View>
               {store.approvalStatus === 'PENDING' && (
                 <Text style={styles.noticeBanner}>
-                  در انتظار تایید فروشگاه توسط مدیریت
+                  {t('store.pendingApproval')}
                 </Text>
               )}
               {store.approvalStatus === 'REJECTED' && (
                 <Text
                   style={[styles.noticeBanner, {color: colors.pallete.red2}]}>
-                  فروشگاه رد شد: {store.rejectionReason}
+                  {t('store.storeRejected', {reason: store.rejectionReason})}
+                </Text>
+              )}
+              {store.status === 'ARCHIVED' && (
+                <Text
+                  style={[styles.noticeBanner, {color: colors.pallete.red2}]}>
+                  {t('store.archivedNotice')}
                 </Text>
               )}
               {!!subscriptionLabel() && (
@@ -246,7 +267,7 @@ export function MyStoreScreen() {
               <Row style={styles.actionsRow}>
                 <Button
                   style={styles.actionCard}
-                  onPress={() => renew()}
+                  onPress={onRenewPress}
                   loading={renewing}>
                   <MaterialCommunityIcons
                     name="handshake-outline"
@@ -254,13 +275,13 @@ export function MyStoreScreen() {
                     color={colors.main}
                   />
                   <Text color={colors.main} size={14} style={{marginTop: 6}}>
-                    تمدید فروشگاه
+                    {t('store.renewStore')}
                   </Text>
                 </Button>
                 <Button style={styles.actionCard} onPress={onCreateOffer}>
                   <Ionicons name="add" size={52} color={colors.main} />
                   <Text color={colors.main} size={14} style={{marginTop: 6}}>
-                    ثبت تخفیف
+                    {t('store.postDiscount')}
                   </Text>
                 </Button>
               </Row>
@@ -278,7 +299,7 @@ export function MyStoreScreen() {
             <ListState
               isLoading={offersLoading}
               isError={offersError}
-              emptyMessage="هنوز تخفیفی ثبت نکرده‌اید"
+              emptyMessage={t('store.noDiscountsYet')}
             />
           }
         />

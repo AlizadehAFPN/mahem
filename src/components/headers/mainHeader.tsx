@@ -1,10 +1,4 @@
-import {
-  View,
-  StyleSheet,
-  Image,
-  Touchable,
-  TouchableOpacity,
-} from 'react-native';
+import {View, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import React, {useRef, useState} from 'react';
 import {
   CityAnchor,
@@ -15,11 +9,14 @@ import {Text} from '../text/text';
 import {colors} from '../../theme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import {useQuery} from 'react-query';
 import {RootState} from '../../stateManager';
 import {getNotifications} from '../../services';
+import {localizeCity} from '../../i18n/display-maps';
 
 interface Header {
   showLocation?: boolean;
@@ -28,13 +25,24 @@ interface Header {
   // When provided, a menu button is shown next to the city selector — used by
   // the تخفیف‌یاب screens to open the discount options bottom sheet.
   onMenuPress?: () => void;
+  // When true, a back arrow is shown next to the logo — for screens reached
+  // by pushing (not a tab's own root screen) that don't already have a
+  // GradiantHeader of their own to carry a back button.
+  showBack?: boolean;
+  // Overrides the back arrow's default navigation.goBack(). Used by the
+  // filter's step-by-step category screens, where "back" pops one tree level
+  // (an in-screen step) rather than leaving the FilterScreen entirely.
+  onBack?: () => void;
 }
 export function MainHeader({
   showLocation,
   title,
   showNews,
   onMenuPress,
+  showBack,
+  onBack,
 }: Header) {
+  useTranslation(); // re-render on language change so the city label localizes
   const user = useSelector((s: RootState) => s.user);
   const [state, setState] = useState({
     modalVisible: false,
@@ -51,7 +59,7 @@ export function MainHeader({
       setState(s => ({...s, modalVisible: true}));
     });
   };
-  const {navigate} = useNavigation();
+  const {navigate, goBack} = useNavigation();
   const {data: notifData} = useQuery(
     ['notifications', 'unread-badge'],
     () => getNotifications({page: 1, limit: 1}),
@@ -62,6 +70,18 @@ export function MainHeader({
   return (
     <Row style={styles.container}>
       <Row style={{alignItems: 'flex-end'}}>
+        {showBack && (
+          <TouchableOpacity
+            onPress={() => (onBack ? onBack() : goBack())}
+            hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
+            style={{paddingLeft: 4}}>
+            <MaterialIcons
+              name="keyboard-arrow-right"
+              size={26}
+              color="white"
+            />
+          </TouchableOpacity>
+        )}
         <Image source={require('../../assets/images/logo.png')} />
         <Text
           size={15}
@@ -86,10 +106,15 @@ export function MainHeader({
       </Row>
 
       <Row style={{alignItems: 'flex-end'}}>
+        {onMenuPress && (
+          <TouchableOpacity onPress={onMenuPress} style={styles.menuButton}>
+            <Ionicons color="white" name="options" size={26} />
+          </TouchableOpacity>
+        )}
         {showLocation ? (
           <TouchableOpacity ref={cityTriggerRef} onPress={toggleModalVisible}>
             <Row style={{alignItems: 'flex-end'}}>
-              <Text color="white">{user.city}</Text>
+              <Text color="white">{localizeCity(user.city)}</Text>
               <Ionicons color={'white'} name="location" size={30} />
             </Row>
             <CitySelectionMenu
@@ -100,11 +125,6 @@ export function MainHeader({
           </TouchableOpacity>
         ) : (
           <View />
-        )}
-        {onMenuPress && (
-          <TouchableOpacity onPress={onMenuPress} style={styles.menuButton}>
-            <Ionicons color="white" name="options" size={26} />
-          </TouchableOpacity>
         )}
       </Row>
     </Row>

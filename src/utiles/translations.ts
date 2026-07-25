@@ -1,9 +1,11 @@
 export const translations = {
   description: 'توضیحات',
   contract_type: 'نوع قرارداد',
+  contractType: 'نوع قرارداد',
   features: 'مشخصات',
   ad_type: 'نوع آگهی',
   degree: 'تحصیلات',
+  education: 'میزان تحصیلات',
   price: 'قیمت',
   price_with_discount: 'قیمت با تخفیف',
   duration: 'مدت زمان',

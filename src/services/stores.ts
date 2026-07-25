@@ -12,6 +12,10 @@ export interface Store {
   images: string[];
   logo?: string | null;
   banner?: string | null;
+  // ARCHIVED once subscriptionExpiresAt has passed unrenewed (see
+  // StoreExpiryCron) — reactivates to ACTIVE only via renew() + an admin's
+  // confirm-payment.
+  status?: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED';
   approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED';
   rejectionReason?: string | null;
   paymentStatus: 'PENDING' | 'PAID';

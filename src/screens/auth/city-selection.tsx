@@ -1,14 +1,18 @@
 import {View, StyleSheet, FlatList} from 'react-native';
 import React, {useCallback, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Screen, Text, Row, Checkbox, Divider, Button} from '../../components';
 import {colors} from '../../theme';
 import {cities} from '../../utiles';
+import {localizeCity} from '../../i18n/display-maps';
 import {useDispatch} from 'react-redux';
 import {setUser} from '../../stateManager/reducers/user';
-import {useMutation, useQuery} from 'react-query';
-import {getCities, updateUser} from '../../services';
+import {useMutation} from 'react-query';
+import {updateUser} from '../../services';
+import {useCities} from '../../hooks/use-cached-cities';
 
 export function CitySelectionScreen() {
+  const {t} = useTranslation();
   const dispatch = useDispatch();
   const [state, setState] = useState({
     gender: '',
@@ -16,7 +20,7 @@ export function CitySelectionScreen() {
   });
 
   const {mutate} = useMutation(updateUser);
-  const {data} = useQuery(['cities'], getCities);
+  const {data} = useCities();
   const handleNext = () => {
     const data = {
       city_id: state?.city?.id,
@@ -49,42 +53,47 @@ export function CitySelectionScreen() {
     <Screen
       withoutScroll
       style={{flex: 1}}
-      statusbarBackgroundColor={colors.main}>
+      statusbarBackgroundColor={colors.main}
+      bottomSafeAreaColor={colors.main}>
       <View style={sytles.topColor}>
         <Text
           style={{textAlign: 'center'}}
           preset="default"
           size={20}
           color="white">
-          برای سرویس دهی بهتر لطفا فرم زیر را پر کنید.
+          {t('auth.citySelectionIntro')}
         </Text>
       </View>
       <View style={sytles.formContainer}>
-        <Text size={18}>جنسیت:</Text>
+        <Text size={18}>{t('auth.gender')}</Text>
         <Row style={{paddingHorizontal: 32}}>
           <Checkbox
             value={state.gender == 'man'}
-            text="مرد"
+            text={t('auth.male')}
             onToggle={() => setState(s => ({...s, gender: 'man'}))}
           />
           <Divider style={{width: 20}} />
           <Checkbox
             value={state.gender == 'woman'}
-            text="زن"
+            text={t('auth.female')}
             onToggle={() => setState(s => ({...s, gender: 'woman'}))}
           />
         </Row>
         <Divider />
-        <Text size={18}>شهر اقامت:</Text>
+        <Text size={18}>{t('auth.residenceCity')}</Text>
         <View style={{paddingHorizontal: 32}}>
           <FlatList
             showsVerticalScrollIndicator={false}
             data={data?.data}
-            keyExtractor={item => item.title}
-            renderItem={({item, index}) => (
+            // Key by the unique city id, not the display title — Iranian city
+            // names can repeat, and two rows sharing a key triggers React's
+            // "Encountered two children with the same key" warning (and can
+            // mis-recycle rows). The inner `key` on Checkbox was redundant
+            // (FlatList keys cells via keyExtractor) and had the same flaw.
+            keyExtractor={item => String(item.id)}
+            renderItem={({item}) => (
               <Checkbox
-                text={item.title}
-                key={item?.title}
+                text={localizeCity(item.title)}
                 value={state.city.id == item.id}
                 onToggle={() => setState(s => ({...s, city: item}))}
               />
@@ -102,7 +111,7 @@ export function CitySelectionScreen() {
           borderWidth: buttonEnabled() ? 0 : 1,
         }}>
         <Text size={17} color={buttonEnabled() ? 'white' : 'black'}>
-          تایید
+          {t('common.confirm')}
         </Text>
       </Button>
     </Screen>

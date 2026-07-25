@@ -45,6 +45,16 @@ export interface ScreenProps {
   keyboardShouldPersistTaps?: 'handled' | 'always' | 'never';
 
   statusbarBackgroundColor?: string;
+
+  /**
+   * Paints the bottom safe-area (home-indicator) strip this color. Left
+   * undefined the strip stays transparent, so it shows the screen's white
+   * background like the rest of the app. Only screens with a big bottom
+   * action button (apply/continue/pay) set this — usually to colors.main —
+   * so the button reads as extending to the very bottom edge.
+   */
+  bottomSafeAreaColor?: string;
+
   withoutScroll?: boolean;
   refreshing?: boolean;
   onRefresh?: () => void;

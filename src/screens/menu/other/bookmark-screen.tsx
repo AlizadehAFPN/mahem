@@ -16,6 +16,7 @@ import {
 } from '../../../components';
 import {colors} from '../../../theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import {useQuery} from 'react-query';
 import {useSelector} from 'react-redux';
@@ -23,6 +24,7 @@ import {getBookmarks} from '../../../services';
 import {RootState} from '../../../stateManager';
 
 export function BookmarkScreen() {
+  const {t} = useTranslation();
   const {goBack, navigate} = useNavigation();
   const {data, isLoading, isError} = useQuery(['bookmarks'], getBookmarks);
   const bookmarks = data?.data;
@@ -46,7 +48,7 @@ export function BookmarkScreen() {
             resizeMode={user?.avatar ? 'cover' : 'contain'}
           />
         </View>
-        <Text size={20}>پنل نشان شده کاربر</Text>
+        <Text size={20}>{t('bookmark.title')}</Text>
       </View>
 
       <FlatList
@@ -63,7 +65,7 @@ export function BookmarkScreen() {
           <ListState
             isLoading={isLoading}
             isError={isError}
-            emptyMessage="هنوز آگهی‌ای نشان نکرده‌اید"
+            emptyMessage={t('bookmark.empty')}
           />
         }
         ListHeaderComponent={<Divider height={10} />}

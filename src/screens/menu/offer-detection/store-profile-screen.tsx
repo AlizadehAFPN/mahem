@@ -1,11 +1,13 @@
 import {Dimensions, FlatList, Image, StyleSheet, View} from 'react-native';
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useQuery} from 'react-query';
 import {
   GradiantHeader,
   GridOfferCard,
+  ListFooter,
   ListState,
   MainHeader,
   Screen,
@@ -30,6 +32,7 @@ const READABLE_HEADER_GRADIENT = ['rgba(0,0,0,0.45)', 'rgba(0,0,0,0.45)'];
 // as a 2-column grid — reached by tapping a store's name/logo from a
 // discount's detail page (see single-product.tsx's store-attribution row).
 export function StoreProfileScreen() {
+  const {t} = useTranslation();
   const {navigate} = useNavigation<any>();
   const {params} = useRoute<any>();
   const storeId = params?.storeId;
@@ -44,6 +47,8 @@ export function StoreProfileScreen() {
     items: offers,
     isLoading,
     isError,
+    isFetchingNextPage,
+    hasNextPage,
     onEndReached,
   } = usePaginatedList({
     queryKey: ['storeOffers', storeId],
@@ -54,12 +59,12 @@ export function StoreProfileScreen() {
 
   return (
     <Screen withoutScroll>
-      <MainHeader title="تخفیف یاب" showLocation />
+      <MainHeader title={t('home.discountFinder')} showLocation />
       <View style={{flex: 1}}>
         <View style={styles.overlayNav}>
           <GradiantHeader
             title=""
-            shareText={store?.name ?? 'ماهم'}
+            shareText={store?.name ?? t('common.appName')}
             details={false}
             onCreatePress={undefined}
             onBookMark={undefined}
@@ -126,7 +131,14 @@ export function StoreProfileScreen() {
             <ListState
               isLoading={storeLoading || isLoading}
               isError={isError}
-              emptyMessage="این فروشگاه هنوز تخفیفی ثبت نکرده است"
+              emptyMessage={t('store.noDiscountsInStore')}
+            />
+          }
+          ListFooterComponent={
+            <ListFooter
+              isFetchingNextPage={isFetchingNextPage}
+              hasNextPage={hasNextPage}
+              itemCount={offers.length}
             />
           }
         />

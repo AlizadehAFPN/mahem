@@ -1,5 +1,6 @@
 import {StyleSheet, View, BackHandler} from 'react-native';
 import React, {useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Row} from '../row/row';
 import {Button} from '../button/button';
 import {Text} from '../text/text';
@@ -18,9 +19,11 @@ export function CreateAdsHeader({
   isSending,
   uploadingIndexes = [],
   initialImages = [],
-  title = 'ثبت رایگان آگهی',
+  title,
 }: any) {
+  const {t} = useTranslation();
   const {goBack} = useNavigation();
+  const headerTitle = title ?? t('createAds.postFreeAd');
   const handleBack = () => {
     if (onBack) {
       onBack();
@@ -53,14 +56,14 @@ export function CreateAdsHeader({
               name="keyboard-arrow-right"
             />
             <Text color="white" size={17}>
-              {title}
+              {headerTitle}
             </Text>
           </Row>
         </Button>
         <Button onPress={onCreatePress} loading={isSending}>
           <Row>
             <Text size={15} color="white">
-              ارسال
+              {t('common.send')}
             </Text>
             <Feather color="white" name="check" size={20} />
           </Row>
@@ -74,11 +77,11 @@ export function CreateAdsHeader({
       />
       <Divider height={10} />
       <Text preset="bold" size={20} style={{textAlign: 'center'}}>
-        انتخاب تصویر مناسب برای آگهی
+        {t('createAds.chooseImage')}
       </Text>
       <Divider height={10} />
       <Text style={{textAlign: 'center'}}>
-        آگهی های شامل تصویر، بیش از ۵ برابر دیده میشوند
+        {t('createAds.imageBoostHint')}
       </Text>
       <Divider />
       <Row style={{justifyContent: 'space-around'}}>

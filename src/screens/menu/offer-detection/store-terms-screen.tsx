@@ -1,30 +1,33 @@
 import {Alert, Image, StyleSheet, View} from 'react-native';
-import React, {useMemo, useState} from 'react';
+import React, {useMemo} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
-import {useMutation, useQuery} from 'react-query';
+import {useMutation} from 'react-query';
 import {Button, Row, Screen, Text} from '../../../components';
-import {createStore, getAdsCategories, upload} from '../../../services';
+import {createStore, upload} from '../../../services';
 import {colors} from '../../../theme';
+import {useAdsCategories} from '../../../hooks/use-cached-categories';
+
+const STORE_FEE_TOMAN = 300000;
 
 // Terms + monthly fee (store_v2.png design, "فروشگاه – 2", verified
 // word-for-word via get_design_context) — the step AFTER the store details
-// form (CreateStoreScreen, "فروشگاه – 1"), not before it. There's no payment
-// gateway (see PaymentStatus in mahem-backend), so tapping "پرداخت" doesn't
-// open one either: it submits the store right here and moves straight to
-// the store page: same as accepting the payment on the spot. The store
-// still comes back paymentStatus PENDING until an admin confirms the bank
-// transfer in mahem-admin — this only skips a fake gateway screen, not that
-// admin confirmation step.
+// form (CreateStoreScreen, "فروشگاه – 1"), not before it. There's still no
+// real payment provider behind this (see PaymentStatus in mahem-backend —
+// the store lands paymentStatus PENDING until an admin confirms the bank
+// transfer by hand in mahem-admin either way), but tapping "پرداخت" now
+// sends the user through the fake bank gateway (BankGatewayScreen) first
+// instead of submitting the store on the spot.
 export function StoreTermsScreen() {
+  const {t} = useTranslation();
   const {navigate, goBack} = useNavigation<any>();
   const {params} = useRoute<any>();
   const {name, cover, logo} = params ?? {};
   const userCityId = useSelector((s: any) => s.user.cityId);
-  const [submitting, setSubmitting] = useState(false);
 
-  const {data: cats} = useQuery(['adsCategories'], getAdsCategories);
+  const {data: cats} = useAdsCategories();
   const discountCategoryId = useMemo(
     () => cats?.data?.find((c: any) => c.title === 'تخفیف یاب')?.id,
     [cats],
@@ -43,38 +46,39 @@ export function StoreTermsScreen() {
     return uploaded?.data?.id as string;
   };
 
-  const onPay = async () => {
-    if (submitting) {
-      return;
-    }
+  const onPay = () => {
     if (!discountCategoryId) {
-      Alert.alert('خطا', 'دسته‌بندی تخفیف‌یاب یافت نشد');
+      Alert.alert(t('common.error'), t('store.discountCategoryNotFound'));
       return;
     }
-    setSubmitting(true);
-    try {
-      const [logoUrl, bannerUrl] = await Promise.all([
-        logo?.uri ? uploadImage(logo) : Promise.resolve(undefined),
-        cover?.uri ? uploadImage(cover) : Promise.resolve(undefined),
-      ]);
+    navigate('bankGateway', {
+      amount: STORE_FEE_TOMAN,
+      description: t('store.createStoreDescription', {name: name ?? ''}),
+      onSuccess: async () => {
+        try {
+          const [logoUrl, bannerUrl] = await Promise.all([
+            logo?.uri ? uploadImage(logo) : Promise.resolve(undefined),
+            cover?.uri ? uploadImage(cover) : Promise.resolve(undefined),
+          ]);
 
-      const store = await mutateAsync({
-        name,
-        categoryId: discountCategoryId,
-        cityId: userCityId,
-        logo: logoUrl,
-        banner: bannerUrl,
-      });
-      setSubmitting(false);
-      navigate('myStore', {storeId: store.id});
-    } catch (e) {
-      setSubmitting(false);
-      Alert.alert('خطا', 'ثبت فروشگاه با خطا مواجه شد. لطفا دوباره تلاش کنید');
-    }
+          const store = await mutateAsync({
+            name,
+            categoryId: discountCategoryId,
+            cityId: userCityId,
+            logo: logoUrl,
+            banner: bannerUrl,
+          });
+          goBack();
+          navigate('myStore', {storeId: store.id});
+        } catch (e) {
+          Alert.alert(t('common.error'), t('store.createStoreError'));
+        }
+      },
+    });
   };
 
   return (
-    <Screen withoutScroll>
+    <Screen withoutScroll bottomSafeAreaColor={colors.main}>
       <View style={styles.header}>
         <Row style={styles.headerRow}>
           <Button onPress={goBack}>
@@ -85,7 +89,7 @@ export function StoreTermsScreen() {
                 name="keyboard-arrow-right"
               />
               <Text color="white" size={17}>
-                تخفیف یاب
+                {t('home.discountFinder')}
               </Text>
             </Row>
           </Button>
@@ -97,20 +101,17 @@ export function StoreTermsScreen() {
         </Row>
       </View>
       <View style={styles.body}>
-        <Text style={styles.paragraph}>
-          ثبت فروشگاه تخفیف یاب رایگان نیست و بصورت اشتراک ماهانه است.
-        </Text>
-        <Text style={styles.paragraph}>
-          هر فروشگاه فقط میتواند توی یک صنف فعالیت کند در غیر اینصورت شرکت ماهم
-          میتواند فروشگاه اش را ببندد.
-        </Text>
+        <Text style={styles.paragraph}>{t('store.termsParagraph1')}</Text>
+        <Text style={styles.paragraph}>{t('store.termsParagraph2')}</Text>
         <Text preset="bold" size={17} color={colors.main} style={styles.fee}>
-          هزینه ثبت فروشگاه 300/000 تومان
+          {t('store.feeAmount', {
+            amount: STORE_FEE_TOMAN.toLocaleString('en-US'),
+          })}
         </Text>
       </View>
-      <Button style={styles.payButton} onPress={onPay} loading={submitting}>
+      <Button style={styles.payButton} onPress={onPay}>
         <Text color="white" size={16} preset="bold">
-          پرداخت
+          {t('createAds.pay')}
         </Text>
       </Button>
     </Screen>

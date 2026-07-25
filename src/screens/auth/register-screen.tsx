@@ -1,5 +1,6 @@
 import {Alert, View, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   Button,
   Divider,
@@ -22,6 +23,7 @@ import {useMutation} from 'react-query';
 import {register} from '../../services';
 
 export function RegisterScreen() {
+  const {t} = useTranslation();
   const timeoutRef = useRef(null);
   const dispatch = useDispatch();
   const {navigate} = useNavigation();
@@ -45,7 +47,7 @@ export function RegisterScreen() {
         if (!mobileValidation(state.mobile)) {
           setState(s => ({
             ...s,
-            mobileError: 'شماره موبایل خود را به درستی وارد کنید!',
+            mobileError: t('auth.mobileError'),
           }));
         }
       }, 500);
@@ -97,8 +99,7 @@ export function RegisterScreen() {
     <Screen statusbarBackgroundColor={colors.main}>
       <View style={sytles.topColor}>
         <Text preset="default" size={20} color="white">
-          برای ثبت نام کافیست شماره همراه خود را وارد نمایید تا کد فعال سازی
-          برایتان ارسال شود.
+          {t('auth.registerIntro')}
         </Text>
       </View>
       <View style={sytles.grayCard}>
@@ -120,7 +121,7 @@ export function RegisterScreen() {
         <TextField
           style={{borderRadius: 8, borderColor: colors.pallete.gray2}}
           labelStyle={{color: 'black', fontSize: 17, marginTop: -5}}
-          label="نام کاربری"
+          label={t('auth.username')}
           error={state.usernameError}
           onChangeText={text => handleChangeText(text, 'username')}
         />
@@ -128,7 +129,7 @@ export function RegisterScreen() {
         <TextField
           style={{borderRadius: 8, borderColor: colors.pallete.gray2}}
           labelStyle={{color: 'black', fontSize: 17, marginTop: -5}}
-          label="شماره همراه"
+          label={t('auth.mobile')}
           inputMode="tel"
           error={state.mobileError}
           onChangeText={text => handleChangeText(text, 'mobile')}
@@ -145,14 +146,17 @@ export function RegisterScreen() {
               : colors.pallete.gray1,
           }}>
           <Text color={enableButton() ? 'white' : 'black'} size={20}>
-            ثبت نام
+            {t('auth.register')}
           </Text>
         </Button>
       </View>
       <FilePickerModal
         onSelectFile={file => {
           if (!isSupportedImageType(file.type)) {
-            Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+            Alert.alert(
+              t('common.imageFormatUnsupported'),
+              UNSUPPORTED_IMAGE_TYPE_MESSAGE(),
+            );
             return;
           }
           setState(s => ({...s, profileImage: file}));

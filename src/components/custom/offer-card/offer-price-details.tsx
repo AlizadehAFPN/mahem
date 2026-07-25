@@ -6,6 +6,7 @@ import {
   Text as RNText,
 } from 'react-native';
 import React, {useMemo} from 'react';
+import {useTranslation} from 'react-i18next';
 import {colors} from '../../../theme';
 import {CirleSlider} from '../../cicle-slider/circle-slider';
 import {Rate} from '../../rating/rate';
@@ -15,6 +16,7 @@ import {Timer} from '../timer/timer';
 import {numberWithCommas} from '../../../utiles';
 
 export function OfferPriceDetails({item, ...prp}) {
+  const {t} = useTranslation();
   const offerPersent = item?.discountPercent ?? 0;
   // expiresAt is an absolute ISO timestamp; Timer wants a countdown in
   // seconds, and counts down locally from there rather than re-reading the
@@ -50,11 +52,10 @@ export function OfferPriceDetails({item, ...prp}) {
         <View>
           <RNText>
             <Text size={12} color={colors.pallete.grayText}>
-              قیمت
+              {`${t('common.price')} `}
             </Text>
             <Text
               style={{
-                marginHorizontal: 8,
                 textDecorationLine: 'line-through',
                 textDecorationColor: colors.pallete.grayText,
               }}
@@ -63,7 +64,7 @@ export function OfferPriceDetails({item, ...prp}) {
               {numberWithCommas(item.originalPrice)}
             </Text>
             <Text size={12} color={colors.pallete.grayText}>
-              تومان
+              {` ${t('common.toman')}`}
             </Text>
           </RNText>
           <View style={styles.line} />
@@ -78,7 +79,7 @@ export function OfferPriceDetails({item, ...prp}) {
           inActiveStrokeColor={colors.pallete.lightRed}>
           <Text style={{lineHeight: 20}}>{offerPersent}%</Text>
           <Text color="rgba(0,0,0,.5)" style={{lineHeight: 20}}>
-            تخفیف
+            {t('common.discount')}
           </Text>
         </CirleSlider>
       </View>
@@ -91,14 +92,11 @@ export function OfferPriceDetails({item, ...prp}) {
         }}>
         {secondsRemaining ? <Timer time={secondsRemaining} /> : <View />}
         <RNText>
-          <Text>پرداختی شما</Text>
-          <Text
-            style={{paddingHorizontal: 10}}
-            size={12}
-            color={colors.pallete.green}>
+          <Text size={12}>{t('offers.yourPayment')}</Text>
+          <Text size={12} color={colors.pallete.green}>
             {numberWithCommas(item.price)}
           </Text>
-          <Text>تومان</Text>
+          <Text size={12}>{` ${t('common.toman')}`}</Text>
         </RNText>
       </View>
     </Row>

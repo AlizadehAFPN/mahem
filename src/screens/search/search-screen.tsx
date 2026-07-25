@@ -13,23 +13,37 @@ import {
   Row,
   Text,
   UnderlineTextField,
-  Divider,
   RowProduct,
   Button,
   ListState,
+  ListFooter,
 } from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
+import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
-import {getAds} from '../../services';
+import {getAds, collectLeafCategoryIds} from '../../services';
 import {numberWithCommas} from '../../utiles';
+import {localizeCategory} from '../../i18n/display-maps';
 import {useDispatch, useSelector} from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {setFilters} from '../../stateManager/reducers/filters';
 import {RootState} from '../../stateManager';
 import {usePaginatedList} from '../../hooks/use-paginated-list';
 import {useDebouncedValue} from '../../hooks/use-debounced-value';
+
+// Reuses the filter screen's sort labels (filter.sort*) so the badge below the
+// search bar reads exactly like the button the user tapped. Only the three
+// sorts the filter UI actually exposes are mapped; any other value renders no
+// badge.
+const SORT_LABEL_KEYS: Record<string, string> = {
+  new: 'filter.sortNewest',
+  price_asc: 'filter.sortCheapest',
+  price_desc: 'filter.sortPriciest',
+};
+
 export function SearchScreen() {
+  const {t} = useTranslation();
   const {navigate} = useNavigation();
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState('');
@@ -64,6 +78,14 @@ export function SearchScreen() {
   } = useSelector((s: RootState) => s.filter);
   const userCityId = useSelector((s: RootState) => s.user.cityId);
   const effectiveCategory = subSubCategory || subCategory || mainCategory;
+  // Ads are only ever tagged with a leaf category, so a filter set to a
+  // non-leaf (the "همه موارد" option, e.g. all of استخدامی) has to be
+  // expanded to every leaf id underneath it — the backend's `categoryId` is
+  // an exact match, while `categoryIds` matches "any of these". For a leaf
+  // pick this is just [that id], so it stays correct either way.
+  const categoryIds = effectiveCategory
+    ? collectLeafCategoryIds(effectiveCategory)
+    : undefined;
   // A location filter (see FilterScreen's "تعیین موقعیت") opts into
   // near-me ranking, which only ever matches ads that themselves have
   // coordinates — everything else stays scoped to the account's city
@@ -77,6 +99,7 @@ export function SearchScreen() {
     isError,
     isFetching,
     isFetchingNextPage,
+    hasNextPage,
     onEndReached,
     refetch,
   } = usePaginatedList({
@@ -113,7 +136,8 @@ export function SearchScreen() {
         page: pageParam,
         limit: 20,
         search: debouncedSearchText || undefined,
-        categoryId: effectiveCategory?.id,
+        categoryIds:
+          categoryIds && categoryIds.length > 0 ? categoryIds : undefined,
         ...(hasLocationFilter
           ? {lat, lng, radiusKm: 10}
           : {cityId: userCityId}),
@@ -152,7 +176,17 @@ export function SearchScreen() {
     );
   };
   const onRemoveFilterSub = mainCategory => {
-    dispatch(setFilters({mainCategory: undefined, subSubCategory: undefined}));
+    // Clear all three levels — `effectiveCategory` falls back through
+    // subSubCategory → subCategory → mainCategory, so leaving `subCategory`
+    // set (the old bug) kept the exact same filter active and the list never
+    // refreshed after the tag was removed.
+    dispatch(
+      setFilters({
+        mainCategory: undefined,
+        subCategory: undefined,
+        subSubCategory: undefined,
+      }),
+    );
     if (mainCategory?.allAds === true) {
       dispatch(setFilters({allAds: false}));
     }
@@ -171,6 +205,11 @@ export function SearchScreen() {
   const onRemoveFilterOnlyImages = () => {
     dispatch(setFilters({onlyImages: false}));
   };
+  const onRemoveFilterSort = () => {
+    // Empty string is the reducer's "no sort" value — the backend treats a
+    // missing sort as newest-first, so this reverts to the default ordering.
+    dispatch(setFilters({sort: ''}));
+  };
 
   // `sort`/`onlyImages` are applied server-side (see FindAdvertisementsDto)
   // so they cover the full result set, not just the currently-loaded page.
@@ -178,7 +217,10 @@ export function SearchScreen() {
 
   return (
     <Screen withoutScroll>
-      <MainHeader title={mainCategory?.title ?? 'جست و جو'} showLocation={true} />
+      <MainHeader
+        title={localizeCategory(mainCategory?.title) || t('search.title')}
+        showLocation={true}
+      />
       <FlatList
         onEndReached={onEndReached}
         data={agahi}
@@ -200,7 +242,7 @@ export function SearchScreen() {
           <ListState
             isLoading={isLoading}
             isError={isError}
-            emptyMessage="آگهی‌ای یافت نشد"
+            emptyMessage={t('search.noAdsFound')}
           />
         }
         ListHeaderComponent={
@@ -211,7 +253,7 @@ export function SearchScreen() {
                 <UnderlineTextField
                   style={{flex: 1}}
                   value={searchText}
-                  placeholder="جست جو برای"
+                  placeholder={t('search.searchFor')}
                   onChangeText={setSearchText}
                 />
               </View>
@@ -224,6 +266,18 @@ export function SearchScreen() {
               </TouchableOpacity>
             </Row>
             <ScrollView horizontal>
+              {!!sort && !!SORT_LABEL_KEYS[sort] && (
+                <View style={styles.badge}>
+                  <Button onPress={onRemoveFilterSort}>
+                    <AntDesign
+                      size={20}
+                      style={{marginRight: 5}}
+                      name="closecircleo"
+                    />
+                  </Button>
+                  <Text>{t(SORT_LABEL_KEYS[sort])}</Text>
+                </View>
+              )}
               {mainCategory && (
                 <View style={styles.badge}>
                   <Button onPress={() => onRemoveFilterSub(mainCategory)}>
@@ -233,7 +287,7 @@ export function SearchScreen() {
                       name="closecircleo"
                     />
                   </Button>
-                  <Text>{effectiveCategory?.title}</Text>
+                  <Text>{localizeCategory(effectiveCategory?.title)}</Text>
                 </View>
               )}
 
@@ -248,10 +302,13 @@ export function SearchScreen() {
                   </Button>
                   <Text>
                     {minPrice !== undefined && maxPrice !== undefined
-                      ? `قیمت ${numberWithCommas(minPrice)} تا ${numberWithCommas(maxPrice)}`
+                      ? t('search.priceRange', {
+                          min: numberWithCommas(minPrice),
+                          max: numberWithCommas(maxPrice),
+                        })
                       : minPrice !== undefined
-                      ? `قیمت از ${numberWithCommas(minPrice)}`
-                      : `قیمت تا ${numberWithCommas(maxPrice)}`}
+                      ? t('search.priceFrom', {min: numberWithCommas(minPrice)})
+                      : t('search.priceTo', {max: numberWithCommas(maxPrice)})}
                   </Text>
                 </View>
               )}
@@ -264,7 +321,7 @@ export function SearchScreen() {
                       name="closecircleo"
                     />
                   </Button>
-                  <Text>فقط عکس دارها</Text>
+                  <Text>{t('search.onlyWithImages')}</Text>
                 </View>
               )}
               {hasLocationFilter && (
@@ -276,13 +333,19 @@ export function SearchScreen() {
                       name="closecircleo"
                     />
                   </Button>
-                  <Text>نزدیک موقعیت انتخابی</Text>
+                  <Text>{t('search.nearSelectedLocation')}</Text>
                 </View>
               )}
             </ScrollView>
           </>
         }
-        ListFooterComponent={<Divider height={40} />}
+        ListFooterComponent={
+          <ListFooter
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            itemCount={agahi.length}
+          />
+        }
       />
     </Screen>
   );

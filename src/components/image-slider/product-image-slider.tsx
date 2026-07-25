@@ -80,6 +80,7 @@ export function ProductImageSlider({product, selectedSlide}) {
             {[...new Array(product.gallery.length).keys()].map(
               (item, index) => (
                 <View
+                  key={index}
                   style={{
                     width: state.active == index ? 30 : 5,
                     height: 5,

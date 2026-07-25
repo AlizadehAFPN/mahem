@@ -3,6 +3,10 @@ import {View, StyleSheet} from 'react-native';
 import {Text} from '../text/text';
 import {Button} from '../button/button';
 import {colors} from '../../theme';
+// Class component — can't use the useTranslation hook, so read from the i18n
+// instance directly. This screen only renders on a caught error, so live
+// language switching here isn't a concern.
+import i18n from '../../i18n';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -35,9 +39,9 @@ export class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <View style={styles.container}>
-          <Text style={styles.message}>مشکلی پیش آمد</Text>
+          <Text style={styles.message}>{i18n.t('common.somethingWrong')}</Text>
           <Button onPress={this.handleRetry} style={styles.button}>
-            <Text color="white">تلاش دوباره</Text>
+            <Text color="white">{i18n.t('common.tryAgain')}</Text>
           </Button>
         </View>
       );

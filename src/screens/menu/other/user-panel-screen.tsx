@@ -17,15 +17,22 @@ import {
 } from '../../../components';
 import {colors} from '../../../theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useSelector} from 'react-redux';
-import {deleteAds, getConversations, getMyAds} from '../../../services';
+import {
+  deleteAds,
+  getConversations,
+  getMyAds,
+  renewAds,
+} from '../../../services';
 import {formatRelativeTime} from '../../../utiles/utiles_funcs';
 import {RootState} from '../../../stateManager';
 
 export function UserPanelScreen() {
+  const {t} = useTranslation();
   const [state, setState] = useState({
     adsMode: true,
   });
@@ -43,14 +50,47 @@ export function UserPanelScreen() {
 
   const onEditAd = (item: any) => navigate('editAd', {ad: item});
   const onDeleteAd = (item: any) => {
-    Alert.alert('حذف آگهی', 'آیا از حذف این آگهی مطمئن هستید؟', [
-      {text: 'انصراف', style: 'cancel'},
-      {
-        text: 'حذف',
-        style: 'destructive',
-        onPress: () => deleteAdMutate(item.id),
+    const isRejected = item.approvalStatus === 'REJECTED';
+    Alert.alert(
+      isRejected
+        ? t('userPanel.deleteAdCompletelyTitle')
+        : t('userPanel.deleteAdTitle'),
+      isRejected
+        ? t('userPanel.deleteRejectedBody')
+        : t('userPanel.deleteConfirmBody'),
+      [
+        {text: t('common.cancel'), style: 'cancel'},
+        {
+          text: isRejected ? t('userPanel.deleteCompletely') : t('common.delete'),
+          style: 'destructive',
+          onPress: () => deleteAdMutate(item.id),
+        },
+      ],
+    );
+  };
+
+  // Fee-required ads only (see Category.adFeeToman / item.paymentStatus) —
+  // opens the same test payment gateway ad creation uses, then flags the ad
+  // as awaiting a new manual bank-transfer confirmation. expiresAt only
+  // actually moves once an admin confirms the payment in mahem-admin.
+  const onRenewAd = (item: any) => {
+    navigate('bankGateway', {
+      amount: item.category_id?.adFeeToman,
+      description: t('userPanel.renewAdDescription', {title: item.title}),
+      onSuccess: async () => {
+        try {
+          await renewAds(item.id);
+          queryClient.invalidateQueries('myAds');
+          goBack();
+          Alert.alert(
+            t('store.renewRequested'),
+            t('userPanel.renewRequestedBody'),
+          );
+        } catch (e) {
+          Alert.alert(t('common.error'), t('store.renewError'));
+        }
       },
-    ]);
+    });
   };
 
   return (
@@ -74,7 +114,7 @@ export function UserPanelScreen() {
             resizeMode={user?.avatar ? 'cover' : 'contain'}
           />
         </TouchableOpacity>
-        <Text size={20}>پنل مدیریت کاربر</Text>
+        <Text size={20}>{t('userPanel.title')}</Text>
       </View>
       {state.adsMode ? (
         <FlatList
@@ -89,20 +129,26 @@ export function UserPanelScreen() {
                   style={{width: '100%', height: 80, resizeMode: 'contain'}}
                   source={require('../../../assets/images/adlist.png')}
                 />
-                {item.approvalStatus && item.approvalStatus !== 'APPROVED' && (
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      item.approvalStatus === 'REJECTED'
-                        ? styles.statusBadgeRejected
-                        : styles.statusBadgePending,
-                    ]}>
+                {item.approvalStatus === 'REJECTED' ? (
+                  <View style={[styles.statusBadge, styles.statusBadgeRejected]}>
                     <Text size={11} color="white">
-                      {item.approvalStatus === 'REJECTED'
-                        ? 'رد شده'
-                        : 'در انتظار تایید'}
+                      {t('userPanel.statusRejected')}
                     </Text>
                   </View>
+                ) : item.status === 'ARCHIVED' ? (
+                  <View style={[styles.statusBadge, styles.statusBadgeArchived]}>
+                    <Text size={11} color="white">
+                      {t('userPanel.statusExpired')}
+                    </Text>
+                  </View>
+                ) : (
+                  item.approvalStatus !== 'APPROVED' && (
+                    <View style={[styles.statusBadge, styles.statusBadgePending]}>
+                      <Text size={11} color="white">
+                        {t('userPanel.statusPending')}
+                      </Text>
+                    </View>
+                  )
                 )}
                 <View
                   style={{
@@ -124,7 +170,9 @@ export function UserPanelScreen() {
                         style={{paddingHorizontal: 8}}
                         size={12}
                         color={colors.pallete.red}>
-                        دلیل رد: {item.rejectionReason}
+                        {t('userPanel.rejectionReason', {
+                          reason: item.rejectionReason,
+                        })}
                       </Text>
                     )}
                   <Row style={{marginBottom: 2}}>
@@ -146,30 +194,57 @@ export function UserPanelScreen() {
                 </View>
               </TouchableOpacity>
               <Row style={{paddingHorizontal: 16, marginTop: 4}}>
-                <Button
-                  onPress={() => navigate('adViewStats', {advertisementId: item.id})}
-                  style={styles.rowActionButton}>
-                  <Text size={13} color={colors.text}>
-                    آمار بازدید
-                  </Text>
-                </Button>
-                <Divider style={{width: 10}} />
-                <Button
-                  onPress={() => onEditAd(item)}
-                  style={styles.rowActionButton}>
-                  <Text size={13} color={colors.main}>
-                    ویرایش
-                  </Text>
-                </Button>
-                <Divider style={{width: 10}} />
-                <Button
-                  onPress={() => onDeleteAd(item)}
-                  style={styles.rowActionButton}>
-                  <Text size={13} color={colors.pallete.red2}>
-                    حذف
-                  </Text>
-                </Button>
+                {item.approvalStatus === 'REJECTED' ? (
+                  <Button
+                    onPress={() => onDeleteAd(item)}
+                    style={styles.rowActionButton}>
+                    <Text size={13} color={colors.pallete.red2}>
+                      {t('userPanel.deleteCompletely')}
+                    </Text>
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      onPress={() =>
+                        navigate('adViewStats', {advertisementId: item.id})
+                      }
+                      style={styles.rowActionButton}>
+                      <Text size={13} color={colors.text}>
+                        {t('userPanel.viewStats')}
+                      </Text>
+                    </Button>
+                    <Divider style={{width: 10}} />
+                    <Button
+                      onPress={() => onEditAd(item)}
+                      style={styles.rowActionButton}>
+                      <Text size={13} color={colors.main}>
+                        {t('common.edit')}
+                      </Text>
+                    </Button>
+                    <Divider style={{width: 10}} />
+                    <Button
+                      onPress={() => onDeleteAd(item)}
+                      style={styles.rowActionButton}>
+                      <Text size={13} color={colors.pallete.red2}>
+                        {t('common.delete')}
+                      </Text>
+                    </Button>
+                  </>
+                )}
               </Row>
+              {item.approvalStatus === 'APPROVED' && item.paymentStatus != null && (
+                <Row style={{paddingHorizontal: 16, marginTop: 4}}>
+                  <Button
+                    onPress={() => onRenewAd(item)}
+                    style={{...styles.rowActionButton, ...styles.renewButton}}>
+                    <Text size={13} color="white">
+                      {item.status === 'ARCHIVED'
+                        ? t('userPanel.renewAdExpired')
+                        : t('userPanel.renewAd')}
+                    </Text>
+                  </Button>
+                </Row>
+              )}
             </View>
           )}
           ListHeaderComponent={<Divider height={10} />}
@@ -267,5 +342,12 @@ const styles = StyleSheet.create({
   },
   statusBadgeRejected: {
     backgroundColor: colors.pallete.red2,
+  },
+  statusBadgeArchived: {
+    backgroundColor: colors.pallete.gray3,
+  },
+  renewButton: {
+    backgroundColor: colors.main,
+    borderColor: colors.main,
   },
 });

@@ -58,7 +58,16 @@ axiosInstance.interceptors.response.use(
         originalRequest.url.includes('/auth/otp/'));
 
     if (status !== 401 || isAuthEndpoint || originalRequest?._retry) {
-      console.error('Axios response error:', error);
+      // error.toString() alone collapses to just "Request failed with
+      // status code 400" — the actual class-validator messages explaining
+      // *which* field failed live in response.data, so log that too or
+      // every 4xx becomes a guessing game.
+      console.error(
+        'Axios response error:',
+        status,
+        originalRequest?.url,
+        error.response?.data ?? error.message,
+      );
       return Promise.reject(error);
     }
 

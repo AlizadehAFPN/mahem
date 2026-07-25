@@ -1,5 +1,6 @@
 import {View, StyleSheet, Image, ScrollView, Alert} from 'react-native';
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {MainModal} from './mainModal';
 import {colors} from '../../theme';
 import {Text} from '../text/text';
@@ -13,17 +14,19 @@ import {useMutation} from 'react-query';
 import {createReport} from '../../services';
 
 import {} from 'react-native-gesture-handler';
-// Values match the backend's ReportCategory enum directly.
+// Values match the backend's ReportCategory enum directly; `titleKey` is the
+// i18n key for the label shown to the user (the enum `value` stays canonical).
 const checkOptions = [
-  {title: 'دسته بندی نامناسب', value: 'CATEGORY_PROBLEM'},
-  {title: 'محتوی آگهی نامناسب', value: 'CONTENT_PROBLEM'},
-  {title: 'قیمت آگهی نامناسب', value: 'PRICE_PROBLEM'},
-  {title: 'شماره تماس نادرست', value: 'CALL_INFO_PROBLEM'},
-  {title: 'محصول دیگر موجود نیست', value: 'EXISTENCY_PROBLEM'},
-  {title: 'دیگر', value: 'OTHER'},
+  {titleKey: 'report.reasonCategory', value: 'CATEGORY_PROBLEM'},
+  {titleKey: 'report.reasonContent', value: 'CONTENT_PROBLEM'},
+  {titleKey: 'report.reasonPrice', value: 'PRICE_PROBLEM'},
+  {titleKey: 'report.reasonCallInfo', value: 'CALL_INFO_PROBLEM'},
+  {titleKey: 'report.reasonExistency', value: 'EXISTENCY_PROBLEM'},
+  {titleKey: 'report.reasonOther', value: 'OTHER'},
 ];
 
 export function ReportProblem({visible, onClose, advertisementId}) {
+  const {t} = useTranslation();
   const [state, setState] = useState({
     checkProb: '',
     phone: '',
@@ -37,17 +40,17 @@ export function ReportProblem({visible, onClose, advertisementId}) {
       onSuccess: () => {
         setState({checkProb: '', phone: '', email: '', description: ''});
         onClose();
-        Alert.alert('گزارش شما ثبت شد', 'با تشکر از همراهی شما.');
+        Alert.alert(t('report.submittedTitle'), t('report.submittedBody'));
       },
       onError: () => {
-        Alert.alert('خطا', 'ارسال گزارش با خطا مواجه شد، دوباره تلاش کنید.');
+        Alert.alert(t('common.error'), t('report.errorBody'));
       },
     },
   );
 
   const onSubmit = () => {
     if (!state.checkProb) {
-      Alert.alert('لطفا نوع مشکل را انتخاب کنید');
+      Alert.alert(t('report.selectReason'));
       return;
     }
     mutate({
@@ -69,14 +72,14 @@ export function ReportProblem({visible, onClose, advertisementId}) {
                 checkedColor={colors.pallete.green}
                 value={state.checkProb === item.value}
                 onToggle={() => setState(s => ({...s, checkProb: item.value}))}
-                text={item.title}
+                text={t(item.titleKey)}
                 style={{marginVertical: 12}}
               />
             ))}
             <TextField
               inputStyle={{textAlign: 'right'}}
               preset="underline"
-              placeholder="شماره موبایل"
+              placeholder={t('common.phoneNumber')}
               inputMode="tel"
               value={state.phone}
               onChangeText={text => setState(s => ({...s, phone: text}))}
@@ -85,7 +88,7 @@ export function ReportProblem({visible, onClose, advertisementId}) {
             <Divider />
             <TextField
               preset="underline"
-              placeholder="ایمیل"
+              placeholder={t('common.email')}
               inputMode="email"
               value={state.email}
               onChangeText={text => setState(s => ({...s, email: text}))}
@@ -94,7 +97,7 @@ export function ReportProblem({visible, onClose, advertisementId}) {
             <Divider />
             <TextField
               preset="underline"
-              placeholder="توضیحات"
+              placeholder={t('common.description')}
               value={state.description}
               onChangeText={text => setState(s => ({...s, description: text}))}
               borderColor={colors.pallete.red2}
@@ -103,11 +106,11 @@ export function ReportProblem({visible, onClose, advertisementId}) {
             <Row style={{justifyContent: 'space-between'}}>
               <Button onPress={onSubmit} disabled={isLoading}>
                 <Text color={colors.pallete.red2}>
-                  {isLoading ? 'در حال ارسال...' : 'ارسال'}
+                  {isLoading ? t('common.sending') : t('common.send')}
                 </Text>
               </Button>
               <Button onPress={onClose}>
-                <Text color={colors.pallete.red2}>بیخیال</Text>
+                <Text color={colors.pallete.red2}>{t('common.neverMind')}</Text>
               </Button>
             </Row>
           </View>

@@ -1,5 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
+import {useTranslation} from 'react-i18next';
 import {Text} from '../text/text';
 import {colors} from '../../theme';
 
@@ -9,9 +10,9 @@ import {colors} from '../../theme';
 export function ListState({
   isLoading,
   isError,
-  emptyMessage = 'موردی یافت نشد',
-  errorMessage = 'خطا در دریافت اطلاعات',
-  loadingMessage = 'در حال بارگذاری...',
+  emptyMessage,
+  errorMessage,
+  loadingMessage,
 }: {
   isLoading?: boolean;
   isError?: boolean;
@@ -19,10 +20,14 @@ export function ListState({
   errorMessage?: string;
   loadingMessage?: string;
 }) {
+  const {t} = useTranslation();
+  const empty = emptyMessage ?? t('common.emptyList');
+  const error = errorMessage ?? t('common.errorLoading');
+  const loading = loadingMessage ?? t('common.loading');
   return (
     <View style={{padding: 24, alignItems: 'center'}}>
       <Text color={colors.pallete.grayText}>
-        {isLoading ? loadingMessage : isError ? errorMessage : emptyMessage}
+        {isLoading ? loading : isError ? error : empty}
       </Text>
     </View>
   );

@@ -1,4 +1,5 @@
 import {
+  AllJobsScreen,
   ChatScreen,
   CitySelectionScreen,
   CodeInput,
@@ -12,6 +13,7 @@ import {
   UserPanelScreen,
   NotifScreen,
 } from '../screens';
+import {PrivacyScreen} from '../screens/menu/other';
 import {EditAdScreen} from '../screens/others/edit-ad/edit-ad-screen';
 import {EditProfile} from '../screens/others/editProfile/editProfile-screen';
 import {Settings} from '../screens/others/settings/settings-screen';
@@ -19,6 +21,9 @@ import {AdViewStatsScreen} from '../screens/others/ad-view-stats/ad-view-stats-s
 import {NoInternetScreen} from '../screens/others/no-internet/no-internet-screen';
 import {NotifDetailScreen} from '../screens/others/notif/notif-detail-screen';
 import {JobCategoryGuideScreen} from '../screens/others/single-job-category/job-category-guide-screen';
+import {BankGatewayScreen} from '../screens/payment/bank-gateway-screen';
+import {CreateAdsPaymentScreen} from '../screens/create-ads/create-ads-payment-screen';
+import {CreateAdsFinalScreen} from '../screens/create-ads/create-ads-final-screen';
 import {
   DiscountMapScreen,
   NearbyDiscountsScreen,
@@ -58,6 +63,10 @@ export const appRoutes = [
   {
     name: 'singleJobCategory',
     component: SingleJobCategoryScreen,
+  },
+  {
+    name: 'allJobs',
+    component: AllJobsScreen,
   },
   {
     name: 'singleJob',
@@ -142,5 +151,21 @@ export const appRoutes = [
   {
     name: 'storeProfile',
     component: StoreProfileScreen,
+  },
+  {
+    name: 'bankGateway',
+    component: BankGatewayScreen,
+  },
+  {
+    name: 'createAdsPayment',
+    component: CreateAdsPaymentScreen,
+  },
+  {
+    name: 'createAdsFinal',
+    component: CreateAdsFinalScreen,
+  },
+  {
+    name: 'privacy',
+    component: PrivacyScreen,
   },
 ];

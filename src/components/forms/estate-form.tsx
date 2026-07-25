@@ -1,5 +1,7 @@
 import {Alert, FlatList, StyleSheet, View} from 'react-native';
 import React, {useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {localizeOption} from '../../i18n/display-maps';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {Checkbox} from '../checkbox/checkbox';
@@ -33,6 +35,7 @@ function boolToLabel(
 }
 
 export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}) {
+  const {t} = useTranslation();
   const {navigate} = useNavigation();
   const [state, setState] = useState(() =>
     editItem
@@ -180,10 +183,10 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
     const {title, contact_info} = state;
     if (!title) {
       isValid = false;
-      Alert.alert('عنوان را وارد کنید');
+      Alert.alert(t('forms.validation.enterTitle'));
     } else if (!contact_info) {
       isValid = false;
-      Alert.alert('اطلاعات تماس را وارد کنید');
+      Alert.alert(t('forms.validation.enterContactInfo'));
     }
     return isValid;
   };
@@ -194,7 +197,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
         <UnderlineTextField
           value={state.title}
           onChangeText={text => setState(s => ({...s, title: text}))}
-          placeholder="عنوان آگهی (حداقل ۱۰ حرف)"
+          placeholder={t('forms.adTitlePlaceholder')}
         />
 
         {!subCategory?.title?.includes('عقد مشارکت') && (
@@ -206,8 +209,8 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
               }>
               <UnderlineTextField
                 editable={false}
-                placeholder="تعداد اتاق"
-                value={state.rooms}
+                placeholder={t('forms.roomsCount')}
+                value={localizeOption(state.rooms)}
               />
             </Button>
             <Divider />
@@ -215,7 +218,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
               value={state.area}
               onChangeText={text => setState(s => ({...s, area: text}))}
               keyboardType="number-pad"
-              placeholder="متراژ (متر مربع)"
+              placeholder={t('forms.areaSquareMeters')}
             />
             <Divider />
             <UnderlineTextField
@@ -224,7 +227,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                 setState(s => ({...s, product_year: text}))
               }
               keyboardType="number-pad"
-              placeholder="سال ساخت"
+              placeholder={t('forms.buildYear')}
             />
             <Divider />
             {/* رهن و اجاره مسکونی/اداری needs separate رهن/اجاره amounts
@@ -236,14 +239,14 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                   value={state.rehn}
                   onChangeText={text => setState(s => ({...s, rehn: text}))}
                   keyboardType="number-pad"
-                  placeholder="رهن را وارد کنید (به تومان)"
+                  placeholder={t('forms.enterMortgageToman')}
                 />
                 <Divider />
                 <UnderlineTextField
                   value={state.ejare}
                   onChangeText={text => setState(s => ({...s, ejare: text}))}
                   keyboardType="number-pad"
-                  placeholder="اجاره را وارد کنید (به تومان)"
+                  placeholder={t('forms.enterRentToman')}
                 />
                 <Divider />
                 <Checkbox
@@ -252,7 +255,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                     setState(s => ({...s, convertible: !s.convertible}))
                   }
                   style={{flexDirection: 'row', alignSelf: 'center'}}
-                  text="قابلیت تبدیل رهن به اجاره"
+                  text={t('forms.convertibleMortgage')}
                 />
               </>
             ) : (
@@ -260,7 +263,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                 value={state.price}
                 onChangeText={text => setState(s => ({...s, price: text}))}
                 keyboardType="number-pad"
-                placeholder="قیمت"
+                placeholder={t('common.price')}
               />
             )}
             <Divider />
@@ -274,8 +277,8 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
               }>
               <UnderlineTextField
                 editable={false}
-                placeholder="نوع آگهی"
-                value={state.adsType}
+                placeholder={t('forms.adType')}
+                value={localizeOption(state.adsType)}
               />
             </Button>
             <Divider />
@@ -289,8 +292,8 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
               }>
               <UnderlineTextField
                 editable={false}
-                placeholder="نوع آگهی دهنده"
-                value={state.adsCreator}
+                placeholder={t('forms.adCreator')}
+                value={localizeOption(state.adsCreator)}
               />
             </Button>
             {subCategory?.title?.includes('اداری و تجاری') && (
@@ -301,7 +304,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                   onChangeText={text =>
                     setState(s => ({...s, documentType: text}))
                   }
-                  placeholder="سند اداری"
+                  placeholder={t('forms.officeDocument')}
                 />
               </>
             )}
@@ -312,7 +315,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
         <UnderlineTextField
           value={state.features}
           onChangeText={text => setState(s => ({...s, features: text}))}
-          placeholder="ویژگی ها"
+          placeholder={t('forms.features')}
         />
 
         <Divider />
@@ -328,8 +331,8 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
         <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            placeholder="تعیین موقعیت (اختیاری)"
-            value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
+            placeholder={t('forms.setLocationOptional')}
+            value={state.lat && state.lng ? t('forms.locationSelected') : ''}
             editable={false}
           />
         </Button>
@@ -338,7 +341,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
         <UnderlineTextField
           value={state.description}
           onChangeText={text => setState(s => ({...s, description: text}))}
-          placeholder="توضیحات"
+          placeholder={t('common.description')}
         />
         {!subCategory?.title?.includes('عقد مشارکت') && (
           <>
@@ -355,8 +358,8 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                   }>
                   <UnderlineTextField
                     editable={false}
-                    placeholder="طبقه"
-                    value={state.floor}
+                    placeholder={t('forms.floor')}
+                    value={localizeOption(state.floor)}
                   />
                 </Button>
                 <Divider />
@@ -370,8 +373,8 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                   }>
                   <UnderlineTextField
                     editable={false}
-                    placeholder="آسانسور"
-                    value={state.elevator}
+                    placeholder={t('forms.elevator')}
+                    value={localizeOption(state.elevator)}
                   />
                 </Button>
                 <Divider />
@@ -385,8 +388,8 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                   }>
                   <UnderlineTextField
                     editable={false}
-                    placeholder="پارکینگ"
-                    value={state.parking}
+                    placeholder={t('forms.parking')}
+                    value={localizeOption(state.parking)}
                   />
                 </Button>
               </>
@@ -398,8 +401,8 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
               }>
               <UnderlineTextField
                 editable={false}
-                placeholder="حومه شهر"
-                value={state.suburb}
+                placeholder={t('forms.suburb')}
+                value={localizeOption(state.suburb)}
               />
             </Button>
           </>

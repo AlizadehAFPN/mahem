@@ -255,3 +255,13 @@ export const updateAds = (id: string, data: any) => {
 export const deleteAds = (id: string) => {
   return axiosInstance.delete(`/advertisements/${id}`);
 };
+
+// "تمدید آگهی": flags the ad as awaiting a new manual bank-transfer
+// confirmation; expiresAt only actually moves once an admin confirms the
+// payment in mahem-admin. Only applies to fee-required ads (see
+// Category.adFeeToman) — mirrors renewStore.
+export const renewAds = (id: string) => {
+  return axiosInstance
+    .post(`/advertisements/${id}/renew`)
+    .then(res => ({data: mapAdvertisement(res.data)}));
+};

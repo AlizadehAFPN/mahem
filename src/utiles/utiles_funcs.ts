@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 export function numberWithCommas(input: string | number | undefined) {
   return input ? input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
 }
@@ -39,8 +41,10 @@ export function isSupportedImageType(mimeType?: string): boolean {
   return SUPPORTED_IMAGE_TYPES.includes(mimeType.toLowerCase());
 }
 
-export const UNSUPPORTED_IMAGE_TYPE_MESSAGE =
-  'فرمت این تصویر پشتیبانی نمی‌شود (مثلاً HEIC). لطفا یک عکس JPEG یا PNG انتخاب کنید، یا از دوربین اپلیکیشن استفاده کنید.';
+// Read from i18n lazily (a getter, not a frozen module-load constant) so it
+// reflects the current language whenever an Alert actually shows it.
+export const UNSUPPORTED_IMAGE_TYPE_MESSAGE = () =>
+  i18n.t('common.imageFormatUnsupportedBody');
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -56,27 +60,27 @@ export function formatRelativeTime(date: string | number | Date): string {
   const diffMinutes = Math.floor(diffMs / MINUTE_MS);
 
   if (diffMinutes < 1) {
-    return 'لحظاتی پیش';
+    return i18n.t('time.momentsAgo');
   }
   if (diffMinutes < 15) {
-    return `${diffMinutes} دقیقه پیش`;
+    return i18n.t('time.minutesAgo', {value: diffMinutes});
   }
   if (diffMinutes < 30) {
-    return 'یک ربع پیش';
+    return i18n.t('time.quarterHourAgo');
   }
   if (diffMinutes < 60) {
-    return 'نیم ساعت پیش';
+    return i18n.t('time.halfHourAgo');
   }
   const diffHours = Math.floor(diffMs / HOUR_MS);
   if (diffHours < 24) {
-    return `${diffHours} ساعت پیش`;
+    return i18n.t('time.hoursAgo', {value: diffHours});
   }
   const diffDays = Math.floor(diffMs / DAY_MS);
   if (diffDays < 30) {
-    return `${diffDays} روز پیش`;
+    return i18n.t('time.daysAgo', {value: diffDays});
   }
   const diffMonths = Math.floor(diffMs / MONTH_MS);
-  return `${diffMonths} ماه پیش`;
+  return i18n.t('time.monthsAgo', {value: diffMonths});
 }
 
 const IMAGE_FIELD_PATTERN = /^image(\d+)$/;

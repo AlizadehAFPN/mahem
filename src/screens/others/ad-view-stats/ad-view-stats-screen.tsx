@@ -2,6 +2,7 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import React, {useMemo} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useQuery} from 'react-query';
+import {useTranslation} from 'react-i18next';
 import {MainHeader, Row, Screen, Text} from '../../../components';
 import {colors} from '../../../theme';
 import {useRoute} from '@react-navigation/native';
@@ -12,6 +13,7 @@ import {getAdViewStats} from '../../../services';
 // A plain-View bar chart (no charting library in the project — see
 // package.json) is enough for 22 equal-width bars.
 export function AdViewStatsScreen() {
+  const {t} = useTranslation();
   const {params} = useRoute<any>();
   const advertisementId = params?.advertisementId;
 
@@ -36,14 +38,16 @@ export function AdViewStatsScreen() {
 
   return (
     <Screen withoutScroll>
-      <MainHeader title="پیش نمایش آگهی من" showBack />
+      <MainHeader title={t('stats.title')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
         <Text preset="bold" size={18} style={styles.total}>
-          مجموع آمار بازدید: {stats?.total ?? 0} نفر
+          {t('stats.totalViews', {count: stats?.total ?? 0})}
         </Text>
 
         {isLoading ? (
-          <Text style={{textAlign: 'center', marginTop: 40}}>در حال بارگذاری...</Text>
+          <Text style={{textAlign: 'center', marginTop: 40}}>
+            {t('common.loading')}
+          </Text>
         ) : (
           <>
             <View style={styles.chartCard}>
@@ -76,10 +80,10 @@ export function AdViewStatsScreen() {
                 </ScrollView>
               </View>
               <Text size={12} color={colors.pallete.grayText} style={styles.xAxisLabel}>
-                روز
+                {t('common.day')}
               </Text>
               <Text size={12} color={colors.pallete.grayText} style={styles.yAxisLabel}>
-                نفر
+                {t('stats.people')}
               </Text>
             </View>
 
@@ -87,13 +91,13 @@ export function AdViewStatsScreen() {
               <Row style={styles.genderItem}>
                 <Ionicons name="female" size={22} color={colors.pallete.red2} />
                 <Text size={16} style={{marginHorizontal: 6}}>
-                  {femalePercent}% خانم
+                  {t('stats.femalePercent', {percent: femalePercent})}
                 </Text>
               </Row>
               <Row style={styles.genderItem}>
                 <Ionicons name="male" size={22} color={colors.pallete.blue} />
                 <Text size={16} style={{marginHorizontal: 6}}>
-                  {malePercent}% مرد
+                  {t('stats.malePercent', {percent: malePercent})}
                 </Text>
               </Row>
             </Row>

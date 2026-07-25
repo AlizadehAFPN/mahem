@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import React, {useMemo} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useQuery} from 'react-query';
+import {useTranslation} from 'react-i18next';
 import {Text} from '../text/text';
 import {Row} from '../row/row';
 import {colors} from '../../theme';
@@ -16,7 +16,8 @@ import {
   getLegacyImagePaths,
   numberWithCommas,
 } from '../../utiles/utiles_funcs';
-import {findMainCategory, getAdsCategories} from '../../services';
+import {findMainCategory} from '../../services';
+import {useAdsCategories} from '../../hooks/use-cached-categories';
 
 const {width} = Dimensions.get('window');
 const imageSize = width / 3.4;
@@ -29,8 +30,9 @@ const imageSize = width / 3.4;
 // CommonForm), which is often left blank — labeled/handled distinctly so it
 // doesn't read like an unpriced item.
 export function RowProduct({product, onPress}) {
+  const {t} = useTranslation();
   const img = useMemo(() => getLegacyImagePaths(product)[0], [product]);
-  const {data: categoriesData} = useQuery(['adsCategories'], getAdsCategories);
+  const {data: categoriesData} = useAdsCategories();
   const mainCategory = useMemo(
     () =>
       findMainCategory(categoriesData?.data ?? [], product?.category_id?.id),
@@ -91,7 +93,7 @@ export function RowProduct({product, onPress}) {
           {hasDiscount ? (
             <Row>
               <Text size={15} preset="bold" color={colors.main}>
-                {numberWithCommas(product.price)} تومان
+                {numberWithCommas(product.price)} {t('common.toman')}
               </Text>
               {!!product?.originalPrice && (
                 <Text size={12} color={colors.pallete.gray2} style={styles.strikePrice}>
@@ -101,12 +103,12 @@ export function RowProduct({product, onPress}) {
             </Row>
           ) : product?.price ? (
             <Text size={15} preset="bold" color={colors.pallete.green}>
-              {isJobListing ? 'حقوق پیشنهادی: ' : ''}
-              {numberWithCommas(product.price)} تومان
+              {isJobListing ? t('product.proposedSalary') : ''}
+              {numberWithCommas(product.price)} {t('common.toman')}
             </Text>
           ) : isJobListing ? (
             <Text size={13} color={colors.pallete.gray2}>
-              حقوق توافقی
+              {t('product.negotiableSalary')}
             </Text>
           ) : null}
           <Row style={styles.metaItem}>

@@ -18,8 +18,17 @@ import {
 } from '../../../components';
 import {colors} from '../../../theme';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {useTranslation} from 'react-i18next';
 import {numberWithCommas, translations} from '../../../utiles';
-import {formatRelativeTime, getLegacyImagePaths} from '../../../utiles/utiles_funcs';
+import {
+  localizeCategory,
+  localizeCity,
+  localizeOption,
+} from '../../../i18n/display-maps';
+import {
+  formatRelativeTime,
+  getLegacyImagePaths,
+} from '../../../utiles/utiles_funcs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
@@ -27,12 +36,12 @@ import {useSelector} from 'react-redux';
 import {
   addBookmark,
   findMainCategory,
-  getAdsCategories,
   getBookmarks,
   getSingleAds,
   rateAd,
   removeBookmark,
 } from '../../../services';
+import {useAdsCategories} from '../../../hooks/use-cached-categories';
 
 const images = [require('../../../assets/images/products/productSlider1.png')];
 // Frosted look for the nav bar so it reads as an overlay on the hero image
@@ -42,16 +51,8 @@ const GLASS_HEADER_GRADIENT = [
   'rgba(255,255,255,0.55)',
   'rgba(255,255,255,0.15)',
 ];
-const productProps = [
-  {label: 'متراژ(متر مربع)', value: '120'},
-  {label: 'رهن', value: 100000000, type: 'price'},
-  {label: 'اجاره ماهیانه', value: 1000000, type: 'price'},
-  {label: 'نوع', value: 'ارایه'},
-  {label: 'آگهی دهنده', value: 'مشاور املاک'},
-  {label: 'تعداد اتاق', value: '3'},
-  {label: 'محل', value: 'گنبد کاووس'},
-];
 export function SinlgeProduct() {
+  const {t} = useTranslation();
   const [state, setState] = useState({
     callInfoModal: false,
     reportModal: false,
@@ -64,7 +65,9 @@ export function SinlgeProduct() {
   // A تخفیف‌یاب listing always carries a discount percent; the generic
   // attribute list is replaced with the boxed ویژگی‌ها/توضیحات layout for it.
   const isOffer = !!ad?.discountPercent;
-  const offerFeatures: string[] = Array.isArray(ad?.features) ? ad.features : [];
+  const offerFeatures: string[] = Array.isArray(ad?.features)
+    ? ad.features
+    : [];
   const queryClient = useQueryClient();
   const {data: bookmarksData} = useQuery(['bookmarks'], getBookmarks);
   const bookmarks = bookmarksData?.data;
@@ -91,7 +94,7 @@ export function SinlgeProduct() {
     setState(s => ({...s, reportModal: !s.reportModal}));
   };
 
-  const {data: categoriesData} = useQuery(['adsCategories'], getAdsCategories);
+  const {data: categoriesData} = useAdsCategories();
   // استخدامی ads use `price` for a proposed salary rather than a sale price
   // (see CommonForm) — ads are only ever tagged with leaf categories, so
   // this walks up the tree to find which top-level branch the ad's category
@@ -110,31 +113,33 @@ export function SinlgeProduct() {
         if (ad[item] !== null && !!translations[item]) {
           let value;
           if (item == 'contract_type') {
-            value = optionsTypes.contractType[ad[item]].title;
+            value = localizeOption(optionsTypes.contractType[ad[item]].title);
           } else if (item == 'degree') {
-            value = optionsTypes.education[ad[item]].title;
+            value = localizeOption(optionsTypes.education[ad[item]].title);
           } else if (item == 'parking') {
-            value = ad[item] ? 'دارد' : 'ندارد';
+            value = ad[item] ? t('product.has') : t('product.hasNot');
           } else if (item == 'is_cash') {
-            value = ad[item] ? 'قسطی' : 'نقد';
+            value = ad[item] ? t('product.installment') : t('product.cash');
           } else if (item == 'by_person') {
-            value = ad[item] ? 'شخصی' : 'بنگاه';
+            value = ad[item] ? t('product.personal') : t('product.agency');
           } else if (item == 'suburbs') {
-            value = ad[item] ? 'بله' : 'خیر';
+            value = ad[item] ? t('common.yes') : t('common.no');
           } else if (item == 'elevator') {
-            value = ad[item] ? 'دارد' : 'ندارد';
+            value = ad[item] ? t('product.has') : t('product.hasNot');
           } else {
             value = ad[item];
           }
           const label =
-            item === 'price' && isJobListing ? 'حقوق پیشنهادی' : translations[item];
+            item === 'price' && isJobListing
+              ? t('product.proposedSalaryLabel')
+              : t(`fields.${item}`);
           arr.push({label, value});
         }
       });
       return arr;
     }
     return [];
-  }, [ad, isJobListing]);
+  }, [ad, isJobListing, t]);
   useEffect(() => {
     if (data) {
       setAd(data?.data);
@@ -163,7 +168,11 @@ export function SinlgeProduct() {
         <GradiantHeader
           isBookmarked={isBookmarked}
           onBookMark={onBookMark}
-          title={isOffer ? 'تخفیف یاب' : data?.data?.category_id?.title}
+          title={
+            isOffer
+              ? t('home.discountFinder')
+              : localizeCategory(data?.data?.category_id?.title)
+          }
           colors={isOffer ? GLASS_HEADER_GRADIENT : undefined}
           iconColor={isOffer ? 'white' : undefined}
           onCreatePress={undefined}
@@ -190,7 +199,9 @@ export function SinlgeProduct() {
             </Text>
             {isOffer && !!ad?.store && (
               <Button
-                onPress={() => navigate('storeProfile', {storeId: ad.store.id})}>
+                onPress={() =>
+                  navigate('storeProfile', {storeId: ad.store.id})
+                }>
                 <Row style={{alignItems: 'center', marginTop: 6}}>
                   <View style={styles.storeLogoDot}>
                     {ad.store.logo ? (
@@ -199,11 +210,18 @@ export function SinlgeProduct() {
                         style={StyleSheet.absoluteFill}
                       />
                     ) : (
-                      <Entypo name="shop" size={12} color={colors.pallete.grayText} />
+                      <Entypo
+                        name="shop"
+                        size={12}
+                        color={colors.pallete.grayText}
+                      />
                     )}
                   </View>
-                  <Text size={13} color={colors.pallete.grayText} style={{marginRight: 6}}>
-                    فروشگاه {ad.store.name}
+                  <Text
+                    size={13}
+                    color={colors.pallete.grayText}
+                    style={{marginRight: 6}}>
+                    {t('product.storeLabel', {name: ad.store.name})}
                   </Text>
                 </Row>
               </Button>
@@ -218,10 +236,12 @@ export function SinlgeProduct() {
                 ]}>
                 <Text size={13} color="white">
                   {ad.approvalStatus === 'REJECTED'
-                    ? `این آگهی رد شده است${
-                        ad.rejectionReason ? `: ${ad.rejectionReason}` : ''
-                      }`
-                    : 'این آگهی در انتظار تایید مدیر است و فقط برای شما نمایش داده می‌شود.'}
+                    ? ad.rejectionReason
+                      ? t('product.adRejectedWithReason', {
+                          reason: ad.rejectionReason,
+                        })
+                      : t('product.adRejected')
+                    : t('product.adPending')}
                 </Text>
               </View>
             )}
@@ -232,11 +252,11 @@ export function SinlgeProduct() {
                 {ad?.createdAt ? formatRelativeTime(ad.createdAt) : ''}
               </Text>
               <Text preset="bold" size={20}>
-                {ad?.city?.title}
+                {localizeCity(ad?.city?.title)}
               </Text>
               <Button onPress={toggleReportModal}>
                 <Row>
-                  <Text>گزارش مشکل آگهی</Text>
+                  <Text>{t('product.reportProblem')}</Text>
                   <Entypo size={20} name="attachment" />
                 </Row>
               </Button>
@@ -251,13 +271,13 @@ export function SinlgeProduct() {
                   <View style={styles.section}>
                     <View style={styles.sectionLabel}>
                       <Text preset="bold" size={14} color="white">
-                        ویژگی‌ها
+                        {t('product.features')}
                       </Text>
                     </View>
                     <View style={styles.sectionBox}>
                       {!!ad?.installment && (
                         <Text size={15} style={styles.sectionLine}>
-                          • امکان خرید اقساطی
+                          • {t('forms.installmentEnabled')}
                         </Text>
                       )}
                       {offerFeatures.map((feature: string, index: number) => (
@@ -275,7 +295,7 @@ export function SinlgeProduct() {
                   <View style={styles.section}>
                     <View style={styles.sectionLabel}>
                       <Text preset="bold" size={14} color="white">
-                        توضیحات
+                        {t('common.description')}
                       </Text>
                     </View>
                     <View style={styles.sectionBox}>
@@ -303,14 +323,16 @@ export function SinlgeProduct() {
             <View style={{padding: 16}}>
               {adsProps.map((item, index) => {
                 return (
-                  <Row key={index} style={{marginVertical: 2}}>
-                    <Text size={17} style={{width: 120, textAlign: 'left'}}>
+                  <Row
+                    key={index}
+                    style={{marginVertical: 2, alignItems: 'flex-start'}}>
+                    <Text size={17} style={{width: 120, textAlign: 'right'}}>
                       {item.label}:
                     </Text>
                     <Divider style={{width: 40}} />
-                    <Text size={17}>
+                    <Text size={17} style={{flex: 1, textAlign: 'right'}}>
                       {item.type == 'price'
-                        ? `${numberWithCommas(item.value)} تومان`
+                        ? `${numberWithCommas(item.value)} ${t('common.toman')}`
                         : item.value}
                     </Text>
                   </Row>
@@ -328,6 +350,8 @@ export function SinlgeProduct() {
         />
         <CallInfo
           phone={ad?.contact_info}
+          email={ad?.email}
+          hideEmail={ad?.hideEmail}
           visible={state.callInfoModal}
           onClose={toggleCallInfoModal}
         />
@@ -340,14 +364,13 @@ export function SinlgeProduct() {
       <Row
         style={{
           ...styles.buttons,
-          bottom: Platform.OS == 'ios' ? insets.bottom : 10,
         }}>
         <Button style={styles.button} onPress={toggleCallInfoModal}>
           <Row style={{alignItems: 'center'}}>
             <Image source={require('../../../assets/images/phone.png')} />
             <Divider style={{width: 5}} />
             <Text size={20} preset="bold">
-              اطلاعات تماس
+              {t('callInfo.title')}
             </Text>
           </Row>
         </Button>
@@ -371,7 +394,7 @@ export function SinlgeProduct() {
                 <Image source={require('../../../assets/images/chat.png')} />
                 <Divider style={{width: 5}} />
                 <Text size={20} preset="bold">
-                  چت
+                  {t('product.chat')}
                 </Text>
               </Row>
             </Button>

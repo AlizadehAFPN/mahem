@@ -1,6 +1,7 @@
 import {Image, ScrollView, StyleSheet, View, Alert} from 'react-native';
 import React, {useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import {
   Button,
@@ -26,6 +27,7 @@ const READABLE_HEADER_GRADIENT = ['rgba(0,0,0,0.45)', 'rgba(0,0,0,0.45)'];
 // (store_v2.png design, "فروشگاه – 2"), which shows the rules + exact fee and
 // is where the store is actually created ("پرداخت" — see that screen for why).
 export function CreateStoreScreen() {
+  const {t} = useTranslation();
   const {navigate} = useNavigation<any>();
   const [name, setName] = useState('');
   const [cover, setCover] = useState<any>(null);
@@ -34,7 +36,7 @@ export function CreateStoreScreen() {
 
   const onNext = () => {
     if (!name.trim()) {
-      Alert.alert('نام فروشگاه وارد کنید');
+      Alert.alert(t('store.enterStoreName'));
       return;
     }
     navigate('storeTerms', {name: name.trim(), cover, logo});
@@ -42,12 +44,12 @@ export function CreateStoreScreen() {
 
   return (
     <Screen withoutScroll>
-      <MainHeader title="تخفیف یاب" />
+      <MainHeader title={t('home.discountFinder')} />
       <View style={{flex: 1}}>
         <View style={styles.overlayNav}>
           <GradiantHeader
             title=""
-            shareText="ماهم"
+            shareText={t('common.appName')}
             details={false}
             create
             onCreatePress={onNext}
@@ -91,14 +93,14 @@ export function CreateStoreScreen() {
               <UnderlineTextField
                 value={name}
                 onChangeText={setName}
-                placeholder="نام فروشگاه وارد کنید"
+                placeholder={t('store.enterStoreName')}
                 placeholderTextColor={colors.main}
                 inputStyle={styles.nameInput}
               />
             </View>
           </View>
 
-          <Text style={styles.hint}>تعرفه فروشگاه پیش فرض ماهانه است</Text>
+          <Text style={styles.hint}>{t('store.monthlyFeeHint')}</Text>
         </ScrollView>
       </View>
 

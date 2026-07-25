@@ -1,6 +1,7 @@
 import {Alert, Switch, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {ContactInfoCard} from './contact-info-card';
@@ -48,6 +49,7 @@ function remainingDuration(expiresAt?: string | null) {
 }
 
 export function OfferForm({editItem, send, onSend, storeId}) {
+  const {t} = useTranslation();
   const [state, setState] = useState(() =>
     editItem
       ? {
@@ -58,7 +60,9 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           chatEnabled: !!editItem.chatEnabled,
           hideEmail: !!editItem.hideEmail,
           originalPrice:
-            editItem.originalPrice != null ? String(editItem.originalPrice) : '',
+            editItem.originalPrice != null
+              ? String(editItem.originalPrice)
+              : '',
           discountPercent:
             editItem.discountPercent != null
               ? String(editItem.discountPercent)
@@ -157,9 +161,7 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           lng,
         } = state;
         const discount = Number(discountPercent) || 0;
-        const price = Math.round(
-          Number(originalPrice) * (1 - discount / 100),
-        );
+        const price = Math.round(Number(originalPrice) * (1 - discount / 100));
         onSend({
           title,
           description,
@@ -187,19 +189,26 @@ export function OfferForm({editItem, send, onSend, storeId}) {
 
   const handleValidation = () => {
     let isValid = true;
-    const {title, contact_info, originalPrice, discountPercent} = state;
+    const {title, description, contact_info, originalPrice, discountPercent} =
+      state;
     if (!title) {
       isValid = false;
-      Alert.alert('عنوان را وارد کنید');
+      Alert.alert(t('forms.validation.enterTitle'));
+      // Backend rejects anything shorter (CreateAdvertisementDto:
+      // @Length(10, 5000) on description) — catching it here instead of
+      // letting the request 400 after the fee's already been "paid".
+    } else if (description.trim().length < 10) {
+      isValid = false;
+      Alert.alert(t('forms.validation.descriptionMinLength'));
     } else if (!originalPrice) {
       isValid = false;
-      Alert.alert('قیمت قبل از تخفیف را وارد کنید');
+      Alert.alert(t('forms.validation.enterOriginalPrice'));
     } else if (!discountPercent) {
       isValid = false;
-      Alert.alert('درصد تخفیف را وارد کنید');
+      Alert.alert(t('forms.validation.enterDiscountPercent'));
     } else if (!contact_info) {
       isValid = false;
-      Alert.alert('اطلاعات تماس را وارد کنید');
+      Alert.alert(t('forms.validation.enterContactInfo'));
     }
     return isValid;
   };
@@ -210,21 +219,21 @@ export function OfferForm({editItem, send, onSend, storeId}) {
         <UnderlineTextField
           value={state.title}
           onChangeText={text => setState(s => ({...s, title: text}))}
-          placeholder="عنوان آگهی (حداقل ۱۰ حرف)"
+          placeholder={t('forms.adTitlePlaceholder')}
         />
         <Divider />
         <UnderlineTextField
           value={state.originalPrice}
           onChangeText={text => setState(s => ({...s, originalPrice: text}))}
           keyboardType="number-pad"
-          placeholder="قیمت اصلی"
+          placeholder={t('forms.originalPrice')}
         />
         <Divider />
         <UnderlineTextField
           value={state.discountPercent}
           onChangeText={text => setState(s => ({...s, discountPercent: text}))}
           keyboardType="number-pad"
-          placeholder="درصد تخفیف"
+          placeholder={t('forms.discountPercent')}
         />
         <Divider />
         <Button onPress={handleToggleDurationModal}>
@@ -233,15 +242,15 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           !state.duration.days ? (
             <UnderlineTextField
               editable={false}
-              placeholder="مدت زمان تخفیف (اختیاری)"
+              placeholder={t('forms.discountDurationOptional')}
             />
           ) : (
             <Row style={{paddingVertical: 8}}>
-              <Text>{state.duration.days || '0'} روز</Text>
+              <Text>{state.duration.days || '0'} {t('common.day')}</Text>
               <Divider style={{width: 10}} />
-              <Text>{state.duration.houres || '0'} ساعت</Text>
+              <Text>{state.duration.houres || '0'} {t('common.hour')}</Text>
               <Divider style={{width: 10}} />
-              <Text>{state.duration.minutes || '0'} دقیقه</Text>
+              <Text>{state.duration.minutes || '0'} {t('common.minute')}</Text>
             </Row>
           )}
         </Button>
@@ -258,8 +267,8 @@ export function OfferForm({editItem, send, onSend, storeId}) {
         <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            placeholder="تعیین موقعیت (اختیاری)"
-            value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
+            placeholder={t('forms.setLocationOptional')}
+            value={state.lat && state.lng ? t('forms.locationSelected') : ''}
             editable={false}
           />
         </Button>
@@ -267,29 +276,30 @@ export function OfferForm({editItem, send, onSend, storeId}) {
         <UnderlineTextField
           value={state.description}
           onChangeText={text => setState(s => ({...s, description: text}))}
-          placeholder="توضیحات"
+          placeholder={t('common.description')}
         />
         <Divider />
         <UnderlineTextField
           value={state.usagePeriodText}
-          onChangeText={text =>
-            setState(s => ({...s, usagePeriodText: text}))
-          }
-          placeholder="بازه تاریخ استفاده (اختیاری)"
+          onChangeText={text => setState(s => ({...s, usagePeriodText: text}))}
+          placeholder={t('forms.usageDateRangeOptional')}
         />
         <Divider />
         <UnderlineTextField
           value={state.testPeriodText}
           onChangeText={text => setState(s => ({...s, testPeriodText: text}))}
-          placeholder="مهلت تست (اختیاری)"
+          placeholder={t('forms.testPeriodOptional')}
         />
         <Divider />
         <Row style={{justifyContent: 'space-between', paddingVertical: 8}}>
-          <Text size={15}>امکان خرید اقساطی</Text>
+          <Text size={15}>{t('forms.installmentEnabled')}</Text>
           <Switch
             value={state.installment}
             onValueChange={v => setState(s => ({...s, installment: v}))}
-            trackColor={{false: colors.pallete.gray3, true: colors.pallete.green1}}
+            trackColor={{
+              false: colors.pallete.gray3,
+              true: colors.pallete.green1,
+            }}
             thumbColor={state.installment ? colors.pallete.green : '#f4f3f4'}
           />
         </Row>
@@ -298,10 +308,8 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           <View style={{flex: 1}}>
             <UnderlineTextField
               value={state.featureInput}
-              onChangeText={text =>
-                setState(s => ({...s, featureInput: text}))
-              }
-              placeholder="افزودن ویژگی (مثلاً گارانتی)"
+              onChangeText={text => setState(s => ({...s, featureInput: text}))}
+              placeholder={t('forms.addFeatureHint')}
               onSubmitEditing={addFeature}
               returnKeyType="done"
             />

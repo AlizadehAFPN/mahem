@@ -10,8 +10,20 @@ export const upload = (data: FormData) => {
 
 export const getCities = () => {
   return axiosInstance.get('/cities').then(res => ({
-    data: res.data.map((city: any) => ({id: city.id, title: city.name})),
+    data: res.data.map((city: any) => ({
+      id: city.id,
+      title: city.name,
+      lat: city.lat,
+      lng: city.lng,
+    })),
   }));
+};
+
+// Cheap poll target for CitiesSyncBridge — the city list rarely changes, so
+// the app caches it locally and only refetches when this counter (bumped
+// server-side on every city create/update/delete or admin reseed) has moved.
+export const getCitiesVersion = (): Promise<number> => {
+  return axiosInstance.get('/cities/version').then(res => res.data.version);
 };
 
 // Banners are strictly scoped per city server-side (400s without a cityId),

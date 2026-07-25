@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import React, {useMemo} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 import {colors} from '../../../theme';
 import {OfferPriceDetails} from './offer-price-details';
 import {Rate} from '../../rating/rate';
@@ -18,13 +19,14 @@ import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 // image with the moon rating, a share button, a photo counter and the city/
 // distance overlaid, followed by the shared price/discount/timer block.
 export function OfferCard({item, onPress}) {
+  const {t} = useTranslation();
   const images = useMemo(() => getLegacyImagePaths(item), [item]);
   const img = images[0];
 
   const onShare = () => {
     const parts = [item?.title];
     if (item?.discountPercent) {
-      parts.push(`${item.discountPercent}٪ تخفیف`);
+      parts.push(t('offers.percentOff', {percent: item.discountPercent}));
     }
     Share.share({message: parts.filter(Boolean).join(' - ')}).catch(() => {});
   };
@@ -54,8 +56,12 @@ export function OfferCard({item, onPress}) {
             <Ionicons name="navigate" size={12} color="white" />
             <Text size={12} color="white" style={{marginRight: 4}}>
               {item.distanceKm < 1
-                ? `${Math.round(item.distanceKm * 1000)} متر`
-                : `${item.distanceKm.toFixed(1)} کیلومتر`}
+                ? t('offers.distanceMeters', {
+                    value: Math.round(item.distanceKm * 1000),
+                  })
+                : t('offers.distanceKilometers', {
+                    value: item.distanceKm.toFixed(1),
+                  })}
             </Text>
           </View>
         )}

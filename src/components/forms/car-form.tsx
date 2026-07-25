@@ -1,5 +1,7 @@
 import {Alert, FlatList, StyleSheet, View} from 'react-native';
 import React, {useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {localizeOption} from '../../i18n/display-maps';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {Checkbox} from '../checkbox/checkbox';
@@ -29,6 +31,7 @@ function boolToLabel(
 }
 
 export function CarForm({subCategory, editItem, send, onSend}) {
+  const {t} = useTranslation();
   const [state, setState] = useState(() =>
     editItem
       ? {
@@ -146,10 +149,10 @@ export function CarForm({subCategory, editItem, send, onSend}) {
     const {title, contact_info} = state;
     if (!title) {
       isValid = false;
-      Alert.alert('عنوان را وارد کنید');
+      Alert.alert(t('forms.validation.enterTitle'));
     } else if (!contact_info) {
       isValid = false;
-      Alert.alert('اطلاعات تماس را وارد کنید');
+      Alert.alert(t('forms.validation.enterContactInfo'));
     }
     return isValid;
   };
@@ -160,7 +163,7 @@ export function CarForm({subCategory, editItem, send, onSend}) {
         <UnderlineTextField
           value={state.title}
           onChangeText={text => setState(s => ({...s, title: text}))}
-          placeholder="عنوان آگهی (حداقل ۱۰ حرف)"
+          placeholder={t('forms.adTitlePlaceholder')}
         />
         {subCategory?.title?.includes('سواری') && (
           <>
@@ -170,9 +173,9 @@ export function CarForm({subCategory, editItem, send, onSend}) {
                 setState(s => ({...s, optionModal: true, optionType: 'brand'}))
               }>
               <UnderlineTextField
-                value={state.brand}
+                value={localizeOption(state.brand)}
                 keyboardType="number-pad"
-                placeholder="برند"
+                placeholder={t('forms.brand')}
                 editable={false}
               />
             </Button>
@@ -182,9 +185,9 @@ export function CarForm({subCategory, editItem, send, onSend}) {
                 setState(s => ({...s, optionModal: true, optionType: 'chassi'}))
               }>
               <UnderlineTextField
-                value={state.chassi}
+                value={localizeOption(state.chassi)}
                 keyboardType="number-pad"
-                placeholder="نوع شاسی"
+                placeholder={t('forms.chassisType')}
                 editable={false}
               />
             </Button>
@@ -196,9 +199,9 @@ export function CarForm({subCategory, editItem, send, onSend}) {
             setState(s => ({...s, optionModal: true, optionType: 'payType'}))
           }>
           <UnderlineTextField
-            value={state.payType}
+            value={localizeOption(state.payType)}
             keyboardType="number-pad"
-            placeholder="نقد/اقساط"
+            placeholder={t('forms.cashOrInstallment')}
             editable={false}
           />
         </Button>
@@ -207,14 +210,14 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           value={state.product_year}
           onChangeText={text => setState(s => ({...s, product_year: text}))}
           keyboardType="number-pad"
-          placeholder="سال تولید"
+          placeholder={t('forms.productionYear')}
         />
         <Divider />
         <UnderlineTextField
           value={state.operation_amount}
           onChangeText={text => setState(s => ({...s, operation_amount: text}))}
           keyboardType="number-pad"
-          placeholder="کارکرد (کیلومتر)"
+          placeholder={t('forms.mileageKm')}
         />
 
         <Divider />
@@ -223,7 +226,7 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           value={state.price}
           onChangeText={text => setState(s => ({...s, price: text}))}
           keyboardType="number-pad"
-          placeholder="قیمت"
+          placeholder={t('common.price')}
           // editable={false}
         />
         {/* </Button> */}
@@ -234,8 +237,8 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           }>
           <UnderlineTextField
             editable={false}
-            placeholder="نوع آگهی"
-            value={state.adsType}
+            placeholder={t('forms.adType')}
+            value={localizeOption(state.adsType)}
           />
         </Button>
         <Divider />
@@ -249,8 +252,8 @@ export function CarForm({subCategory, editItem, send, onSend}) {
           }>
           <UnderlineTextField
             editable={false}
-            placeholder="نوع آگهی دهنده"
-            value={state.carAdsCreator}
+            placeholder={t('forms.adCreator')}
+            value={localizeOption(state.carAdsCreator)}
           />
         </Button>
 
@@ -258,7 +261,7 @@ export function CarForm({subCategory, editItem, send, onSend}) {
         <UnderlineTextField
           value={state.features}
           onChangeText={text => setState(s => ({...s, features: text}))}
-          placeholder="ویژگی ها"
+          placeholder={t('forms.features')}
         />
 
         <Divider />
@@ -274,8 +277,8 @@ export function CarForm({subCategory, editItem, send, onSend}) {
         <Divider />
         <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
           <UnderlineTextField
-            placeholder="تعیین موقعیت (اختیاری)"
-            value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
+            placeholder={t('forms.setLocationOptional')}
+            value={state.lat && state.lng ? t('forms.locationSelected') : ''}
             editable={false}
           />
         </Button>
@@ -284,7 +287,7 @@ export function CarForm({subCategory, editItem, send, onSend}) {
         <UnderlineTextField
           value={state.description}
           onChangeText={text => setState(s => ({...s, description: text}))}
-          placeholder="توضیحات"
+          placeholder={t('common.description')}
         />
       </View>
       <LocationSelectModal

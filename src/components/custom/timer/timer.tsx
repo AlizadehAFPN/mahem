@@ -1,10 +1,12 @@
 import {StyleSheet, View} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Row} from '../../row/row';
 import {Text} from '../../text/text';
 import {colors} from '../../../theme';
 
 export function Timer({time}) {
+  const {t} = useTranslation();
   const [state, setState] = useState({
     time: time,
     days: '',
@@ -31,19 +33,19 @@ export function Timer({time}) {
           <Text color={colors.pallete.grayText} style={{lineHeight: 20}}>
             {state.days}
           </Text>
-          <Text style={{lineHeight: 20}}>روز</Text>
+          <Text style={{lineHeight: 20}}>{t('common.day')}</Text>
         </View>
         <View style={styles.itemContainer}>
           <Text color={colors.pallete.grayText} style={{lineHeight: 20}}>
             {state.houres}
           </Text>
-          <Text style={{lineHeight: 20}}>ساعت</Text>
+          <Text style={{lineHeight: 20}}>{t('common.hour')}</Text>
         </View>
         <View style={styles.itemContainer}>
           <Text color={colors.pallete.grayText} style={{lineHeight: 20}}>
             {state.minutes}
           </Text>
-          <Text style={{lineHeight: 20}}>دقیقه</Text>
+          <Text style={{lineHeight: 20}}>{t('common.minute')}</Text>
         </View>
       </Row>
     </View>

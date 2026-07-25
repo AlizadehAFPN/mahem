@@ -50,10 +50,30 @@ export function usePaginatedList({
     },
   });
 
-  const items = useMemo(
-    () => data?.pages?.flatMap(page => selectItems(page) ?? []) ?? [],
-    [data, selectItems],
-  );
+  const items = useMemo(() => {
+    const flattened =
+      data?.pages?.flatMap(page => selectItems(page) ?? []) ?? [];
+    // The backend paginates over a live dataset: an item inserted/removed
+    // between two fetches shifts the page window, so the same record can
+    // come back on two consecutive pages. Flattening those pages then yields
+    // duplicate ids, which React Native surfaces as "two children with the
+    // same key". Dedupe by id here (keeping first occurrence) so every list
+    // built on this hook is safe, regardless of its keyExtractor.
+    const seen = new Set<string>();
+    const deduped: any[] = [];
+    for (const item of flattened) {
+      const id = item?.id ?? item?._id;
+      const key = id != null ? String(id) : undefined;
+      if (key !== undefined) {
+        if (seen.has(key)) {
+          continue;
+        }
+        seen.add(key);
+      }
+      deduped.push(item);
+    }
+    return deduped;
+  }, [data, selectItems]);
 
   const onEndReached = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -67,6 +87,7 @@ export function usePaginatedList({
     isError,
     isFetching,
     isFetchingNextPage,
+    hasNextPage,
     onEndReached,
     refetch,
   };

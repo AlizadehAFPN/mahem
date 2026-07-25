@@ -69,3 +69,7 @@ yarn-error.log
 .expo
 dist/
 web-build/
+
+# Firebase secrets - never commit
+*firebase-adminsdk*.json
+*.p8

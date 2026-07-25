@@ -1,5 +1,6 @@
 import {StyleSheet, TextInput, View} from 'react-native';
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Row} from '../row/row';
 import {Button} from '../button/button';
 import {Text} from '../text/text';
@@ -7,6 +8,7 @@ import {colors, normalFont} from '../../theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export function MessageSender({onPressButton}: any) {
+  const {t} = useTranslation();
   const [text, setText] = useState('');
   // console.log(text, 'text');
   return (
@@ -23,7 +25,7 @@ export function MessageSender({onPressButton}: any) {
         }}>
         <Row style={{paddingBottom: 5}}>
           <Text size={17} color={colors.pallete.green}>
-            send
+            {t('common.send')}
           </Text>
           <View style={{width: 8}} />
           <MaterialCommunityIcons
@@ -37,7 +39,7 @@ export function MessageSender({onPressButton}: any) {
         value={text}
         onChangeText={setText}
         multiline
-        placeholder="افزودن متن"
+        placeholder={t('chat.inputPlaceholder')}
         style={styles.textinput}
       />
       {/* <Button style={{paddingBottom: 5}} >

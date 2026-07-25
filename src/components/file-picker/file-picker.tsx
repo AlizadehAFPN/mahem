@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from 'react-native';
+import {useTranslation} from 'react-i18next';
 import {Button} from '../button/button';
 import {Divider} from '../divider/divider';
 import {Row} from '../row/row';
@@ -29,6 +30,7 @@ export const FilePickerModal: FunctionComponent<FilePickerModalProps> = ({
   multiple = false,
   onPreviewImages,
 }) => {
+  const {t} = useTranslation();
   const lounchcamera = async () => {
     const result = await launchCamera({
       cameraType: 'front',
@@ -65,11 +67,11 @@ export const FilePickerModal: FunctionComponent<FilePickerModalProps> = ({
           <Divider />
           <Row style={{paddingHorizontal: 16}}>
             <Button style={styles.button} onPress={lounchMedia}>
-              <Text>گالری</Text>
+              <Text>{t('common.gallery')}</Text>
             </Button>
             <Divider style={{width: 30}} />
             <Button style={styles.button} onPress={lounchcamera}>
-              <Text>دوربین</Text>
+              <Text>{t('common.camera')}</Text>
             </Button>
           </Row>
           <Divider />

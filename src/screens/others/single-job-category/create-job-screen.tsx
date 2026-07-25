@@ -21,8 +21,10 @@ import {
   Checkbox,
   CitySelectModal,
 } from '../../../components';
+import {LocationSelectModal} from '../../../components/modal/location-select-modal';
 import {colors} from '../../../theme';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import {useTranslation} from 'react-i18next';
 import {useMutation} from 'react-query';
 import {upload} from '../../../services';
 import {createJob, updateJob} from '../../../services/job';
@@ -31,9 +33,11 @@ import {
   isSupportedImageType,
   UNSUPPORTED_IMAGE_TYPE_MESSAGE,
 } from '../../../utiles/utiles_funcs';
+import {localizeCategory, localizeCity} from '../../../i18n/display-maps';
 
 const {width} = Dimensions.get('window');
 export function CreateJobScreen() {
+  const {t} = useTranslation();
   const {params} = useRoute();
   const editItem = params?.editItem;
   const [state, setState] = useState(() =>
@@ -53,7 +57,6 @@ export function CreateJobScreen() {
           phone: editItem.phone ?? '',
           mobile: editItem.mobile ?? '',
           description: editItem.description ?? '',
-          salary: editItem.salary != null ? String(editItem.salary) : '',
           address: editItem.address ?? '',
           register_code: editItem.registerCode ?? '',
           email: editItem.email ?? '',
@@ -62,6 +65,9 @@ export function CreateJobScreen() {
             ? {id: editItem.cityId, title: editItem.city.name}
             : '',
           citySelectModal: false,
+          lat: editItem.lat ?? undefined,
+          lng: editItem.lng ?? undefined,
+          locationModal: false,
           uploadedBanner: editItem.banner ? {id: editItem.banner} : undefined,
           uploadedLogo: editItem.logo ? {id: editItem.logo} : undefined,
         }
@@ -83,13 +89,15 @@ export function CreateJobScreen() {
           phone: '',
           mobile: '',
           description: '',
-          salary: '',
           address: '',
           register_code: '',
           email: '',
           manager: '',
           city: '',
           citySelectModal: false,
+          lat: undefined,
+          lng: undefined,
+          locationModal: false,
           uploadedBanner: undefined,
           uploadedLogo: undefined,
         },
@@ -114,30 +122,34 @@ export function CreateJobScreen() {
       telegram,
       instagram,
       city,
+      acceptance,
     } = state;
     if (!title) {
-      Alert.alert('عنوان را وارد کنید');
+      Alert.alert(t('jobs.validation.enterUnitName'));
       return false;
     } else if (!manager) {
-      Alert.alert('مدیریت را وارد کنید');
+      Alert.alert(t('jobs.validation.enterManager'));
       return false;
     } else if (!category) {
-      Alert.alert('نوع صنف را انتخاب کنید');
+      Alert.alert(t('jobs.validation.selectGuildType'));
       return false;
     } else if (!register_code) {
-      Alert.alert('شماره ثبت را وارد کنید');
+      Alert.alert(t('jobs.validation.enterRegisterCode'));
       return false;
     } else if (!phone) {
-      Alert.alert('شماره تلفن را وارد کنید');
+      Alert.alert(t('jobs.validation.enterPhone'));
       return false;
     } else if (!mobile) {
-      Alert.alert('شماره موبایل را وارد کنید');
+      Alert.alert(t('jobs.validation.enterMobile'));
       return false;
     } else if (!address) {
-      Alert.alert('آدرس را وارد کنید');
+      Alert.alert(t('jobs.validation.enterAddress'));
       return false;
     } else if (!city) {
-      Alert.alert('شهر را وارد کنید');
+      Alert.alert(t('jobs.validation.enterCity'));
+      return false;
+    } else if (!acceptance) {
+      Alert.alert(t('jobs.validation.mustAcceptTerms'));
       return false;
     }
     return true;
@@ -158,8 +170,9 @@ export function CreateJobScreen() {
         instagram,
         email,
         description,
-        salary,
         city,
+        lat,
+        lng,
         uploadedBanner,
         uploadedLogo,
       } = state;
@@ -176,14 +189,25 @@ export function CreateJobScreen() {
         instagram,
         email,
         description,
-        salary,
         city_id: city?.id,
+        lat,
+        lng,
         banner: uploadedBanner?.id,
         logo: uploadedLogo?.id,
       };
       jobMutate(data, {
         onSuccess: () => {
-          goBack();
+          if (editItem) {
+            // Editing resets the job posting to PENDING on the backend for
+            // re-review (see jobs.service.ts CONTENT_FIELDS) without
+            // touching paymentStatus — an already-confirmed payment stays
+            // confirmed, no repeat payment needed.
+            Alert.alert(t('jobs.editedTitle'), t('jobs.editedBody'), [
+              {text: t('common.ok'), onPress: goBack},
+            ]);
+          } else {
+            goBack();
+          }
         },
       });
     }
@@ -198,7 +222,10 @@ export function CreateJobScreen() {
   };
   const onSelectFile = file => {
     if (!isSupportedImageType(file.type)) {
-      Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+      Alert.alert(
+        t('common.imageFormatUnsupported'),
+        UNSUPPORTED_IMAGE_TYPE_MESSAGE(),
+      );
       return;
     }
     setState(s => ({...s, [s.tempSelect]: file}));
@@ -217,13 +244,16 @@ export function CreateJobScreen() {
   const onSelectCity = city => {
     setState(s => ({...s, city, citySelectModal: false}));
   };
+  const onSelectLocation = (lat: number, lng: number) => {
+    setState(s => ({...s, lat, lng}));
+  };
 
   const onChangeField = (field, value) => {
     setState(s => ({...s, [field]: value}));
   };
   return (
     <Screen withoutScroll>
-      <MainHeader title={editItem ? 'ویرایش صنف' : 'ثبت صنف جدید'} />
+      <MainHeader title={editItem ? t('jobs.editGuild') : t('jobs.createGuild')} />
       <View style={styles.nav}>
         <GradiantHeader
           details={false}
@@ -257,7 +287,7 @@ export function CreateJobScreen() {
         <Divider height={8} />
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>عنوان</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.unitName')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -271,7 +301,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>مدیریت</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.manager')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -285,27 +315,27 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>نوع صنف</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.guildType')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <TouchableOpacity
             onPress={() => setState(s => ({...s, jobClassModal: true}))}
             style={{...styles.detailItem, flex: 1}}>
             <Text style={{...styles.itemText, textAlign: 'right'}}>
-              {state?.category?.title}
+              {localizeCategory(state?.category?.title)}
             </Text>
           </TouchableOpacity>
         </Row>
         <Row style={{paddingHorizontal: 8, justifyContent: 'flex-end'}}>
           <TouchableOpacity onPress={() => navigate('jobCategoryGuide')}>
             <Text style={{fontSize: 12, color: colors.main}}>
-              راهنمای انتخاب صنف
+              {t('jobs.guildGuide')}
             </Text>
           </TouchableOpacity>
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>شماره ثبت</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.registerCode')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -319,7 +349,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>تلفن ثابت</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.landline')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -334,7 +364,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>تلفن همراه</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.mobile')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -349,7 +379,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>فکس</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.fax')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -364,7 +394,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>آدرس</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.address')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -378,7 +408,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>تلگرام</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.telegram')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -392,7 +422,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>اینستاگرام</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.instagram')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -406,7 +436,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>ایمیل</Text>
+            <Text style={{...styles.itemText}}>{t('common.email')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -420,7 +450,7 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>توضیحات</Text>
+            <Text style={{...styles.itemText}}>{t('common.description')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <View style={{...styles.detailItem, flex: 1}}>
@@ -434,36 +464,43 @@ export function CreateJobScreen() {
         </Row>
         <Row style={{paddingHorizontal: 8}}>
           <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>حقوق</Text>
-          </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
-            <TextField
-              value={state.salary}
-              onChangeText={text => onChangeField('salary', text)}
-              keyboardType="number-pad"
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
-            />
-          </View>
-        </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>موقعیت</Text>
+            <Text style={{...styles.itemText}}>{t('jobs.city')}</Text>
           </View>
           <Divider style={{width: 10}} />
           <TouchableOpacity
             onPress={() => setState(s => ({...s, citySelectModal: true}))}
             style={{...styles.detailItem, flex: 1}}>
-            <Text>{state?.city?.title}</Text>
+            <Text style={{...styles.itemText, textAlign: 'right'}}>
+              {localizeCity(state?.city?.title)}
+            </Text>
           </TouchableOpacity>
         </Row>
+        <Divider height={8} />
+        <View style={{paddingHorizontal: 8}}>
+          <View style={styles.mapPreview}>
+            <ProductLocation
+              lat={state.lat}
+              lng={state.lng}
+              zoomEnabled={false}
+              scrollEnabled={false}
+              pointerEvents="none"
+            />
+          </View>
+          <TouchableOpacity
+            onPress={() => setState(s => ({...s, locationModal: true}))}
+            style={styles.locationButton}>
+            <Text size={15} style={{textAlign: 'center'}}>
+              {t('jobs.selectLocationOnMap')}
+            </Text>
+          </TouchableOpacity>
+        </View>
         <View>
           <Checkbox
             value={state.acceptance}
             onToggle={() => setState(s => ({...s, acceptance: !s.acceptance}))}
+            onTextPress={() => navigate('privacy')}
             style={{flexDirection: 'row', alignSelf: 'center'}}
-            text="با قوانین و شرایط موافقم"
+            text={t('createAds.acceptTerms')}
           />
         </View>
       </Screen>
@@ -483,6 +520,11 @@ export function CreateJobScreen() {
         onSelect={onSelectCity}
         visible={state.citySelectModal}
         onClose={() => setState(s => ({...s, citySelectModal: false}))}
+      />
+      <LocationSelectModal
+        visible={state.locationModal}
+        onSelect={onSelectLocation}
+        onClose={() => setState(s => ({...s, locationModal: false}))}
       />
     </Screen>
   );
@@ -529,5 +571,26 @@ const styles = StyleSheet.create({
   },
   itemText: {
     lineHeight: 19,
+  },
+  mapPreview: {
+    width: '100%',
+    aspectRatio: 1.6,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: colors.pallete.gray1,
+  },
+  locationButton: {
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 4,
+    height: 32,
+    minWidth: 200,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: colors.text,
+    backgroundColor: 'white',
   },
 });

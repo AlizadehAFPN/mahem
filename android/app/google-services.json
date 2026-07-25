@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "664402536457",
-    "firebase_url": "https://mahem-45019-default-rtdb.europe-west1.firebasedatabase.app",
-    "project_id": "mahem-45019",
-    "storage_bucket": "mahem-45019.appspot.com"
+    "project_number": "941696454550",
+    "project_id": "mahem-20402",
+    "storage_bucket": "mahem-20402.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:664402536457:android:34e55f57ca0e6e7bdf70d8",
+        "mobilesdk_app_id": "1:941696454550:android:e7c52985919230273e57b7",
         "android_client_info": {
           "package_name": "com.mahem_app"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAVcNBuzoFzO9pqyXSSlGaSXH7GePKg0JM"
+          "current_key": "AIzaSyBBLKfE6tj0kjmGDTXY5VMK4dW8RnazWOI"
         }
       ],
       "services": {

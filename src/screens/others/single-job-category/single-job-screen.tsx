@@ -11,14 +11,24 @@ import {
   ProductLocation,
 } from '../../../components';
 import {colors} from '../../../theme';
+import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {useMutation, useQueryClient} from 'react-query';
-import {deleteJob} from '../../../services/job';
+import {deleteJob, renewJob} from '../../../services/job';
+import {localizeCategory} from '../../../i18n/display-maps';
 const {width} = Dimensions.get('window');
+
+// There's no established job-posting fee anywhere in the app today (unlike
+// Advertisement's Category.adFeeToman or Store's STORE_FEE_TOMAN) — Job
+// payment has always been an admin-confirmed manual/negotiated arrangement
+// (see JobsService.confirmPayment's doc comment). This is a placeholder
+// display figure for the gateway screen until an actual amount is decided.
+const JOB_RENEWAL_FEE_TOMAN = 0;
 export function SingleJobScreen() {
+  const {t} = useTranslation();
   const {params} = useRoute();
-  const {navigate, goBack} = useNavigation();
+  const {navigate, goBack} = useNavigation<any>();
   const [job, setJob] = useState(params?.job);
   const user = useSelector(s => s.user);
   const isOwner = job?.userId && job.userId === user?.id;
@@ -29,15 +39,48 @@ export function SingleJobScreen() {
       goBack();
     },
   });
+  const isRejected = job?.approvalStatus === 'REJECTED';
   const onDeleteJob = () => {
-    Alert.alert('حذف آگهی', 'آیا از حذف این آگهی مطمئن هستید؟', [
-      {text: 'انصراف', style: 'cancel'},
-      {text: 'حذف', style: 'destructive', onPress: () => deleteJobMutate()},
-    ]);
+    Alert.alert(
+      isRejected
+        ? t('userPanel.deleteAdCompletelyTitle')
+        : t('userPanel.deleteAdTitle'),
+      isRejected
+        ? t('userPanel.deleteRejectedBody')
+        : t('userPanel.deleteConfirmBody'),
+      [
+        {text: t('common.cancel'), style: 'cancel'},
+        {
+          text: isRejected ? t('userPanel.deleteCompletely') : t('common.delete'),
+          style: 'destructive',
+          onPress: () => deleteJobMutate(),
+        },
+      ],
+    );
+  };
+
+  const onRenewJob = () => {
+    navigate('bankGateway', {
+      amount: JOB_RENEWAL_FEE_TOMAN,
+      description: t('userPanel.renewAdDescription', {title: job?.title ?? ''}),
+      onSuccess: async () => {
+        try {
+          await renewJob(job.id);
+          goBack();
+          Alert.alert(
+            t('store.renewRequested'),
+            t('userPanel.renewRequestedBody'),
+          );
+        } catch (e) {
+          Alert.alert(t('common.error'), t('store.renewError'));
+        }
+      },
+    });
   };
   const jobObj = useMemo(() => {
     if (job) {
       const {
+        title,
         manager,
         register_code,
         phone,
@@ -51,27 +94,28 @@ export function SingleJobScreen() {
         job_category_id,
       } = job;
       return [
-        {title: 'مدیریت', value: manager},
-        {title: 'نوع صنف', value: job_category_id.title},
-        {title: 'شماره ثبت', value: register_code},
-        {title: 'تلفن ثابت', value: phone},
-        {title: 'تلفن همراه', value: mobile},
-        {title: 'فکس', value: fax},
-        {title: 'آدرس', value: address},
-        {title: 'تلگرام', value: telegram},
-        {title: 'اینستاگرام', value: instagram},
-        {title: 'ایمیل', value: email},
-        {title: 'توضیحات', value: description},
+        {title: t('jobs.unitName'), value: title},
+        {title: t('jobs.manager'), value: manager},
+        {title: t('jobs.guildType'), value: localizeCategory(job_category_id.title)},
+        {title: t('jobs.registerCode'), value: register_code},
+        {title: t('jobs.landline'), value: phone},
+        {title: t('jobs.mobile'), value: mobile},
+        {title: t('jobs.fax'), value: fax},
+        {title: t('jobs.address'), value: address},
+        {title: t('jobs.telegram'), value: telegram},
+        {title: t('jobs.instagram'), value: instagram},
+        {title: t('common.email'), value: email},
+        {title: t('common.description'), value: description},
       ];
     }
     return [];
-  }, [job]);
+  }, [job, t]);
 
   return (
     <Screen withoutScroll>
-      <MainHeader title={job?.job_category_id?.title} />
+      <MainHeader title={localizeCategory(job?.job_category_id?.title)} showBack />
       <View style={styles.nav}>
-        <GradiantHeader />
+        <GradiantHeader shareText={job?.title} />
       </View>
       <Screen unsafe>
         <View style={styles.bannerContaier}>
@@ -89,25 +133,72 @@ export function SingleJobScreen() {
           </View>
         </View>
         <Divider height={8} />
+        {isOwner && isRejected && job?.rejectionReason && (
+          <Text
+            style={{
+              paddingHorizontal: 8,
+              marginBottom: 4,
+              textAlign: 'center',
+            }}
+            size={12}
+            color={colors.pallete.red2}>
+            {t('jobs.adRejected', {reason: job.rejectionReason})}
+          </Text>
+        )}
+        {isOwner && job?.status === 'ARCHIVED' && (
+          <Text
+            style={{
+              paddingHorizontal: 8,
+              marginBottom: 4,
+              textAlign: 'center',
+            }}
+            size={12}
+            color={colors.pallete.red2}>
+            {t('jobs.adArchivedNotice')}
+          </Text>
+        )}
         {isOwner && (
           <Row style={{paddingHorizontal: 8, marginBottom: 4}}>
+            {isRejected ? (
+              <Button onPress={onDeleteJob} style={styles.ownerActionButton}>
+                <Text size={13} color={colors.pallete.red2}>
+                  {t('userPanel.deleteCompletely')}
+                </Text>
+              </Button>
+            ) : (
+              <>
+                <Button
+                  onPress={() => navigate('createJob', {editItem: job})}
+                  style={styles.ownerActionButton}>
+                  <Text size={13} color={colors.main}>
+                    {t('common.edit')}
+                  </Text>
+                </Button>
+                <Divider style={{width: 10}} />
+                <Button onPress={onDeleteJob} style={styles.ownerActionButton}>
+                  <Text size={13} color={colors.pallete.red2}>
+                    {t('common.delete')}
+                  </Text>
+                </Button>
+              </>
+            )}
+          </Row>
+        )}
+        {isOwner && !isRejected && job?.approvalStatus === 'APPROVED' && (
+          <Row style={{paddingHorizontal: 8, marginBottom: 4}}>
             <Button
-              onPress={() => navigate('createJob', {editItem: job})}
-              style={styles.ownerActionButton}>
-              <Text size={13} color={colors.main}>
-                ویرایش
-              </Text>
-            </Button>
-            <Divider style={{width: 10}} />
-            <Button onPress={onDeleteJob} style={styles.ownerActionButton}>
-              <Text size={13} color={colors.pallete.red2}>
-                حذف
+              onPress={onRenewJob}
+              style={{...styles.ownerActionButton, ...styles.renewButton}}>
+              <Text size={13} color="white">
+                {job.status === 'ARCHIVED'
+                  ? t('userPanel.renewAdExpired')
+                  : t('userPanel.renewAd')}
               </Text>
             </Button>
           </Row>
         )}
         {jobObj.map(item => (
-          <Row style={{paddingHorizontal: 8}}>
+          <Row key={item.title} style={{paddingHorizontal: 8}}>
             <View style={{...styles.detailItem, width: 70}}>
               <Text style={{...styles.itemText}}>{item.title}</Text>
             </View>
@@ -143,6 +234,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
+  },
+  renewButton: {
+    backgroundColor: colors.main,
+    borderColor: colors.main,
   },
   nav: {
     position: 'absolute',

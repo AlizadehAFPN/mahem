@@ -60,7 +60,7 @@ export function Settings() {
 
   return (
     <Screen withoutScroll style={{flex: 1}}>
-      <MainHeader title={translate('setting')} showBack />
+      <MainHeader title={translate('settings.title')} showBack />
       <View
         style={{
           width: '100%',
@@ -100,13 +100,15 @@ export function Settings() {
             value={isPersian}
             onValueChange={toggleSwitch}
           />
-          <Text style={{marginHorizontal: 8}}>فارسی</Text>
+          <Text style={{marginHorizontal: 8}}>
+            {isPersian ? translate('settings.persian') : translate('settings.english')}
+          </Text>
         </View>
       </View>
 
       <View style={{marginTop: 32, paddingHorizontal: 16}}>
         <Text style={{textAlign: 'right', fontSize: 22}}>
-          {translate('chooseCity')}
+          {translate('settings.chooseCity')}
         </Text>
       </View>
       <TouchableOpacity
@@ -119,7 +121,7 @@ export function Settings() {
           paddingVertical: 8,
         }}>
         <Text style={{textAlign: 'center'}}>
-          {user?.city || translate('chooseCity')}
+          {user?.city || translate('settings.chooseCity')}
         </Text>
       </TouchableOpacity>
       <CityPicker
@@ -132,7 +134,7 @@ export function Settings() {
         onPress={() => navigate('editProfile' as never)}
         style={{marginTop: 32, paddingHorizontal: 16}}>
         <Text style={{fontSize: 16}}>
-          {translate('editProfile')} ({user?.username})
+          {translate('settings.editProfile')} ({user?.username})
         </Text>
       </TouchableOpacity>
 
@@ -143,13 +145,13 @@ export function Settings() {
           )
         }
         style={{marginTop: 32, paddingHorizontal: 16}}>
-        <Text style={{fontSize: 16}}>{translate('rateMahem')}</Text>
+        <Text style={{fontSize: 16}}>{translate('settings.rateMahem')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={onExit}
         style={{marginTop: 32, paddingHorizontal: 16}}>
-        <Text style={{fontSize: 16}}>{translate('exit')}</Text>
+        <Text style={{fontSize: 16}}>{translate('settings.exit')}</Text>
       </TouchableOpacity>
     </Screen>
   );

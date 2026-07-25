@@ -1,5 +1,6 @@
 import {StyleSheet, TouchableOpacity, View, Image} from 'react-native';
 import React, {useMemo} from 'react';
+import {useTranslation} from 'react-i18next';
 import {colors} from '../../../theme';
 import {CirleSlider} from '../../cicle-slider/circle-slider';
 import {Row} from '../../row/row';
@@ -13,6 +14,7 @@ import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 // offers at a glance: image, title, discount ring, discounted price, and
 // the struck-through original.
 export function GridOfferCard({item, onPress}) {
+  const {t} = useTranslation();
   const img = useMemo(() => getLegacyImagePaths(item)[0], [item]);
   const offerPersent = item?.discountPercent ?? 0;
   return (
@@ -45,14 +47,14 @@ export function GridOfferCard({item, onPress}) {
           </CirleSlider>
           <View style={styles.priceTexts}>
             <Text size={14} preset="bold" color={colors.main}>
-              {numberWithCommas(item.price)} تومان
+              {numberWithCommas(item.price)} {t('common.toman')}
             </Text>
             {!!item.originalPrice && (
               <Text
                 size={11}
                 color={colors.pallete.gray2}
                 style={styles.strikePrice}>
-                {numberWithCommas(item.originalPrice)} تومان
+                {numberWithCommas(item.originalPrice)} {t('common.toman')}
               </Text>
             )}
           </View>

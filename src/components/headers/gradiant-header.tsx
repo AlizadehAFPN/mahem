@@ -1,5 +1,6 @@
 import {View, StyleSheet} from 'react-native';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import LinearGradient from 'react-native-linear-gradient';
 import {Button} from '../button/button';
 import {Divider} from '../divider/divider';
@@ -26,9 +27,10 @@ export function GradiantHeader({
   // real-estate screen this header started on.
   shareText,
 }) {
+  const {t} = useTranslation();
   const {goBack} = useNavigation();
   const onShare = () => {
-    SocialShare(shareText || title || 'ماهم');
+    SocialShare(shareText || title || t('common.appName'));
   };
   const onBookMarkPress = () => {
     onBookMark && onBookMark();
@@ -71,7 +73,7 @@ export function GradiantHeader({
         <Button onPress={onCreatePress}>
           <Row>
             <Text size={15} color="white">
-              ارسال
+              {t('common.send')}
             </Text>
             <Feather color="white" name="check" size={20} />
           </Row>

@@ -1,6 +1,7 @@
 import {Image, StyleSheet, View, Dimensions} from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useTranslation} from 'react-i18next';
 import {Button, Screen, Text} from '../../../components';
 import {colors} from '../../../theme';
 import {useNavigation} from '@react-navigation/native';
@@ -14,6 +15,7 @@ const {width, height} = Dimensions.get('window');
 // caller can navigate to when it already knows a request failed with a
 // network error, or push to once connectivity monitoring is added.
 export function NoInternetScreen() {
+  const {t} = useTranslation();
   const {goBack} = useNavigation();
   return (
     <Screen statusbarBackgroundColor="black" withoutScroll unsafe style={{flex: 1}}>
@@ -21,11 +23,11 @@ export function NoInternetScreen() {
       <View style={styles.overlay}>
         <MaterialCommunityIcons name="wifi-off" size={72} color={colors.pallete.red2} />
         <Text color="white" size={18} preset="bold" style={styles.text}>
-          اتصال اینترنت برقرار نیست
+          {t('noInternet.message')}
         </Text>
         <Button style={styles.retryButton} onPress={() => goBack()}>
           <Text color="white" size={16}>
-            تلاش دوباره
+            {t('common.tryAgain')}
           </Text>
         </Button>
       </View>

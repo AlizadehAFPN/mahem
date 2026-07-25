@@ -10,6 +10,7 @@ import {
 } from '../../../components';
 import {colors} from '../../../theme';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {useMutation} from 'react-query';
@@ -22,6 +23,7 @@ import {
 } from '../../../utiles/utiles_funcs';
 
 export function EditProfile() {
+  const {t} = useTranslation();
   const user = useSelector((s: RootState) => s.user);
   const dispatch = useDispatch();
 
@@ -41,7 +43,10 @@ export function EditProfile() {
   const {mutate: uploadMutate, isLoading: isUploading} = useMutation(upload);
   const onSelectAvatar = (file: {fileName: any; type: any; uri: any}) => {
     if (!isSupportedImageType(file.type)) {
-      Alert.alert('فرمت تصویر پشتیبانی نمی‌شود', UNSUPPORTED_IMAGE_TYPE_MESSAGE);
+      Alert.alert(
+        t('common.imageFormatUnsupported'),
+        UNSUPPORTED_IMAGE_TYPE_MESSAGE(),
+      );
       return;
     }
     setState(s => ({...s, profileImage: file}));
@@ -84,7 +89,7 @@ export function EditProfile() {
     <Screen statusbarBackgroundColor={colors.main}>
       <View style={sytles.topColor}>
         <Text preset="default" size={20} color="white">
-          ویرایش پروفایل
+          {t('editProfile.title')}
         </Text>
       </View>
       <View style={sytles.grayCard}>
@@ -106,7 +111,7 @@ export function EditProfile() {
         <TextField
           style={{borderRadius: 8, borderColor: colors.pallete.gray2}}
           labelStyle={{color: 'black', fontSize: 17, marginTop: -5}}
-          label="نام کاربری"
+          label={t('auth.username')}
           value={state?.username}
           onChangeText={text => handleChangeText(text, 'username')}
         />
@@ -123,7 +128,7 @@ export function EditProfile() {
               : colors.pallete.gray1,
           }}>
           <Text color={enableButton() ? 'white' : 'black'} size={20}>
-            ویرایش
+            {t('common.edit')}
           </Text>
         </Button>
       </View>

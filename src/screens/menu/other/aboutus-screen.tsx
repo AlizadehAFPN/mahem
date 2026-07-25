@@ -1,18 +1,14 @@
-import {
-  Image,
-  StyleSheet,
-  View,
-  Text as RNText,
-  Dimensions,
-} from 'react-native';
+import {Image, View} from 'react-native';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {Divider, MainHeader, Screen, Text} from '../../../components';
 import {colors} from '../../../theme';
-const {width} = Dimensions.get('window');
+
 export function AboutUsScreen() {
+  const {t} = useTranslation();
   return (
     <Screen withoutScroll>
-      <MainHeader title="درباره ما" />
+      <MainHeader title={t('menu.aboutUs')} showBack />
       <View
         style={{
           width: '100%',
@@ -26,17 +22,12 @@ export function AboutUsScreen() {
       </View>
       <Screen unsafe style={{paddingHorizontal: 15, flex: 1}}>
         <Text size={17} style={{}}>
-          ماهـم، اولیـن اپلیکیشن در سطح استان گلستان فعالیت خـود را از سال 1399
-          با موضوع کاریابی و نیازمندیهای آنلاین و بانک مشاغل و تخفیف یاب شـروع
-          کرده است و هـدف اصلی آن حذف واسطه و تسهیل در امـر خریـد و فـروش و در
-          ارتباط قـرار دادن خریـدار با .فروشنده به صورت مستقیم است در مـاهـم،
-          خـریـد و فـروش کاربـران مستقیمـا انجـام می پذیـرد .و از معامـلات
-          کاربـران هیچـگـونه سـودی عاید ماهـم نمی گـردد
+          {t('info.aboutText')}
         </Text>
         <View style={{flex: 1}} />
         <View style={{alignItems: 'center'}}>
           <Text size={17} style={{textAlign: 'center'}}>
-            ماهم به زبان ترکمنی به معنای ماه من است
+            {t('info.aboutTagline')}
           </Text>
           <Image source={require('../../../assets/images/version.png')} />
         </View>
@@ -45,5 +36,3 @@ export function AboutUsScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({});

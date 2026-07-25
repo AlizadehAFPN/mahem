@@ -1,5 +1,6 @@
 import {StyleSheet, Switch, View} from 'react-native';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {Row} from '../row/row';
 import {Text} from '../text/text';
 import {UnderlineTextField} from '../text-field/underline-text-field';
@@ -23,21 +24,20 @@ interface ContactInfoCardProps {
 // so they ride into `Advertisement.attributes` the same way brand/area/etc.
 // already do (see ads.ts's createAds).
 export function ContactInfoCard({value, onChange}: ContactInfoCardProps) {
+  const {t} = useTranslation();
   const set = (patch: Partial<ContactInfoValue>) =>
     onChange({...value, ...patch});
 
   return (
     <View style={styles.card}>
-      <Text style={styles.label}>شماره موبایل</Text>
+      <Text style={styles.label}>{t('common.phoneNumber')}</Text>
       <UnderlineTextField
         value={value.contact_info}
         onChangeText={text => set({contact_info: text})}
-        placeholder="شماره موبایل شما"
+        placeholder={t('forms.contact.mobilePlaceholder')}
         keyboardType="number-pad"
       />
-      <Text style={styles.helper}>
-        {'کد تایید به شماره موبایل شما ارسال خواهد شد\nتماس و چت نیز با این شماره انجام می شود'}
-      </Text>
+      <Text style={styles.helper}>{t('forms.contact.mobileHelper')}</Text>
       <Row style={styles.toggleRow}>
         <Switch
           value={value.chatEnabled}
@@ -46,21 +46,19 @@ export function ContactInfoCard({value, onChange}: ContactInfoCardProps) {
           thumbColor={value.chatEnabled ? colors.pallete.green : '#f4f3f4'}
         />
         <Text size={15} style={styles.toggleLabel}>
-          فعال کردن چت
+          {t('forms.contact.enableChat')}
         </Text>
       </Row>
 
-      <Text style={[styles.label, styles.emailLabel]}>ایمیل</Text>
+      <Text style={[styles.label, styles.emailLabel]}>{t('common.email')}</Text>
       <UnderlineTextField
         value={value.email}
         onChangeText={text => set({email: text})}
-        placeholder="ایمیل شما"
+        placeholder={t('forms.contact.emailPlaceholder')}
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <Text style={styles.helper}>
-        آدرس ایمیل خود را بدرستی وارد کنید. لینک «مدیریت آگهی» به ایمیل شما ارسال خواهد شد
-      </Text>
+      <Text style={styles.helper}>{t('forms.contact.emailHelper')}</Text>
       <Row style={styles.toggleRow}>
         <Switch
           value={value.hideEmail}
@@ -69,7 +67,7 @@ export function ContactInfoCard({value, onChange}: ContactInfoCardProps) {
           thumbColor={value.hideEmail ? colors.pallete.green : '#f4f3f4'}
         />
         <Text size={15} style={styles.toggleLabel}>
-          عدم نمایش ایمیل در آگهی
+          {t('forms.contact.hideEmail')}
         </Text>
       </Row>
     </View>

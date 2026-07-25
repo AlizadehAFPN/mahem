@@ -1,5 +1,6 @@
 import {ScrollView, StyleSheet, View} from 'react-native';
 import React, {useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import moment from 'moment-jalaali';
 import {
   Row,
@@ -10,64 +11,38 @@ import {
   Screen,
   Divider,
   UnderlineTextField,
-  SelectAdsCategory,
   AdsOptionsModal,
   Picker,
   OptionPicker,
 } from '../../../components';
 import {LocationSelectModal} from '../../../components/modal/location-select-modal';
+import {FilterCategorySelect} from './filter-category-select';
+import {useAdsCategories} from '../../../hooks/use-cached-categories';
 import {colors} from '../../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {clearFilters, setFilters} from '../../../stateManager/reducers/filters';
 import {RootState} from '../../../stateManager';
+import {localizeCategory, localizeOption} from '../../../i18n/display-maps';
 
 // Matches Figma's "فیلتر- <دسته>" frames exactly: 3 equal-width sort
 // buttons (not the previous 5-chip wrapping row), right-to-left order
 // ارزان‌ترین/جدیدترین/گران‌ترین. Values match the backend's
 // AdvertisementSort enum (find-advertisements.dto.ts) 1:1.
 const SORT_OPTIONS = [
-  {value: 'price_asc', label: 'ارزان‌ترین'},
-  {value: 'new', label: 'جدیدترین'},
-  {value: 'price_desc', label: 'گران‌ترین'},
+  {value: 'price_asc', labelKey: 'filter.sortCheapest'},
+  {value: 'new', labelKey: 'filter.sortNewest'},
+  {value: 'price_desc', labelKey: 'filter.sortPriciest'},
 ] as const;
 
+// Room counts double as the value sent to the backend (`rooms`), so the
+// Persian title stays canonical; it's only translated for display via
+// localizeOption. AREA/AGE bucket labels, by contrast, are display-only (the
+// min/max carry the value) and are built localized inside the component.
 const ROOMS = ['بدون اتاق', 'یک', 'دو', 'سه', 'چهار یا بیشتر'].map(title => ({
   id: title,
   title,
 }));
-
-// "متراژ" (Figma 106:5611) — a preset bucket list, not a free range input;
-// each option maps to a min/max area threshold.
-const AREA_BUCKETS = [
-  {id: 'lt50', title: 'کمتر از 50 متر', maxArea: 50},
-  {id: 'lt100', title: 'زیر 100 متر', maxArea: 100},
-  {id: 'lt150', title: 'زیر 150 متر', maxArea: 150},
-  {id: 'lt200', title: 'زیر 200 متر', maxArea: 200},
-  {id: 'gt200', title: 'بالای 200 متر', minArea: 200},
-];
-
-// "سن بنا" (Figma 106:5695) — preset age buckets, converted to a
-// minProductYear/maxProductYear range using the current Shamsi year (the
-// app already depends on moment-jalaali; سال ساخت is entered in Shamsi by
-// the user in EstateForm, same as وسایل نقلیه's سال تولید).
-function buildAgeBuckets() {
-  const currentYear = moment().jYear();
-  return [
-    {id: 'age1', title: 'حداکثر 1 سال', minProductYear: currentYear - 1},
-    {id: 'age2', title: 'حداکثر 2 سال', minProductYear: currentYear - 2},
-    {id: 'age5', title: 'حداکثر 5 سال', minProductYear: currentYear - 5},
-    {id: 'age10', title: 'حداکثر 10 سال', minProductYear: currentYear - 10},
-    {id: 'age15', title: 'حداکثر 15 سال', minProductYear: currentYear - 15},
-    {id: 'age20', title: 'حداکثر 20 سال', minProductYear: currentYear - 20},
-    {id: 'age20plus', title: 'بیش از 20سال', maxProductYear: currentYear - 20},
-  ];
-}
-
-const YES_NO = [
-  {id: 'yes', title: 'بله'},
-  {id: 'no', title: 'خیر'},
-];
 
 type PickerField =
   | 'rooms'
@@ -89,9 +64,39 @@ type PickerField =
 // subCategory-title conditionals already used by EstateForm/CarForm when
 // posting an ad, for consistency.
 export function FilterScreen() {
+  const {t} = useTranslation();
   const {goBack} = useNavigation();
   const dispatch = useDispatch();
   const filters = useSelector((s: RootState) => s.filter);
+  const {data: adsCategories} = useAdsCategories();
+
+  // "متراژ"/"سن بنا" preset buckets — display-only labels (the min/max carry
+  // the value), so they're localized here at render time.
+  const currentYear = moment().jYear();
+  const areaBuckets = [
+    {id: 'lt50', title: t('filter.areaLt50'), maxArea: 50},
+    {id: 'lt100', title: t('filter.areaLt100'), maxArea: 100},
+    {id: 'lt150', title: t('filter.areaLt150'), maxArea: 150},
+    {id: 'lt200', title: t('filter.areaLt200'), maxArea: 200},
+    {id: 'gt200', title: t('filter.areaGt200'), minArea: 200},
+  ];
+  const ageBuckets = [
+    {id: 'age1', title: t('filter.ageMax', {years: 1}), minProductYear: currentYear - 1},
+    {id: 'age2', title: t('filter.ageMax', {years: 2}), minProductYear: currentYear - 2},
+    {id: 'age5', title: t('filter.ageMax', {years: 5}), minProductYear: currentYear - 5},
+    {id: 'age10', title: t('filter.ageMax', {years: 10}), minProductYear: currentYear - 10},
+    {id: 'age15', title: t('filter.ageMax', {years: 15}), minProductYear: currentYear - 15},
+    {id: 'age20', title: t('filter.ageMax', {years: 20}), minProductYear: currentYear - 20},
+    {id: 'age20plus', title: t('filter.ageOver20'), maxProductYear: currentYear - 20},
+  ];
+  const yesNo = [
+    {id: 'yes', title: t('common.yes')},
+    {id: 'no', title: t('common.no')},
+  ];
+  const estateCreatorOptions = [
+    {id: 'personal', title: t('filter.personal')},
+    {id: 'agency', title: t('filter.estateAgent')},
+  ];
 
   const [state, setState] = useState({
     selectCategoryModal: false,
@@ -141,16 +146,16 @@ export function FilterScreen() {
   const groupTitle = useMemo(() => {
     let title = '';
     if (state.mainCategory) {
-      title = state.mainCategory?.title;
+      title = localizeCategory(state.mainCategory?.title);
     }
     if (state.subCategory) {
-      title = title + ' / ' + state.subCategory?.title;
+      title = title + ' / ' + localizeCategory(state.subCategory?.title);
     }
     if (state.subSubCategory) {
-      title = title + ' / ' + state.subSubCategory?.title;
+      title = title + ' / ' + localizeCategory(state.subSubCategory?.title);
     }
     return title;
-  }, [state.mainCategory, state.subCategory, state.subSubCategory]);
+  }, [state.mainCategory, state.subCategory, state.subSubCategory, t]);
 
   const isEstate = state.mainCategory?.title === 'املاک';
   const isVehicle = state.mainCategory?.title === 'وسایل نقلیه';
@@ -205,8 +210,11 @@ export function FilterScreen() {
   };
 
   return (
-    <Screen withoutScroll style={{flex: 1}}>
-      <MainHeader title="فیلتر" showBack />
+    <Screen
+      withoutScroll
+      style={{flex: 1}}
+      bottomSafeAreaColor={colors.main}>
+      <MainHeader title={t('filter.title')} showBack />
       <ScrollView
         style={{flex: 1}}
         contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 24}}
@@ -221,7 +229,7 @@ export function FilterScreen() {
                 onPress={() => setState(s => ({...s, sort: option.value}))}
                 style={active ? styles.sortChipActive : styles.sortChip}>
                 <Text size={14} color={active ? 'white' : colors.text}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </Text>
               </Button>
             );
@@ -231,7 +239,7 @@ export function FilterScreen() {
         <Divider height={16} />
         <Button onPress={onToggleSelectCategory}>
           <UnderlineTextField
-            placeholder="انتخاب گروه"
+            placeholder={t('createAds.selectGroup')}
             editable={false}
             value={state.mainCategory ? groupTitle : undefined}
           />
@@ -246,15 +254,15 @@ export function FilterScreen() {
                 <Button onPress={() => openPicker('rooms')}>
                   <UnderlineTextField
                     editable={false}
-                    placeholder="تعیین تعداد اتاق"
-                    value={state.rooms}
+                    placeholder={t('filter.roomsPlaceholder')}
+                    value={localizeOption(state.rooms)}
                   />
                 </Button>
                 <Divider />
                 <Button onPress={() => openPicker('area')}>
                   <UnderlineTextField
                     editable={false}
-                    placeholder="تعیین متراژ"
+                    placeholder={t('filter.areaPlaceholder')}
                     value={state.areaLabel}
                   />
                 </Button>
@@ -264,13 +272,13 @@ export function FilterScreen() {
             <Button onPress={() => openPicker('estateCreator')}>
               <UnderlineTextField
                 editable={false}
-                placeholder="آگهی دهنده"
+                placeholder={t('filter.advertiser')}
                 value={
                   state.isPersonalSeller === undefined
                     ? ''
                     : state.isPersonalSeller
-                    ? 'شخصی'
-                    : 'مشاور املاک'
+                    ? t('filter.personal')
+                    : t('filter.estateAgent')
                 }
               />
             </Button>
@@ -283,7 +291,7 @@ export function FilterScreen() {
                       <UnderlineTextField
                         value={state.minRehn}
                         onChangeText={text => setState(s => ({...s, minRehn: text}))}
-                        placeholder="رهن از"
+                        placeholder={t('filter.mortgageFrom')}
                         keyboardType="number-pad"
                       />
                     </View>
@@ -292,7 +300,7 @@ export function FilterScreen() {
                       <UnderlineTextField
                         value={state.maxRehn}
                         onChangeText={text => setState(s => ({...s, maxRehn: text}))}
-                        placeholder="رهن تا"
+                        placeholder={t('filter.mortgageTo')}
                         keyboardType="number-pad"
                       />
                     </View>
@@ -303,7 +311,7 @@ export function FilterScreen() {
                       <UnderlineTextField
                         value={state.minEjare}
                         onChangeText={text => setState(s => ({...s, minEjare: text}))}
-                        placeholder="اجاره از"
+                        placeholder={t('filter.rentFrom')}
                         keyboardType="number-pad"
                       />
                     </View>
@@ -312,7 +320,7 @@ export function FilterScreen() {
                       <UnderlineTextField
                         value={state.maxEjare}
                         onChangeText={text => setState(s => ({...s, maxEjare: text}))}
-                        placeholder="اجاره تا"
+                        placeholder={t('filter.rentTo')}
                         keyboardType="number-pad"
                       />
                     </View>
@@ -326,7 +334,7 @@ export function FilterScreen() {
                       <UnderlineTextField
                         value={state.minPrice}
                         onChangeText={text => setState(s => ({...s, minPrice: text}))}
-                        placeholder="قیمت از"
+                        placeholder={t('filter.priceFrom')}
                         keyboardType="number-pad"
                       />
                     </View>
@@ -335,7 +343,7 @@ export function FilterScreen() {
                       <UnderlineTextField
                         value={state.maxPrice}
                         onChangeText={text => setState(s => ({...s, maxPrice: text}))}
-                        placeholder="قیمت تا"
+                        placeholder={t('filter.priceTo')}
                         keyboardType="number-pad"
                       />
                     </View>
@@ -348,7 +356,7 @@ export function FilterScreen() {
                 <Button onPress={() => openPicker('age')}>
                   <UnderlineTextField
                     editable={false}
-                    placeholder="سن بنا"
+                    placeholder={t('filter.buildingAge')}
                     value={state.ageLabel}
                   />
                 </Button>
@@ -356,13 +364,13 @@ export function FilterScreen() {
                 <Button onPress={() => openPicker('suburb')}>
                   <UnderlineTextField
                     editable={false}
-                    placeholder="حومه شهر"
+                    placeholder={t('forms.suburb')}
                     value={
                       state.hasSuburb === undefined
                         ? ''
                         : state.hasSuburb
-                        ? 'بله'
-                        : 'خیر'
+                        ? t('common.yes')
+                        : t('common.no')
                     }
                   />
                 </Button>
@@ -380,8 +388,8 @@ export function FilterScreen() {
                 <Button onPress={() => openPicker('brand')}>
                   <UnderlineTextField
                     editable={false}
-                    placeholder="برند"
-                    value={state.brand}
+                    placeholder={t('forms.brand')}
+                    value={localizeOption(state.brand)}
                   />
                 </Button>
               </>
@@ -392,7 +400,7 @@ export function FilterScreen() {
                 <UnderlineTextField
                   value={state.minPrice}
                   onChangeText={text => setState(s => ({...s, minPrice: text}))}
-                  placeholder="قیمت از"
+                  placeholder={t('filter.priceFrom')}
                   keyboardType="number-pad"
                 />
               </View>
@@ -401,7 +409,7 @@ export function FilterScreen() {
                 <UnderlineTextField
                   value={state.maxPrice}
                   onChangeText={text => setState(s => ({...s, maxPrice: text}))}
-                  placeholder="قیمت تا"
+                  placeholder={t('filter.priceTo')}
                   keyboardType="number-pad"
                 />
               </View>
@@ -419,7 +427,7 @@ export function FilterScreen() {
                       minProductYear: text ? Number(text) : undefined,
                     }))
                   }
-                  placeholder="از سال"
+                  placeholder={t('filter.yearFrom')}
                   keyboardType="number-pad"
                 />
               </View>
@@ -435,7 +443,7 @@ export function FilterScreen() {
                       maxProductYear: text ? Number(text) : undefined,
                     }))
                   }
-                  placeholder="تا سال"
+                  placeholder={t('filter.yearTo')}
                   keyboardType="number-pad"
                 />
               </View>
@@ -444,8 +452,8 @@ export function FilterScreen() {
             <Button onPress={() => openPicker('adType')}>
               <UnderlineTextField
                 editable={false}
-                placeholder="تعیین نوع آگهی"
-                value={state.adType}
+                placeholder={t('filter.adTypePlaceholder')}
+                value={localizeOption(state.adType)}
               />
             </Button>
             <Divider />
@@ -456,7 +464,7 @@ export function FilterScreen() {
                   onChangeText={text =>
                     setState(s => ({...s, minOperationAmount: text}))
                   }
-                  placeholder="کارکرد از"
+                  placeholder={t('filter.mileageFrom')}
                   keyboardType="number-pad"
                 />
               </View>
@@ -467,7 +475,7 @@ export function FilterScreen() {
                   onChangeText={text =>
                     setState(s => ({...s, maxOperationAmount: text}))
                   }
-                  placeholder="کارکرد تا"
+                  placeholder={t('filter.mileageTo')}
                   keyboardType="number-pad"
                 />
               </View>
@@ -482,16 +490,16 @@ export function FilterScreen() {
             <Button onPress={() => openPicker('contractType')}>
               <UnderlineTextField
                 editable={false}
-                placeholder="نوع قرارداد"
-                value={state.contractType}
+                placeholder={t('forms.contractType')}
+                value={localizeOption(state.contractType)}
               />
             </Button>
             <Divider />
             <Button onPress={() => openPicker('education')}>
               <UnderlineTextField
                 editable={false}
-                placeholder="میزان تحصیلات"
-                value={state.education}
+                placeholder={t('forms.education')}
+                value={localizeOption(state.education)}
               />
             </Button>
           </>
@@ -505,8 +513,8 @@ export function FilterScreen() {
             <Button onPress={() => setState(s => ({...s, locationModal: true}))}>
               <UnderlineTextField
                 editable={false}
-                placeholder="تعیین موقعیت"
-                value={state.lat && state.lng ? 'موقعیت انتخاب شد' : ''}
+                placeholder={t('filter.setLocation')}
+                value={state.lat && state.lng ? t('forms.locationSelected') : ''}
               />
             </Button>
             <Divider />
@@ -515,7 +523,7 @@ export function FilterScreen() {
                 <UnderlineTextField
                   value={state.minPrice}
                   onChangeText={text => setState(s => ({...s, minPrice: text}))}
-                  placeholder="قیمت از"
+                  placeholder={t('filter.priceFrom')}
                   keyboardType="number-pad"
                 />
               </View>
@@ -524,7 +532,7 @@ export function FilterScreen() {
                 <UnderlineTextField
                   value={state.maxPrice}
                   onChangeText={text => setState(s => ({...s, maxPrice: text}))}
-                  placeholder="قیمت تا"
+                  placeholder={t('filter.priceTo')}
                   keyboardType="number-pad"
                 />
               </View>
@@ -537,30 +545,18 @@ export function FilterScreen() {
           value={state.onlyImages}
           onToggle={() => setState(s => ({...s, onlyImages: !s.onlyImages}))}
           style={{flexDirection: 'row', alignSelf: 'center'}}
-          text="نمایش فقط آگهی های عکس دار"
+          text={t('filter.onlyWithImagesCheckbox')}
         />
 
         <Divider height={24} />
         <Button onPress={handleClear} style={styles.clearButton}>
           <Text size={15} color={colors.main}>
-            پاک کردن همه فیلترها
+            {t('filter.clearAll')}
           </Text>
         </Button>
         <Divider height={64} />
       </ScrollView>
 
-      <SelectAdsCategory
-        onSelect={(m: any, sc: any, ssc: any) =>
-          setState(s => ({
-            ...s,
-            mainCategory: m,
-            subCategory: sc,
-            subSubCategory: ssc,
-          }))
-        }
-        onClose={onToggleSelectCategory}
-        visible={state.selectCategoryModal}
-      />
       <LocationSelectModal
         visible={state.locationModal}
         onClose={() => setState(s => ({...s, locationModal: false}))}
@@ -591,7 +587,7 @@ export function FilterScreen() {
       <Picker
         visible={state.pickerField === 'area'}
         onClose={closePicker}
-        data={AREA_BUCKETS}
+        data={areaBuckets}
         onSelect={(item: any) => {
           setState(s => ({
             ...s,
@@ -605,7 +601,7 @@ export function FilterScreen() {
       <Picker
         visible={state.pickerField === 'age'}
         onClose={closePicker}
-        data={buildAgeBuckets()}
+        data={ageBuckets}
         onSelect={(item: any) => {
           setState(s => ({
             ...s,
@@ -619,7 +615,7 @@ export function FilterScreen() {
       <Picker
         visible={state.pickerField === 'suburb'}
         onClose={closePicker}
-        data={YES_NO}
+        data={yesNo}
         onSelect={(item: any) => {
           setState(s => ({...s, hasSuburb: item.id === 'yes'}));
           closePicker();
@@ -628,10 +624,7 @@ export function FilterScreen() {
       <Picker
         visible={state.pickerField === 'estateCreator'}
         onClose={closePicker}
-        data={[
-          {id: 'personal', title: 'شخصی'},
-          {id: 'agency', title: 'مشاور املاک'},
-        ]}
+        data={estateCreatorOptions}
         onSelect={(item: any) => {
           setState(s => ({...s, isPersonalSeller: item.id === 'personal'}));
           closePicker();
@@ -676,9 +669,30 @@ export function FilterScreen() {
 
       <Button onPress={handleApply} style={styles.applyButton}>
         <Text size={19} color="white">
-          اعـمـال
+          {t('filter.apply')}
         </Text>
       </Button>
+
+      {/* Step-by-step, full-screen category selection (Figma "فیلتر – 1" /
+          "فیلتر- <دسته>"): rendered last so its absolute-fill overlay sits
+          above the form and the اعمال bar while open. تخفیف‌یاب is part of the
+          GENERAL tree but excluded here — it has its own تخفیف‌یاب browse
+          flow and isn't one of the filter's 9 categories in Figma. */}
+      <FilterCategorySelect
+        visible={state.selectCategoryModal}
+        data={adsCategories?.data || []}
+        excludeTitles={['تخفیف']}
+        onClose={onToggleSelectCategory}
+        onSelect={path =>
+          setState(s => ({
+            ...s,
+            mainCategory: path[0],
+            subCategory: path[1],
+            subSubCategory: path[2],
+            selectCategoryModal: false,
+          }))
+        }
+      />
     </Screen>
   );
 }

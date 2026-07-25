@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyA4H5J90RmsicVCdnvBSrGdu4ja9QtBSFU</string>
+	<string>AIzaSyDMjQVja5cFsQbeA_GjuiVpge2ajS90cEU</string>
 	<key>GCM_SENDER_ID</key>
-	<string>664402536457</string>
+	<string>941696454550</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.mymiror.mirorim</string>
+	<string>com.mahem</string>
 	<key>PROJECT_ID</key>
-	<string>mahem-45019</string>
+	<string>mahem-20402</string>
 	<key>STORAGE_BUCKET</key>
-	<string>mahem-45019.appspot.com</string>
+	<string>mahem-20402.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,8 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:664402536457:ios:42c121cbb97d4773df70d8</string>
-	<key>DATABASE_URL</key>
-	<string>https://mahem-45019-default-rtdb.europe-west1.firebasedatabase.app</string>
+	<string>1:941696454550:ios:49e11badd3b07a8d3e57b7</string>
 </dict>
 </plist>

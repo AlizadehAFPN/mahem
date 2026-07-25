@@ -3,6 +3,7 @@ import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Text} from '../../text/text';
 import {colors} from '../../../theme';
+import {localizeCategory} from '../../../i18n/display-maps';
 
 // Matches every "دسته بندی-"/"ثبت آگهی-" list-row frame in Figma: #EEEEEE
 // row, #707070 1px border, 5px radius, centered text, and a left-pointing
@@ -23,7 +24,7 @@ export function CategroyItem({item, onPress}) {
         />
       )}
       <Text size={17} style={styles.text}>
-        {item.title}
+        {localizeCategory(item.title)}
       </Text>
     </TouchableOpacity>
   );
