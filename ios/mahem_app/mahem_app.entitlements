@@ -2,7 +2,17 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Resolved per build configuration from APS_ENVIRONMENT in
+	     project.pbxproj: `development` for Debug, `production` for Release.
+
+	     This file is shared by both configurations, and the value has to match
+	     the provisioning profile the build is signed with or the entitlement
+	     is rejected at signing time. It was hardcoded to `development`, which
+	     meant a TestFlight/App Store build carried the sandbox entitlement:
+	     the device registers a token against the APNs sandbox while the
+	     backend sends to production APNs, so no push ever arrives — and
+	     nothing about it looks like a failure from either side. -->
 	<key>aps-environment</key>
-	<string>development</string>
+	<string>$(APS_ENVIRONMENT)</string>
 </dict>
 </plist>

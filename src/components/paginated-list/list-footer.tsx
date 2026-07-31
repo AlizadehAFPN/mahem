@@ -2,7 +2,7 @@ import React from 'react';
 import {ActivityIndicator, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {Text} from '../text/text';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 
 // Shared ListFooterComponent for every backend-paginated FlatList (the ones
 // wired to usePaginatedList + onEndReached). While the next page is loading it
@@ -25,7 +25,7 @@ export function ListFooter({
   const {t} = useTranslation();
   if (isFetchingNextPage) {
     return (
-      <View style={{paddingVertical: 16, alignItems: 'center'}}>
+      <View style={{paddingVertical: scaled(16), alignItems: 'center'}}>
         <ActivityIndicator size="small" color={colors.main} />
       </View>
     );
@@ -38,7 +38,7 @@ export function ListFooter({
     return (
       <View
         style={{
-          paddingTop: 16,
+          paddingTop: scaled(16),
           paddingBottom: bottomSpacing,
           alignItems: 'center',
         }}>

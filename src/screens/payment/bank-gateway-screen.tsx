@@ -2,9 +2,9 @@ import {Alert, Image, StyleSheet, View} from 'react-native';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {Button, Screen, Text} from '../../components';
+import {Button, HeaderBackButton, Row, Screen, Text} from '../../components';
 import {TextField} from '../../components/text-field/text-field';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 
 function formatCardNumber(value: string) {
   const digits = value.replace(/\D/g, '').slice(0, 16);
@@ -76,13 +76,25 @@ export function BankGatewayScreen() {
 
   return (
     <Screen withoutScroll>
-      <View style={styles.header}>
-        <Image
-          source={require('../../assets/images/logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
+      {/* Same band as CreateAdsPaymentScreen. The «لغو پرداخت» button at the
+          bottom already pops the screen, but it's below the fold once the
+          keyboard is up on the card fields — the arrow is always reachable.
+          Hidden mid-submit so the caller's onSuccess can't be orphaned; the
+          slot keeps its width so the logo doesn't shift when it goes. Arrow
+          first in the row-reverse Row, i.e. on the right edge like every other
+          back arrow in the app (MainHeader, auth, edit-profile). */}
+      <Row style={styles.header}>
+        <Row>
+          <View style={styles.backSlot}>
+            {!submitting && <HeaderBackButton />}
+          </View>
+          <Image
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </Row>
+      </Row>
       <View style={styles.sandboxBanner}>
         <Text size={12} color={colors.pallete.gray2}>
           {t('payment.sandboxNotice')}
@@ -121,7 +133,9 @@ export function BankGatewayScreen() {
               label="CVV2"
               placeholder="XXX"
               value={cvv2}
-              onChangeText={text => setCvv2(text.replace(/\D/g, '').slice(0, 4))}
+              onChangeText={text =>
+                setCvv2(text.replace(/\D/g, '').slice(0, 4))
+              }
               keyboardType="number-pad"
               secureTextEntry
               textAlign="left"
@@ -165,60 +179,63 @@ export function BankGatewayScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    height: 48,
+    height: scaled(48),
     backgroundColor: colors.main,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: scaled(8),
+  },
+  backSlot: {
+    width: scaled(26),
+    alignItems: 'center',
   },
   logo: {
-    width: 72,
-    height: 34,
+    width: scaled(72),
+    height: scaled(34),
   },
   sandboxBanner: {
     backgroundColor: colors.pallete.gray1,
-    paddingVertical: 6,
+    paddingVertical: scaled(6),
     alignItems: 'center',
   },
   body: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingHorizontal: scaled(20),
+    paddingTop: scaled(24),
   },
   paragraph: {
     textAlign: 'center',
   },
   fee: {
     textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 24,
+    marginTop: scaled(8),
+    marginBottom: scaled(24),
   },
   field: {
-    marginBottom: 16,
+    marginBottom: scaled(16),
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: scaled(12),
   },
   halfField: {
     flex: 1,
-    marginBottom: 16,
+    marginBottom: scaled(16),
   },
   footer: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 20,
+    paddingHorizontal: scaled(20),
+    paddingTop: scaled(12),
+    paddingBottom: scaled(20),
   },
   payButton: {
     backgroundColor: colors.main,
-    height: 48,
+    height: scaled(48),
     justifyContent: 'center',
     alignItems: 'center',
   },
   cancelButton: {
-    marginTop: 12,
-    height: 40,
+    marginTop: scaled(12),
+    height: scaled(40),
     justifyContent: 'center',
     alignItems: 'center',
   },

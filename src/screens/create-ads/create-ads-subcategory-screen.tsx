@@ -2,8 +2,13 @@ import {FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {MainHeader, Screen, Text} from '../../components';
-import {colors} from '../../theme';
+import {
+  MainHeader,
+  Screen,
+  TAB_BAR_BUTTON_CLEARANCE,
+  Text,
+} from '../../components';
+import {colors, scaled} from '../../theme';
 
 // Generic, reusable step matching every "ثبت آگهی – <دسته>" subcategory/
 // sub-subcategory list frame in Figma (e.g. استخدامی, تخفیف یاب, وسایل
@@ -35,10 +40,12 @@ export function CreateAdsSubcategoryScreen() {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         renderItem={({item}) => (
-          <TouchableOpacity style={styles.row} onPress={() => onPressItem(item)}>
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => onPressItem(item)}>
             <MaterialIcons
               name="keyboard-arrow-left"
-              size={22}
+              size={scaled(22)}
               color={colors.text}
               style={styles.chevron}
             />
@@ -52,28 +59,31 @@ export function CreateAdsSubcategoryScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    paddingHorizontal: 5,
-    paddingTop: 8,
+    paddingHorizontal: scaled(5),
+    paddingTop: scaled(8),
+    // Same clearance as CreateAdsCategoryScreen: the tab bar's «+» button
+    // floats over the end of the list.
+    paddingBottom: TAB_BAR_BUTTON_CLEARANCE,
   },
   row: {
-    height: 52,
+    height: scaled(52),
     marginBottom: 2,
-    borderRadius: 5,
+    borderRadius: scaled(5),
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
     backgroundColor: colors.pallete.gray1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: scaled(8),
   },
   chevron: {
     position: 'absolute',
-    left: 8,
+    left: scaled(8),
   },
   rowText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 17,
+    fontSize: scaled(17),
     color: 'black',
   },
 });

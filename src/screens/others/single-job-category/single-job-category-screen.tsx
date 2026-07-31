@@ -5,11 +5,9 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  ActivityIndicator,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
-  Button,
   Divider,
   ListFooter,
   ListState,
@@ -19,7 +17,7 @@ import {
   Text,
   TextField,
 } from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {useTranslation} from 'react-i18next';
@@ -34,11 +32,11 @@ import {localizeCategory} from '../../../i18n/display-maps';
 const {width} = Dimensions.get('window');
 export function SingleJobCategoryScreen() {
   const {t} = useTranslation();
-  const {goBack, navigate} = useNavigation();
-  const {params} = useRoute();
+  const {goBack, navigate} = useNavigation<any>();
+  const {params} = useRoute<any>();
   const [searchText, setSearchText] = useState('');
   const debouncedSearchText = useDebouncedValue(searchText);
-  const [category, setCategory] = useState(params?.category);
+  const [category] = useState(params?.category);
   const {
     items: jobs,
     isLoading,
@@ -56,13 +54,23 @@ export function SingleJobCategoryScreen() {
       }),
     selectItems: page => page?.data?.jobs,
   });
-  const handlePressItem = item => {
+  const handlePressItem = (item: any) => {
     navigate('singleJob', {job: item});
   };
 
   return (
     <Screen withoutScroll style={{flex: 1}}>
-      <View style={styles.headerCard} />
+      <View style={styles.headerCard}>
+        <TouchableOpacity
+          onPress={goBack}
+          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+          <MaterialIcons
+            name="keyboard-arrow-right"
+            size={scaled(26)}
+            color="white"
+          />
+        </TouchableOpacity>
+      </View>
       <View style={styles.iconContainer}>
         <Image
           style={{width: '80%', height: '80%'}}
@@ -80,28 +88,24 @@ export function SingleJobCategoryScreen() {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <Fontisto size={20} name="search" color={colors.pallete.gray2} />
+          <Fontisto
+            size={scaled(20)}
+            name="search"
+            color={colors.pallete.gray2}
+          />
           <TextField
             onChangeText={text => setSearchText(text)}
-            inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
-            style={{flex: 1, height: 20, width: width - 172}}
+            inputStyle={{padding: 0, fontSize: scaled(12), textAlign: 'right'}}
+            style={{flex: 1, height: scaled(20), width: width - 162}}
             placeholder={t('jobs.searchPlaceholder')}
             preset="underline"
             borderColor={colors.pallete.red2}
           />
-          <Button onPress={goBack}>
-            <MaterialIcons
-              style={{transform: [{rotate: '-90deg'}]}}
-              size={22}
-              name="keyboard-arrow-down"
-              color={colors.pallete.gray2}
-            />
-          </Button>
         </Row>
       </View>
       <FlatList
         onEndReached={onEndReached}
-        style={{paddingTop: 4}}
+        style={{paddingTop: scaled(4)}}
         ListEmptyComponent={
           <ListState
             isLoading={isLoading}
@@ -143,13 +147,16 @@ export function SingleJobCategoryScreen() {
         <TouchableOpacity
           style={styles.circle}
           onPress={() => navigate('createJob', {category})}>
-          <Entypo name="plus" color="white" size={30} />
+          <Entypo name="plus" color="white" size={scaled(30)} />
         </TouchableOpacity>
         <Divider height={8} />
         <TouchableOpacity
           style={styles.circle}
           onPress={() => navigate('createJobHelper')}>
-          <Image source={require('../../../assets/images/headphone.png')} />
+          <Image
+            source={require('../../../assets/images/headphone.png')}
+            style={{width: scaled(26), height: scaled(26)}}
+          />
         </TouchableOpacity>
       </View>
     </Screen>
@@ -158,38 +165,43 @@ export function SingleJobCategoryScreen() {
 
 const styles = StyleSheet.create({
   headerCard: {
-    height: 75,
+    height: scaled(75),
     backgroundColor: colors.main,
+    // Back arrow sits in the red band (like MainHeader's), not in the gray
+    // title bar. Native layout is LTR, so flex-end puts it on the right.
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingHorizontal: scaled(10),
   },
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 94,
-    height: 94,
-    borderRadius: 50,
+    width: scaled(94),
+    height: scaled(94),
+    borderRadius: scaled(50),
     position: 'absolute',
-    left: 30,
-    top: 19,
+    left: scaled(30),
+    top: scaled(19),
     zIndex: 1000001,
     backgroundColor: colors.pallete.gray1,
     borderWidth: 1,
   },
   titleBar: {
     backgroundColor: colors.pallete.gray1,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    paddingLeft: 126,
+    paddingHorizontal: scaled(16),
+    paddingVertical: scaled(8),
+    paddingLeft: scaled(126),
   },
   addContainer: {
     position: 'absolute',
-    bottom: 8,
-    right: 20,
+    bottom: scaled(8),
+    right: scaled(20),
     zIndex: 100001,
   },
   circle: {
-    width: 47,
-    height: 47,
-    borderRadius: 30,
+    width: scaled(47),
+    height: scaled(47),
+    borderRadius: scaled(30),
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.main,

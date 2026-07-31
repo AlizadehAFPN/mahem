@@ -91,6 +91,16 @@ export const renewJob = (id: string) => {
     .then(res => ({data: mapJob(res.data)}));
 };
 
+// SingleJobScreen is normally handed the whole job object by the list it was
+// opened from; this is for the cases that only have an id (a JOB_APPROVED /
+// JOB_REJECTED notification tap). The owner can read their own non-approved
+// posting here — see JobsService.findOne.
+export const getSingleJob = (id: string) => {
+  return axiosInstance
+    .get(`/jobs/${id}`)
+    .then(res => ({data: mapJob(res.data)}));
+};
+
 export const getMyJobs = (query?: any) => {
   return axiosInstance
     .get('/jobs/mine', {params: normalizeListQuery(query)})

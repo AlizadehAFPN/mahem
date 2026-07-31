@@ -1,8 +1,9 @@
-import {View, FlatList} from 'react-native';
+import {View} from 'react-native';
 import React from 'react';
 import {Button} from '../button/button';
 import {Text} from '../text/text';
 import {Row} from '../row/row';
+import {scaled} from '../../theme';
 
 export function RowCategories({
   title,
@@ -14,9 +15,9 @@ export function RowCategories({
     <View>
       <Row
         style={{
-          marginVertical: 8,
+          marginVertical: scaled(8),
           justifyContent: 'space-between',
-          paddingHorizontal: 10,
+          paddingHorizontal: scaled(10),
         }}>
         <Text size={17}>{title}</Text>
         <Button onPress={onPressMore}>

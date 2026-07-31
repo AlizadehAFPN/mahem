@@ -9,9 +9,14 @@ import {
 import React, {useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {getLegacyImagePaths, numberWithCommas} from '../../utiles/utiles_funcs';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 const {width} = Dimensions.get('window');
-export function GridProduct({product, onPress}) {
+export interface GridProductProps {
+  product?: any;
+  onPress?: any;
+}
+
+export function GridProduct({product, onPress}: GridProductProps) {
   const {t} = useTranslation();
   // Advertisements carry images via the synthesized image1/image2... fields
   // (see getLegacyImagePaths); Jobs have no such thing, just plain
@@ -49,18 +54,18 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: 8,
+    borderRadius: scaled(8),
     overflow: 'hidden',
     backgroundColor: '#efefef',
   },
   title: {
-    marginTop: 4,
-    fontSize: 12,
+    marginTop: scaled(4),
+    fontSize: scaled(12),
     textAlign: 'right',
   },
   price: {
     marginTop: 2,
-    fontSize: 11,
+    fontSize: scaled(11),
     color: colors.pallete.green,
     textAlign: 'right',
   },

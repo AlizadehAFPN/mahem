@@ -4,6 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {CategroyItem, Divider, MainHeader, Screen} from '../../components';
 import {useNavigation} from '@react-navigation/native';
 import {useAdsCategories} from '../../hooks/use-cached-categories';
+import {scaled} from '../../theme';
 
 // Landing page of the employee tab — general-ad browsing by category, as
 // actual pushed pages (not a modal), mirroring OfferDetectionScreen's
@@ -12,7 +13,7 @@ import {useAdsCategories} from '../../hooks/use-cached-categories';
 // aren't part of the GENERAL category tree useAdsCategories fetches.
 export function EmployeeScreen() {
   const {t} = useTranslation();
-  const {navigate} = useNavigation();
+  const {navigate} = useNavigation<any>();
   const {data} = useAdsCategories();
 
   const categories = useMemo(
@@ -24,10 +25,13 @@ export function EmployeeScreen() {
     if (item.sub_categories?.length > 0) {
       navigate('employeeCategory' as never, {node: item} as never);
     } else {
-      navigate('employeeAds' as never, {
-        categoryIds: [item.id],
-        title: item.title,
-      } as never);
+      navigate(
+        'employeeAds' as never,
+        {
+          categoryIds: [item.id],
+          title: item.title,
+        } as never,
+      );
     }
   };
 
@@ -36,16 +40,19 @@ export function EmployeeScreen() {
       <MainHeader title={t('search.adsTitle')} showLocation={true} />
       <FlatList
         data={categories}
-        style={{paddingHorizontal: 8}}
+        style={{paddingHorizontal: scaled(8)}}
         ListHeaderComponent={
           <View>
             <Divider height={8} />
             <CategroyItem
               item={{title: t('common.allItems')}}
               onPress={() =>
-                navigate('employeeAds' as never, {
-                  title: t('common.allItems'),
-                } as never)
+                navigate(
+                  'employeeAds' as never,
+                  {
+                    title: t('common.allItems'),
+                  } as never,
+                )
               }
             />
             <View style={styles.separator} />
@@ -63,6 +70,6 @@ export function EmployeeScreen() {
 
 const styles = StyleSheet.create({
   separator: {
-    height: 8,
+    height: scaled(8),
   },
 });

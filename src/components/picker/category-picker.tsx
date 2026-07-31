@@ -7,7 +7,19 @@ import {localizeCategory} from '../../i18n/display-maps';
 // Tree-mode category picker. `onSelect` is called once with whichever node
 // is deepest (main, sub?, subSub?) — the same shape every existing caller
 // (ad creation, filters, store category) already expects.
-export function CategoryPicker({visible, onClose, onSelect, showTitle = true}) {
+export interface CategoryPickerProps {
+  visible?: any;
+  onClose?: any;
+  onSelect?: any;
+  showTitle?: any;
+}
+
+export function CategoryPicker({
+  visible,
+  onClose,
+  onSelect,
+  showTitle = true,
+}: CategoryPickerProps) {
   const {t} = useTranslation();
   const {data} = useAdsCategories();
 

@@ -1,10 +1,16 @@
-import React from 'react';
 import {ViewStyle} from 'react-native';
+import {scaled} from '../../theme';
 
 const BASE: ViewStyle = {
   // justifyContent: "space-between",
   alignItems: 'center',
-  flexDirection: 'row-reverse', //i18n.locale=='fa'? 'row-reverse': 'row'
+  // Reversed rather than RTL: the app's base layout direction is pinned to
+  // left-to-right on both platforms (AppDelegate.mm / MainActivity.java), so
+  // this reversal is the one and only thing deciding that rows read
+  // right-to-left. It has to stay that way — on a phone set to Persian the
+  // system would otherwise flip the base direction under it and this would
+  // reverse a reversal, drawing every row left-to-right.
+  flexDirection: 'row-reverse',
 };
 
 export const presets = {
@@ -12,8 +18,8 @@ export const presets = {
 
   spacing: {
     ...BASE,
-    paddingHorizontal: 16,
-    marginVertical: 8,
+    paddingHorizontal: scaled(16),
+    marginVertical: scaled(8),
   } as ViewStyle,
   side: {
     ...BASE,

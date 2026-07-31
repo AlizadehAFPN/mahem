@@ -5,7 +5,7 @@ import {Button} from '../button/button';
 import {Text} from '../text/text';
 import {Divider} from '../divider/divider';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 interface ChatHeaderProps {
@@ -15,39 +15,37 @@ interface ChatHeaderProps {
 }
 export function ChatHeader({title, avatar, onCreatePress}: ChatHeaderProps) {
   const {t} = useTranslation();
-  const {goBack} = useNavigation();
+  const {goBack} = useNavigation<any>();
   return (
     <View style={styles.continer}>
       <Row
         style={{
           justifyContent: 'space-between',
-          paddingHorizontal: 8,
-          paddingBottom: 4,
+          paddingHorizontal: scaled(8),
+          paddingBottom: scaled(4),
         }}>
         <Row>
           <Button onPress={() => goBack()}>
             <MaterialIcons
               color="white"
-              size={30}
+              size={scaled(30)}
               name="keyboard-arrow-right"
             />
           </Button>
-          <Divider style={{width: 5}} />
+          <Divider style={{width: scaled(5)}} />
           <Image
             style={{
-              width: 41,
-              height: 41,
-              borderRadius: 30,
+              width: scaled(41),
+              height: scaled(41),
+              borderRadius: scaled(30),
               overflow: 'hidden',
             }}
             resizeMode={avatar ? 'cover' : 'contain'}
             source={
-              avatar
-                ? {uri: avatar}
-                : require('../../assets/images/logo.png')
+              avatar ? {uri: avatar} : require('../../assets/images/logo.png')
             }
           />
-          <Divider style={{width: 5}} />
+          <Divider style={{width: scaled(5)}} />
           <Text size={17} color="white">
             {title || t('chat.mahemUser')}
           </Text>
@@ -55,7 +53,10 @@ export function ChatHeader({title, avatar, onCreatePress}: ChatHeaderProps) {
 
         {onCreatePress && (
           <Button onPress={onCreatePress}>
-            <Image source={require('../../assets/images/phone-white.png')} />
+            <Image
+              source={require('../../assets/images/phone-white.png')}
+              style={{width: scaled(26), height: scaled(26)}}
+            />
           </Button>
         )}
       </Row>

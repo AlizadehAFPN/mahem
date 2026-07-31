@@ -2,13 +2,9 @@ import {ScrollView, StyleSheet} from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {MainHeader, Screen, Text} from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {useRoute} from '@react-navigation/native';
-
-function formatDate(iso?: string) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleDateString('fa-IR');
-}
+import {formatNotificationDate} from './notification-date';
 
 // "متن نوتیفیکشن" (Figma 106:624) — the notification list only shows a
 // 2-line-truncated preview (NewsComp); this is the full-text view reached
@@ -23,7 +19,7 @@ export function NotifDetailScreen() {
       <MainHeader title={item?.title ?? t('notif.messageFallback')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
         <Text size={13} color={colors.pallete.grayText} style={styles.date}>
-          {formatDate(item?.createdAt)}
+          {formatNotificationDate(item?.createdAt)}
         </Text>
         <Text size={16} style={styles.body}>
           {item?.body}
@@ -35,14 +31,14 @@ export function NotifDetailScreen() {
 
 const styles = StyleSheet.create({
   content: {
-    padding: 16,
+    padding: scaled(16),
   },
   date: {
     textAlign: 'left',
-    marginBottom: 12,
+    marginBottom: scaled(12),
   },
   body: {
     textAlign: 'right',
-    lineHeight: 28,
+    lineHeight: scaled(28),
   },
 });

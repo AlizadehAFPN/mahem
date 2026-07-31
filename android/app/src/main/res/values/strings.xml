@@ -1,4 +1,22 @@
 <resources>
-  <string name="app_name">Mahem</string>
-  <string name="expo_runtime_version">1.0.0</string>
+  <!-- What the launcher prints under the icon. Not the React component name —
+       that is "mahem_app", registered in index.js and returned by
+       MainActivity.getMainComponentName(), and changing it there would leave
+       the root view with nothing to render. -->
+  <string name="app_name">ماهم</string>
+  <!-- The compatibility contract between the JS bundle EAS Update serves and
+       the native binary running it. It MUST be bumped in the same commit as
+       any native change (new/updated native module, new bundled font, Podfile
+       /gradle change) — see __tests__/expo-updates-config.test.ts, which keeps
+       this in sync with app.json and ios/mahem_app/Supporting/Expo.plist.
+
+       It was left at a hardcoded "1.0.0" across many native changes, so every
+       `eas update` reached builds whose binaries lacked the native modules and
+       fonts the new bundle expected: text fell back to the system font (the
+       Vazir/IRANSans files live in the binary, not in the update), bundled
+       images and whole screens failed to load, and — because expo-updates
+       applies a downloaded update on the *next* launch and keeps it — the app
+       stayed broken through restarts and only a reinstall (which clears the
+       updates cache and falls back to the embedded bundle) recovered it. -->
+  <string name="expo_runtime_version">1.0.1</string>
 </resources>

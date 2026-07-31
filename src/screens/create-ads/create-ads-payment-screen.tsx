@@ -2,13 +2,14 @@ import {Image, StyleSheet, View, Alert} from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {Button, Screen, Text} from '../../components';
+import {Button, HeaderBackButton, Row, Screen, Text} from '../../components';
 import {createAdsWithImages} from '../../services';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {localizeCategory} from '../../i18n/display-maps';
 
-// "ثبت آگهی- استخدامی2" (Figma): the fee step shown only for
-// استخدامی/تخفیف‌یاب ads (see Category.adFeeToman) — reached from
+// "ثبت آگهی- استخدامی2" (Figma): the fee step shown only for استخدامی ads —
+// the one root category left carrying a Category.adFeeToman, now that
+// تخفیف‌یاب posts for free. Reached from
 // CreateAdsDetailsScreen once the form is valid, carrying the already
 // -validated `payload`/`images`. There's still no real payment provider
 // behind this (mahem-backend just wants the ad to land paymentStatus
@@ -42,17 +43,22 @@ export function CreateAdsPaymentScreen() {
 
   return (
     <Screen withoutScroll bottomSafeAreaColor={colors.main}>
-      <View style={styles.header}>
-        <Image
-          source={require('../../assets/images/logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
+      {/* Arrow first in the row-reverse Row, so it lands on the right edge like
+          every other back arrow in the app (MainHeader, auth, edit-profile),
+          with the logo beside it. Back means "return to the ad form" — nothing
+          has been submitted or charged at this point. */}
+      <Row style={styles.header}>
+        <Row>
+          <HeaderBackButton />
+          <Image
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </Row>
+      </Row>
       <View style={styles.body}>
-        <Text style={styles.paragraph}>
-          {t('createAds.feeNotFree')}
-        </Text>
+        <Text style={styles.paragraph}>{t('createAds.feeNotFree')}</Text>
         <Text preset="bold" size={17} color={colors.main} style={styles.fee}>
           {t('createAds.feeAmount', {amount: mainCategory?.adFeeToman})}
         </Text>
@@ -68,31 +74,30 @@ export function CreateAdsPaymentScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    height: 48,
+    height: scaled(48),
     backgroundColor: colors.main,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: scaled(8),
   },
   logo: {
-    width: 72,
-    height: 34,
+    width: scaled(72),
+    height: scaled(34),
   },
   body: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingHorizontal: scaled(20),
+    paddingTop: scaled(24),
   },
   paragraph: {
     textAlign: 'center',
   },
   fee: {
     textAlign: 'center',
-    marginTop: 24,
+    marginTop: scaled(24),
   },
   payButton: {
     backgroundColor: colors.main,
-    height: 48,
+    height: scaled(48),
     justifyContent: 'center',
     alignItems: 'center',
   },

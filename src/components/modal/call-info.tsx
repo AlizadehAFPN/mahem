@@ -2,7 +2,7 @@ import {Platform, View, StyleSheet, Image, Linking} from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {MainModal} from './mainModal';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {Text} from '../text/text';
 import {Row} from '../row/row';
 import {Divider} from '../divider/divider';
@@ -11,7 +11,21 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 // `email`/`hideEmail` come straight from ContactInfoCard's collected values
 // (see ads.ts's attributes flattening) — only shown here when the poster
 // actually provided an email and didn't opt to hide it from viewers.
-export function CallInfo({visible, onClose, phone, email, hideEmail}) {
+export interface CallInfoProps {
+  visible?: any;
+  onClose?: any;
+  phone?: any;
+  email?: any;
+  hideEmail?: any;
+}
+
+export function CallInfo({
+  visible,
+  onClose,
+  phone,
+  email,
+  hideEmail,
+}: CallInfoProps) {
   const {t} = useTranslation();
   const showEmail = !!email && !hideEmail;
   function openUrl(url: string): Promise<any> {
@@ -33,16 +47,26 @@ export function CallInfo({visible, onClose, phone, email, hideEmail}) {
         <View style={styles.card2}>
           <Button onPress={() => Linking.openURL(`tel:${phone}`)}>
             <Row>
-              <Image source={require('../../assets/images/phone.png')} />
-              <Text style={styles.textItem}>{t('callInfo.callWith', {phone})}</Text>
+              <Image
+                source={require('../../assets/images/phone.png')}
+                style={{width: scaled(31), height: scaled(31)}}
+              />
+              <Text style={styles.textItem}>
+                {t('callInfo.callWith', {phone})}
+              </Text>
             </Row>
           </Button>
 
           <Divider />
           <Button onPress={() => openSmsUrl(phone, '')}>
             <Row>
-              <Image source={require('../../assets/images/chat2.png')} />
-              <Text style={styles.textItem}>{t('callInfo.sendSms')}</Text>
+              <Image
+                source={require('../../assets/images/chat2.png')}
+                style={{width: scaled(26), height: scaled(25)}}
+              />
+              <Text style={styles.textItem}>
+                {t('callInfo.sendSms', {phone})}
+              </Text>
             </Row>
           </Button>
 
@@ -51,7 +75,10 @@ export function CallInfo({visible, onClose, phone, email, hideEmail}) {
               <Divider />
               <Button onPress={() => Linking.openURL(`mailto:${email}`)}>
                 <Row>
-                  <MaterialCommunityIcons size={25} name="email-outline" />
+                  <MaterialCommunityIcons
+                    size={scaled(25)}
+                    name="email-outline"
+                  />
                   <Text style={styles.textItem}>
                     {t('callInfo.emailTo', {email})}
                   </Text>
@@ -77,14 +104,14 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
-    paddingHorizontal: 8,
-    paddingTop: 16,
+    paddingHorizontal: scaled(8),
+    paddingTop: scaled(16),
     backgroundColor: colors.pallete.gray1,
   },
   textItem: {
-    paddingHorizontal: 10,
+    paddingHorizontal: scaled(10),
   },
   card2: {
-    paddingHorizontal: 16,
+    paddingHorizontal: scaled(16),
   },
 });

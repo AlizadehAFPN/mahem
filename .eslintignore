@@ -1,0 +1,24 @@
+# `yarn lint` runs `eslint .`, and without this it walked the build and
+# delivery output too: `delivery/` alone is ~210 MB (it vendors a Swagger UI
+# bundle), `dist/` ~27 MB. Linting them took long enough that the script read
+# as hung rather than slow, so in practice nobody ran it.
+#
+# Everything here is generated or third-party. The app's own sources —
+# src/, App.tsx, index.js, __tests__/, and the config files — are still linted.
+
+node_modules/
+
+# Build output
+android/
+ios/
+dist/
+web-build/
+coverage/
+.expo/
+
+# Client-facing delivery page and its vendored Swagger UI (delivery/README.md)
+delivery/
+delivery-report/
+
+# Patch files are diffs, not source
+patches/

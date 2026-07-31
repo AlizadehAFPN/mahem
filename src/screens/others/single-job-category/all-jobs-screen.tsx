@@ -9,15 +9,14 @@ import {
   TableRow,
   TextField,
 } from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
 import {getAllJobs} from '../../../services/job';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
 import {useDebouncedValue} from '../../../hooks/use-debounced-value';
-import {RootState} from '../../../stateManager';
+import {useBrowseCity} from '../../../hooks/use-browse-city';
 
 const {width} = Dimensions.get('window');
 
@@ -33,7 +32,7 @@ const {width} = Dimensions.get('window');
 export function AllJobsScreen() {
   const {t} = useTranslation();
   const {navigate} = useNavigation<any>();
-  const cityId = useSelector((s: RootState) => s.user.cityId);
+  const {cityIdParam: browseCityId, cityKey: browseCityKey} = useBrowseCity();
   const [searchText, setSearchText] = useState('');
   const debouncedSearchText = useDebouncedValue(searchText);
 
@@ -45,11 +44,11 @@ export function AllJobsScreen() {
     hasNextPage,
     onEndReached,
   } = usePaginatedList({
-    queryKey: ['allCityJobs', cityId, debouncedSearchText],
+    queryKey: ['allCityJobs', browseCityKey, debouncedSearchText],
     queryFn: ({pageParam = 1}) =>
       getAllJobs({
         page: pageParam,
-        cityId: cityId || undefined,
+        cityId: browseCityId,
         search: debouncedSearchText || undefined,
       }),
     selectItems: page => page?.data?.jobs,
@@ -70,14 +69,18 @@ export function AllJobsScreen() {
       <MainHeader showLocation showBack title={t('home.jobsBank')} />
       <View style={styles.searchBar}>
         <Row style={{alignItems: 'center'}}>
-          <Fontisto size={20} name="search" color={colors.pallete.gray2} />
+          <Fontisto
+            size={scaled(20)}
+            name="search"
+            color={colors.pallete.gray2}
+          />
           <TextField
             onChangeText={setSearchText}
-            inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+            inputStyle={{padding: 0, fontSize: scaled(12), textAlign: 'right'}}
             style={{
               flex: 1,
-              height: 20,
-              marginHorizontal: 8,
+              height: scaled(20),
+              marginHorizontal: scaled(8),
               width: width - 72,
             }}
             placeholder={t('jobs.searchPlaceholder')}
@@ -91,7 +94,7 @@ export function AllJobsScreen() {
         onEndReached={onEndReached}
         onEndReachedThreshold={0.4}
         keyExtractor={item => String(item?.id)}
-        style={{paddingTop: 4}}
+        style={{paddingTop: scaled(4)}}
         removeClippedSubviews
         initialNumToRender={15}
         maxToRenderPerBatch={15}
@@ -130,7 +133,7 @@ export function AllJobsScreen() {
 const styles = StyleSheet.create({
   searchBar: {
     backgroundColor: colors.pallete.gray1,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: scaled(16),
+    paddingVertical: scaled(10),
   },
 });

@@ -33,6 +33,9 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+# Upload-key credentials. The keystore itself is covered by *.keystore above.
+# Both are unrecoverable if lost — Play only accepts updates signed by this key.
+android/keystore.properties
 
 # node.js
 #
@@ -73,3 +76,26 @@ web-build/
 # Firebase secrets - never commit
 *firebase-adminsdk*.json
 *.p8
+
+# Signing keys and the Apple push key, gathered for handover. Most are copies
+# of files already ignored above, but keystore.properties and the folder's own
+# README are not — so the whole directory is ignored, not just its contents by
+# extension. Unquoted on purpose: git treats quotes in a pattern as literal
+# characters, and spaces in a path need no escaping (only trailing ones do).
+فایل های حساس/
+
+# Next.js build traces. Nothing in this repo is a Next.js app; .next/trace and
+# .next/trace-build were committed by a tool run in the wrong directory and
+# tracked for a while before being removed.
+.next/
+
+# Client-facing delivery page (delivery/README.md) — ~210 MB of vendored
+# Swagger UI and downloadable builds, published by manual upload to cPanel,
+# not from this repo.
+delivery/
+delivery-report/
+
+# Stale artifact of a one-off TypeScript error-count budget. The count it held
+# (392) had been zero for a long time before the file was removed; nothing
+# reads it.
+tsc-error-budget.txt

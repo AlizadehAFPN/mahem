@@ -1,18 +1,19 @@
-import {View, StyleSheet} from 'react-native';
-import React from 'react';
+import {View, StyleSheet, BackHandler} from 'react-native';
+import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {CommonActions, useNavigation} from '@react-navigation/native';
 import {Button, Divider, MainHeader, Screen, Text} from '../../components';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 
-// Deliberately no back button (MainHeader without showBack) — the wizard is
-// done and there's nothing to go back to fix. "ادامه" resets the AppStack
-// straight to dashboard/home instead of navigate()+goBack(), so the whole
-// create-ads back-stack (details/payment/gateway/this screen) is cleared and
-// hardware back from home can't land the user here again.
+// The ad is already submitted by the time this screen appears, so "back" can't
+// mean popping into the finished checkout behind it (that would re-offer a
+// payment for an ad that's already in the queue). The header arrow is wired to
+// the same reset as "ادامه" instead: the whole create-ads back-stack
+// (details/payment/gateway/this screen) is cleared and the user lands on
+// dashboard/home, which is the only place there is to go from here.
 export function CreateAdsFinalScreen() {
   const {t} = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   const onContinue = () => {
     navigation.dispatch(
@@ -23,10 +24,25 @@ export function CreateAdsFinalScreen() {
     );
   };
 
+  // Android's hardware back would otherwise pop straight into the payment
+  // step, which the header arrow above deliberately avoids — route it through
+  // the same reset so both ways out behave identically.
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        onContinue();
+        return true;
+      },
+    );
+    return () => subscription.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Screen withoutScroll bottomSafeAreaColor={colors.main}>
-      <MainHeader />
-      <View style={{paddingHorizontal: 16, flex: 1}}>
+      <MainHeader showBack onBack={onContinue} />
+      <View style={{paddingHorizontal: scaled(16), flex: 1}}>
         <Divider />
         <Text size={17} style={{textAlign: 'center'}}>
           {t('createAds.finalReviewMessage')}
@@ -48,7 +64,7 @@ export function CreateAdsFinalScreen() {
 const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: colors.main,
-    height: 48,
+    height: scaled(48),
     // Full-bleed (no side margins) so the red bottom safe-area strip below
     // it reads as one continuous block down to the screen edge, matching
     // the other wizard CTAs (پرداخت/اعمال).

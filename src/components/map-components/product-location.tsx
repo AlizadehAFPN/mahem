@@ -1,8 +1,20 @@
-import {View, Text, StyleSheet, Platform, Linking} from 'react-native';
+import {StyleSheet, Platform, Linking} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import MapView, {Marker} from 'react-native-maps';
 
-export function ProductLocation({lat, lng, ...prp}) {
+export interface ProductLocationProps {
+  lat?: any;
+  lng?: any;
+  prp?: any;
+  // Everything else is forwarded verbatim to the component underneath
+  // (a `...prp` rest parameter, or the underlying library's own props).
+  // Declaring that here is what lets callers keep passing style,
+  // zoomEnabled, radius and the rest — they were never this component's
+  // props to begin with.
+  [key: string]: any;
+}
+
+export function ProductLocation({lat, lng, ...prp}: ProductLocationProps) {
   const [region, setRegion] = useState({
     latitude: 36.841746,
     longitude: 54.43256,

@@ -1,61 +1,76 @@
-import {Image, StyleSheet, View, Dimensions} from 'react-native';
 import React from 'react';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Image, StyleSheet, useWindowDimensions, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {Button, Screen, Text} from '../../../components';
-import {colors} from '../../../theme';
-import {useNavigation} from '@react-navigation/native';
+import {Screen} from '../../../components';
 
-const {width, height} = Dimensions.get('window');
+// «نبود نت» (Figma 106:350) is a single 360×640 composition: the same photo the
+// splash screen uses, plus a red "cut wire" pinned to one exact spot on it —
+// the wifi arcs sit on the moon, the line drops from them, and the scissors cut
+// it just above the wordmark. splash.png already contains the photo and the
+// wordmark, so the overlay (Figma 106:353, at 107,194 within the composition)
+// is the only extra asset.
+const ART = {width: 360, height: 640};
+const CUT = {left: 107, top: 194, width: 137, height: 412};
 
-// "نبود نت" (Figma 106:350) — same full-bleed splash photo as
-// SplashScreen, with a broken-wifi glyph overlay instead of the plain
-// wordmark. Purely presentational for now (no live connectivity check is
-// wired anywhere in the app yet — see NetInfo note below); a screen a
-// caller can navigate to when it already knows a request failed with a
-// network error, or push to once connectivity monitoring is added.
+// Rendered by OfflineGate, not by a route — see offline-gate.tsx. There is
+// deliberately no retry button and no message: the design has neither, and the
+// gate takes itself down the moment the connection is back, so there is nothing
+// for the user to press.
 export function NoInternetScreen() {
   const {t} = useTranslation();
-  const {goBack} = useNavigation();
+  const {width, height} = useWindowDimensions();
+
+  // Scale the whole composition by one cover factor and center it, instead of
+  // giving the photo `resizeMode: 'cover'` and positioning the overlay against
+  // the screen. Screens are taller than 9:16, so cover crops the photo — and
+  // anything positioned against the screen instead of against the photo would
+  // drift off the moon by exactly that crop.
+  const scale = Math.max(width / ART.width, height / ART.height);
+  const art = {width: ART.width * scale, height: ART.height * scale};
+
   return (
-    <Screen statusbarBackgroundColor="black" withoutScroll unsafe style={{flex: 1}}>
-      <Image style={styles.image} source={require('../../../assets/images/splash.png')} />
-      <View style={styles.overlay}>
-        <MaterialCommunityIcons name="wifi-off" size={72} color={colors.pallete.red2} />
-        <Text color="white" size={18} preset="bold" style={styles.text}>
-          {t('noInternet.message')}
-        </Text>
-        <Button style={styles.retryButton} onPress={() => goBack()}>
-          <Text color="white" size={16}>
-            {t('common.tryAgain')}
-          </Text>
-        </Button>
+    <Screen
+      backgroundColor="black"
+      statusbarBackgroundColor="black"
+      withoutScroll
+      unsafe
+      style={styles.container}>
+      <View style={art} accessible accessibilityLabel={t('noInternet.message')}>
+        <Image
+          style={[art, styles.photo]}
+          source={require('../../../assets/images/splash.png')}
+        />
+        <Image
+          style={[
+            styles.cut,
+            {
+              left: CUT.left * scale,
+              top: CUT.top * scale,
+              width: CUT.width * scale,
+              height: CUT.height * scale,
+            },
+          ]}
+          source={require('../../../assets/images/no-internet-cut.png')}
+        />
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  image: {
-    width,
-    height,
-    resizeMode: 'cover',
-    position: 'absolute',
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
+  container: {
+    backgroundColor: 'black',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    // The scaled composition is wider than the screen on anything taller than
+    // 9:16 — clip the sides rather than letting it paint outside.
+    overflow: 'hidden',
   },
-  text: {
-    marginTop: 16,
+  photo: {
+    resizeMode: 'cover',
   },
-  retryButton: {
-    marginTop: 24,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: colors.main,
+  cut: {
+    position: 'absolute',
+    resizeMode: 'contain',
   },
 });

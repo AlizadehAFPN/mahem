@@ -79,6 +79,21 @@ target 'mahem_app' do
        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
       end
      end
+    # Sentry Cocoa 8.41.0 (pinned by RNSentry 5.36.0, the latest 5.x release) declares
+    # `std::vector<const ThreadHandleMetadataPair>` in SentryThreadMetadataCache.hpp.
+    # That's not standard-conforming (std::vector requires a non-const, erasable value
+    # type), and newer libc++ (Xcode 16+/26) now hard-fails to compile it with a cascade
+    # of static_assert errors (allocator_traits/allocator/enable_if/vector). Strip the
+    # invalid `const` until upstream ships a fix.
+    thread_metadata_cache_header = File.join(installer.sandbox.pod_dir('Sentry'), 'Sources/Sentry/include/SentryThreadMetadataCache.hpp')
+    if File.exist?(thread_metadata_cache_header)
+      contents = File.read(thread_metadata_cache_header)
+      patched = contents.sub('std::vector<const ThreadHandleMetadataPair>', 'std::vector<ThreadHandleMetadataPair>')
+      if patched != contents
+        File.chmod(0o644, thread_metadata_cache_header)
+        File.write(thread_metadata_cache_header, patched)
+      end
+    end
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,

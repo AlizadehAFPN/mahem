@@ -57,17 +57,56 @@ export const en: TranslationResource = {
     genericError: 'An error occurred, please try again',
   },
   auth: {
-    registerIntro:
-      'To sign up, just enter your mobile number and an activation code will be sent to you.',
     username: 'Username',
     mobile: 'Mobile number',
-    register: 'Sign up',
+    mobilePlaceholder: '09123456789',
     mobileError: 'Please enter your mobile number correctly!',
-    codeIntro:
-      'Please enter the activation code sent to you to complete your registration in Mahem.',
+    usernameLengthError: 'Username must be at least {{min}} characters!',
+    // Sign-up — where the app starts. Intro copy taken from Figma (106:145).
+    registerIntro:
+      'To sign up, just enter your mobile number and an activation code will be sent to you',
+    registerAction: 'Sign up',
+    usernameTaken: 'This username is already taken',
+    mobileTaken: 'This mobile number is already registered',
+    accountExists:
+      'This user already exists. If you have registered before, sign in from the login screen.',
+    goToLogin: 'Go to the login screen',
+    alreadyRegistered: 'Already registered?',
+    loginAction: 'Sign in',
+    // Sign-in — the mobile number of an account that already exists.
+    loginIntro:
+      'To sign in, just enter your mobile number and a verification code will be sent to you',
+    getCode: 'Send code',
+    noAccountFound:
+      'No account was found for this mobile number. Sign up first to create one.',
+    goToRegister: 'Go to the sign-up screen',
+    noAccount: 'Don’t have an account?',
+    // Three pieces, because the middle one links to the terms screen.
+    loginTermsPrefix: 'By continuing you accept ',
+    loginTermsLink: 'Mahem’s terms and conditions',
+    loginTermsSuffix: '',
+    // The explicit tick, on the sign-up and complete-profile screens.
+    acceptTerms: 'I accept Mahem’s terms and conditions',
+    codeIntro: 'Enter the verification code sent to {{mobile}}',
+    changeNumber: 'Edit number',
     testCode: 'Test code: {{code}}',
     verificationCode: 'Verification code',
-    finalConfirm: 'Confirm',
+    codeInvalid: 'The code you entered is incorrect.',
+    codeExpired: 'This code has expired. Please request a new one.',
+    codeTooManyAttempts: 'Too many failed attempts. Please request a new code.',
+    codeGenericError: 'Connection failed. Please try again.',
+    citySaveError: 'Your details could not be saved. Please try again.',
+    finalConfirm: 'Confirm and continue',
+    completeProfileTitle: 'Complete your account',
+    completeProfileIntro: 'Welcome! Pick a username to continue.',
+    profilePhotoOptional: 'Add a profile photo (optional)',
+    avatarUploading: 'Uploading photo...',
+    avatarUploadError: 'The photo could not be uploaded. Please try again.',
+    profileSaveError: 'Your details could not be saved. Please try again.',
+    usernameHint: 'This is the name other people see in the app.',
+    useAnotherNumber: 'Use a different number',
+    useAnotherNumberBody:
+      'You will be signed out of this account and can sign in with another number. Continue?',
     citySelectionIntro: 'For better service, please fill out the form below.',
     gender: 'Gender:',
     male: 'Male',
@@ -80,10 +119,13 @@ export const en: TranslationResource = {
     discountFinder: 'Discount Finder',
     jobsBank: 'Jobs Bank',
     allAds: 'All ads',
+    allProvince: 'Whole province',
   },
   settings: {
     title: 'Settings',
+    chooseLanguage: 'Choose Language',
     chooseCity: 'Choose City',
+    cityHint: 'Select your city',
     editProfile: 'Edit Profile',
     rateMahem: 'Rate Mahem',
     exit: 'Sign Out',
@@ -96,6 +138,8 @@ export const en: TranslationResource = {
     rules: 'Terms',
     manageAds: 'Manage ads',
     share: 'Share',
+    shareAppMessage:
+      'Mahem — classifieds, shops and discounts across Golestan. Give it a try.',
     bookmarks: 'Saved ads',
     aboutUs: 'About us',
     contactUs: 'Contact us',
@@ -133,6 +177,7 @@ export const en: TranslationResource = {
     telegramId: 'Telegram ID',
     emailAddress: 'Email address',
     instagramId: 'Instagram ID',
+    phoneNumber: 'Phone number',
     officeNotice:
       "Mahem's management and support team currently reside in Tehran, and the steps needed to move the office to Gonbad-e Kavus are underway; the exact office address in Gonbad-e Kavus will be announced.",
     cyberpoliceNotice:
@@ -146,6 +191,7 @@ export const en: TranslationResource = {
     body: PRIVACY_BODY_EN,
   },
   jobs: {
+    jobDeleted: 'This job posting has been deleted and is no longer available.',
     searchPlaceholder: 'Search for ...',
     noResults: 'No items found',
     colRow: 'Row',
@@ -199,11 +245,12 @@ export const en: TranslationResource = {
     storeLabel: 'Store {{name}}',
     adRejected: 'This ad has been rejected',
     adRejectedWithReason: 'This ad has been rejected: {{reason}}',
-    adPending:
-      'This ad is awaiting manager approval and is only shown to you.',
+    adPending: 'This ad is awaiting manager approval and is only shown to you.',
+    adDeleted: 'This ad has been deleted and is no longer available.',
     reportProblem: 'Report an issue with the ad',
     features: 'Features',
     chat: 'Chat',
+    adChats: 'Ad chats',
   },
   fields: {
     description: 'Description',
@@ -279,7 +326,7 @@ export const en: TranslationResource = {
   callInfo: {
     title: 'Contact info',
     callWith: 'Call {{phone}}',
-    sendSms: 'Send a text message...',
+    sendSms: 'Send a text message to {{phone}}',
     emailTo: 'Email {{email}}',
     policeWarning:
       'Police warning: after completing the deal and paying, please verify the goods or services in person before you trust them. ',
@@ -319,7 +366,8 @@ export const en: TranslationResource = {
       'After review by the Mahem support team, it will be finalized and the result reported to you in Mahem.',
     queueWaitMessage: 'The maximum wait time in the queue will be 5 hours.',
     payDescription: 'Posting an ad in the “{{category}}” category',
-    feeNotFree: 'Posting under the Hiring and Discount Finder sections is not free.',
+    feeNotFree:
+      'Posting under the Hiring and Discount Finder sections is not free.',
     feeAmount: 'Posting fee: {{amount}} Toman',
     pay: 'Pay',
   },
@@ -335,8 +383,7 @@ export const en: TranslationResource = {
   },
   location: {
     permissionTitle: 'Location access',
-    permissionMessage:
-      'We need your location to show discounts near you.',
+    permissionMessage: 'We need your location to show discounts near you.',
   },
   map: {
     selectHint: 'Pick the exact ad location on the map',
@@ -345,6 +392,10 @@ export const en: TranslationResource = {
   chat: {
     mahemUser: 'Mahem user',
     inputPlaceholder: 'Add text',
+    attachImage: 'Send photo',
+    imageSendFailed: 'The photo could not be sent, please try again',
+    threadDeleted:
+      'This conversation has been deleted and is no longer available.',
   },
   search: {
     adsTitle: 'Advertisements',
@@ -392,6 +443,13 @@ export const en: TranslationResource = {
     title: 'Messages',
     empty: 'No messages for you',
     messageFallback: 'Message',
+    yesterday: 'Yesterday',
+    daysAgo: '{{value}} days ago',
+    weekAgo: 'A week ago',
+    twoWeeksAgo: 'Two weeks ago',
+    weeksAgo: '{{value}} weeks ago',
+    monthsAgo: '{{value}} months ago',
+    yearsAgo: '{{value}} years ago',
   },
   noInternet: {
     message: 'No internet connection',
@@ -417,7 +475,7 @@ export const en: TranslationResource = {
     mileageFrom: 'Mileage from',
     mileageTo: 'Mileage to',
     setLocation: 'Set location',
-    onlyWithImagesCheckbox: 'Show only ads with photos',
+    onlyWithImages: 'Show only ads with photos',
     clearAll: 'Clear all filters',
     apply: 'Apply',
     personal: 'Personal',
@@ -445,10 +503,6 @@ export const en: TranslationResource = {
     originalPrice: 'Original price',
     discountPercent: 'Discount percentage',
     discountDurationOptional: 'Discount duration (optional)',
-    usageDateRangeOptional: 'Usage date range (optional)',
-    testPeriodOptional: 'Trial period (optional)',
-    addFeatureHint: 'Add a feature (e.g. warranty)',
-    installmentEnabled: 'Installment purchase available',
     brand: 'Brand',
     chassisType: 'Chassis type',
     cashOrInstallment: 'Cash / Installment',

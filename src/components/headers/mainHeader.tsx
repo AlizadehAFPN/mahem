@@ -6,7 +6,7 @@ import {
 } from '../city-selectionDown/city-selection-menu';
 import {Row} from '../row/row';
 import {Text} from '../text/text';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -17,10 +17,14 @@ import {useQuery} from 'react-query';
 import {RootState} from '../../stateManager';
 import {getNotifications} from '../../services';
 import {localizeCity} from '../../i18n/display-maps';
+import {useBrowseCity} from '../../hooks/use-browse-city';
 
 interface Header {
   showLocation?: boolean;
-  title: string;
+  // Optional: the screens that pair this band with a GradiantHeader below it
+  // (single-product, my-store, …) carry their title there instead, and render
+  // this one as logo-only.
+  title?: string;
   showNews?: boolean;
   // When provided, a menu button is shown next to the city selector — used by
   // the تخفیف‌یاب screens to open the discount options bottom sheet.
@@ -42,8 +46,11 @@ export function MainHeader({
   showBack,
   onBack,
 }: Header) {
-  useTranslation(); // re-render on language change so the city label localizes
+  const {t} = useTranslation(); // re-render on language change so the city label localizes
   const user = useSelector((s: RootState) => s.user);
+  // The city label reflects the *browse* filter (what you're viewing), not the
+  // account's home city — the two are separate now (see useBrowseCity).
+  const {isAllCities, cityName} = useBrowseCity();
   const [state, setState] = useState({
     modalVisible: false,
   });
@@ -59,7 +66,7 @@ export function MainHeader({
       setState(s => ({...s, modalVisible: true}));
     });
   };
-  const {navigate, goBack} = useNavigation();
+  const {navigate, goBack} = useNavigation<any>();
   const {data: notifData} = useQuery(
     ['notifications', 'unread-badge'],
     () => getNotifications({page: 1, limit: 1}),
@@ -74,18 +81,24 @@ export function MainHeader({
           <TouchableOpacity
             onPress={() => (onBack ? onBack() : goBack())}
             hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
-            style={{paddingLeft: 4}}>
+            style={{paddingLeft: scaled(4)}}>
             <MaterialIcons
               name="keyboard-arrow-right"
-              size={26}
+              size={scaled(26)}
               color="white"
             />
           </TouchableOpacity>
         )}
-        <Image source={require('../../assets/images/logo.png')} />
+        <Image
+          source={require('../../assets/images/logo.png')}
+          // logo.png is 72x34; stated so it can shrink with the 48pt band
+          // it sits in rather than crowding it out on a small screen.
+          style={{width: scaled(72), height: scaled(34)}}
+          resizeMode="contain"
+        />
         <Text
           size={15}
-          style={{fontWeight: 'bold', paddingHorizontal: 8}}
+          style={{fontWeight: 'bold', paddingHorizontal: scaled(8)}}
           color="white">
           {title}
         </Text>
@@ -93,7 +106,7 @@ export function MainHeader({
           <TouchableOpacity
             onPress={() => navigate('notif' as never)}
             style={{alignItems: 'center'}}>
-            <FontAwesome color={'black'} name="envelope-o" size={24} />
+            <FontAwesome color={'black'} name="envelope-o" size={scaled(24)} />
             {unreadCount > 0 && (
               <View style={styles.badge}>
                 <Text size={10} color="white">
@@ -108,14 +121,16 @@ export function MainHeader({
       <Row style={{alignItems: 'flex-end'}}>
         {onMenuPress && (
           <TouchableOpacity onPress={onMenuPress} style={styles.menuButton}>
-            <Ionicons color="white" name="options" size={26} />
+            <Ionicons color="white" name="options" size={scaled(26)} />
           </TouchableOpacity>
         )}
         {showLocation ? (
           <TouchableOpacity ref={cityTriggerRef} onPress={toggleModalVisible}>
             <Row style={{alignItems: 'flex-end'}}>
-              <Text color="white">{localizeCity(user.city)}</Text>
-              <Ionicons color={'white'} name="location" size={30} />
+              <Text color="white">
+                {isAllCities ? t('home.allProvince') : localizeCity(cityName)}
+              </Text>
+              <Ionicons color={'white'} name="location" size={scaled(30)} />
             </Row>
             <CitySelectionMenu
               onClose={toggleModalVisible}
@@ -132,25 +147,25 @@ export function MainHeader({
 }
 const styles = StyleSheet.create({
   container: {
-    height: 48,
+    height: scaled(48),
     backgroundColor: colors.main,
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    paddingHorizontal: scaled(10),
   },
   badge: {
     position: 'absolute',
-    top: -4,
-    left: -6,
-    minWidth: 15,
-    height: 15,
-    borderRadius: 8,
+    top: scaled(-4),
+    left: scaled(-6),
+    minWidth: scaled(15),
+    height: scaled(15),
+    borderRadius: scaled(8),
     paddingHorizontal: 2,
     backgroundColor: colors.pallete.red2,
     justifyContent: 'center',
     alignItems: 'center',
   },
   menuButton: {
-    marginLeft: 12,
+    marginLeft: scaled(12),
     paddingBottom: 2,
   },
 });

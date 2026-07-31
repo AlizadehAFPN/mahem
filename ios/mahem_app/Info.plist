@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>fa</string>
 	<key>CFBundleDisplayName</key>
-	<string>mahem_app</string>
+	<string>ماهم</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -20,15 +20,53 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<!-- Custom scheme behind the links the app shares (mahem://ad/<id>, …).
+	     The Android half of the same contract is the intent-filter in
+	     AndroidManifest.xml; the JS half is src/navigation/linking.ts. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mahem</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Required, not sloppiness: the API is reached at http://2.28.2.151:3000
+	     because no HTTPS host is available that resolves inside Iran (see
+	     src/services/axios-config.ts). Without this exception iOS blocks every
+	     request and every image. Scoped to that one host rather than
+	     NSAllowsArbitraryLoads, so the rest of the app keeps ATS — and so the
+	     App Store review question has a narrow, answerable scope. Delete the
+	     whole key the day a real domain gives the API an https:// origin. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>2.28.2.151</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<false/>
+			</dict>
+		</dict>
 	</dict>
+	<!-- Both required by react-native-image-picker (src/components/file-picker).
+	     iOS terminates the process the instant a privacy-sensitive API is
+	     touched without its purpose string, so without these the app doesn't
+	     warn — it disappears — on ad photos, the profile picture, the store
+	     logo and chat attachments. -->
+	<key>NSCameraUsageDescription</key>
+	<string>برای گرفتن عکس آگهی، عکس پروفایل و ارسال تصویر در گفت‌وگو، به دوربین شما نیاز داریم.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>برای انتخاب عکس آگهی، عکس پروفایل و ارسال تصویر در گفت‌وگو، به تصاویر شما نیاز داریم.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>برای نمایش تخفیف‌های نزدیک شما روی نقشه و اطلاع‌رسانی تخفیف‌های اطراف، به موقعیت مکانی شما نیاز داریم.</string>
 	<key>UIAppFonts</key>
@@ -53,22 +91,29 @@
 		<string>Zocial.ttf</string>
 		<string>Fontisto.ttf</string>
 	</array>
+	<!-- remote-notification only. `processing` was declared without the app
+	     ever scheduling a BGProcessingTask, and App Store review rejects a
+	     background mode the binary doesn't use. -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
-		<string>processing</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+	<!-- arm64, not armv7: the deployment target is iOS 13, which no 32-bit
+	     device can run, so the old template value described a device set that
+	     cannot install this app anyway. -->
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
+	<!-- Portrait only. Every screen is laid out against fixed Figma heights
+	     through scaled() (see src/theme), so landscape doesn't reflow — it
+	     clips. Android is pinned the same way, via android:screenOrientation
+	     in AndroidManifest.xml. -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>

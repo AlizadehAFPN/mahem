@@ -1,4 +1,4 @@
-import {View, StyleSheet, Image, Platform} from 'react-native';
+import {View, StyleSheet, Image} from 'react-native';
 import React, {useEffect, useMemo, useState} from 'react';
 import {
   GradiantHeader,
@@ -12,11 +12,12 @@ import {
   Text,
   ProductLocation,
   CallInfo,
+  ImageViewerModal,
   ReportProblem,
   optionsTypes,
   Rate,
 } from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useTranslation} from 'react-i18next';
 import {numberWithCommas, translations} from '../../../utiles';
@@ -42,8 +43,9 @@ import {
   removeBookmark,
 } from '../../../services';
 import {useAdsCategories} from '../../../hooks/use-cached-categories';
+import {useMissingEntityGuard} from '../../../hooks/use-missing-entity-guard';
+import {buildAdLink} from '../../../navigation/deep-links';
 
-const images = [require('../../../assets/images/products/productSlider1.png')];
 // Frosted look for the nav bar so it reads as an overlay on the hero image
 // rather than an opaque bar sitting above it (the previous solid white-white
 // gradient hid the top of the photo instead of blending with it).
@@ -58,15 +60,27 @@ export function SinlgeProduct() {
     reportModal: false,
     ads: undefined,
   });
-  const {params} = useRoute();
+  // The photo currently open full-screen, if any — same pattern (and same
+  // viewer) as the chat thread's image messages.
+  const [viewerUri, setViewerUri] = useState<string | null>(null);
+  const {params} = useRoute<any>();
   const [ad, setAd] = useState(params?.ads);
   const currentUser = useSelector(s => s.user);
   const isOwnAd = ad?.userId && ad.userId === currentUser?.id;
+  // Whether this ad offers chat at all. Absent means yes: the toggle is on by
+  // default when posting (see ContactInfoCard) and ads created before it
+  // existed carry nothing, so only an explicit `false` — the owner having
+  // turned it off — takes chat away.
+  const chatEnabled = ad?.chatEnabled !== false;
   // A تخفیف‌یاب listing always carries a discount percent; the generic
   // attribute list is replaced with the boxed ویژگی‌ها/توضیحات layout for it.
   const isOffer = !!ad?.discountPercent;
+  // ویژگی‌ها is a single line now (see OfferForm), but discounts posted
+  // before that change stored a list — render both shapes.
   const offerFeatures: string[] = Array.isArray(ad?.features)
     ? ad.features
+    : ad?.features
+    ? [String(ad.features)]
     : [];
   const queryClient = useQueryClient();
   const {data: bookmarksData} = useQuery(['bookmarks'], getBookmarks);
@@ -81,11 +95,13 @@ export function SinlgeProduct() {
     (value: number) => rateAd(ad.id, value),
     {onSuccess: res => setAd((prev: any) => ({...prev, ...res.data}))},
   );
+  const missingAdGuard = useMissingEntityGuard('product.adDeleted');
   const {data} = useQuery(
     [`singleAd-${params?.ads?.id}`, params?.ads?.id],
     () => getSingleAds(params?.ads?.id),
+    missingAdGuard,
   );
-  const {navigate} = useNavigation();
+  const {navigate} = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const toggleCallInfoModal = () => {
     setState(s => ({...s, callInfoModal: !s.callInfoModal}));
@@ -147,7 +163,7 @@ export function SinlgeProduct() {
   }, [data]);
   const images = useMemo(() => getLegacyImagePaths(ad), [ad]);
   const isBookmarked = useMemo(() => {
-    return !!bookmarks?.find(item => item.id === params?.ads?.id);
+    return !!bookmarks?.find((item: any) => item.id === params?.ads?.id);
   }, [bookmarks]);
 
   const onBookMark = () => {
@@ -173,6 +189,10 @@ export function SinlgeProduct() {
               ? t('home.discountFinder')
               : localizeCategory(data?.data?.category_id?.title)
           }
+          // Without these the share fell through to GradiantHeader's `title`
+          // fallback and sent the *category name* — "املاک" — with no link.
+          shareText={ad?.title}
+          shareLink={ad?.id ? buildAdLink(ad.id) : undefined}
           colors={isOffer ? GLASS_HEADER_GRADIENT : undefined}
           iconColor={isOffer ? 'white' : undefined}
           onCreatePress={undefined}
@@ -181,7 +201,12 @@ export function SinlgeProduct() {
       <Screen unsafe style={{paddingBottom: insets.bottom + 90}}>
         <View>
           <View>
-            <ImageSlider images={images} autoPlay={false} loop={false} />
+            <ImageSlider
+              images={images}
+              autoPlay={false}
+              loop={false}
+              onPressImage={(uri: string) => setViewerUri(uri)}
+            />
             {isOffer && (
               <View style={styles.ratingOverlay}>
                 <Rate
@@ -202,7 +227,7 @@ export function SinlgeProduct() {
                 onPress={() =>
                   navigate('storeProfile', {storeId: ad.store.id})
                 }>
-                <Row style={{alignItems: 'center', marginTop: 6}}>
+                <Row style={{alignItems: 'center', marginTop: scaled(6)}}>
                   <View style={styles.storeLogoDot}>
                     {ad.store.logo ? (
                       <Image
@@ -212,7 +237,7 @@ export function SinlgeProduct() {
                     ) : (
                       <Entypo
                         name="shop"
-                        size={12}
+                        size={scaled(12)}
                         color={colors.pallete.grayText}
                       />
                     )}
@@ -220,7 +245,7 @@ export function SinlgeProduct() {
                   <Text
                     size={13}
                     color={colors.pallete.grayText}
-                    style={{marginRight: 6}}>
+                    style={{marginRight: scaled(6)}}>
                     {t('product.storeLabel', {name: ad.store.name})}
                   </Text>
                 </Row>
@@ -257,7 +282,7 @@ export function SinlgeProduct() {
               <Button onPress={toggleReportModal}>
                 <Row>
                   <Text>{t('product.reportProblem')}</Text>
-                  <Entypo size={20} name="attachment" />
+                  <Entypo size={scaled(20)} name="attachment" />
                 </Row>
               </Button>
             </Row>
@@ -266,8 +291,9 @@ export function SinlgeProduct() {
             <>
               <OfferPriceDetails item={ad} />
 
-              <View style={{paddingHorizontal: 16, paddingTop: 14}}>
-                {(offerFeatures.length > 0 || !!ad?.installment) && (
+              <View
+                style={{paddingHorizontal: scaled(16), paddingTop: scaled(14)}}>
+                {offerFeatures.length > 0 && (
                   <View style={styles.section}>
                     <View style={styles.sectionLabel}>
                       <Text preset="bold" size={14} color="white">
@@ -275,11 +301,6 @@ export function SinlgeProduct() {
                       </Text>
                     </View>
                     <View style={styles.sectionBox}>
-                      {!!ad?.installment && (
-                        <Text size={15} style={styles.sectionLine}>
-                          • {t('forms.installmentEnabled')}
-                        </Text>
-                      )}
                       {offerFeatures.map((feature: string, index: number) => (
                         <Text key={index} size={15} style={styles.sectionLine}>
                           • {feature}
@@ -289,9 +310,7 @@ export function SinlgeProduct() {
                   </View>
                 )}
 
-                {(!!ad?.description ||
-                  !!ad?.usagePeriodText ||
-                  !!ad?.testPeriodText) && (
+                {!!ad?.description && (
                   <View style={styles.section}>
                     <View style={styles.sectionLabel}>
                       <Text preset="bold" size={14} color="white">
@@ -299,37 +318,28 @@ export function SinlgeProduct() {
                       </Text>
                     </View>
                     <View style={styles.sectionBox}>
-                      {!!ad?.description && (
-                        <Text size={15} style={styles.sectionLine}>
-                          {ad.description}
-                        </Text>
-                      )}
-                      {!!ad?.usagePeriodText && (
-                        <Text size={15} style={styles.sectionLine}>
-                          {ad.usagePeriodText}
-                        </Text>
-                      )}
-                      {!!ad?.testPeriodText && (
-                        <Text size={15} style={styles.sectionLine}>
-                          {ad.testPeriodText}
-                        </Text>
-                      )}
+                      <Text size={15} style={styles.sectionLine}>
+                        {ad.description}
+                      </Text>
                     </View>
                   </View>
                 )}
               </View>
             </>
           ) : (
-            <View style={{padding: 16}}>
+            <View
+              style={{paddingHorizontal: scaled(16), paddingTop: scaled(16)}}>
               {adsProps.map((item, index) => {
                 return (
                   <Row
                     key={index}
                     style={{marginVertical: 2, alignItems: 'flex-start'}}>
-                    <Text size={17} style={{width: 120, textAlign: 'right'}}>
+                    <Text
+                      size={17}
+                      style={{width: scaled(120), textAlign: 'right'}}>
                       {item.label}:
                     </Text>
-                    <Divider style={{width: 40}} />
+                    <Divider style={{width: scaled(40)}} />
                     <Text size={17} style={{flex: 1, textAlign: 'right'}}>
                       {item.type == 'price'
                         ? `${numberWithCommas(item.value)} ${t('common.toman')}`
@@ -342,12 +352,14 @@ export function SinlgeProduct() {
           )}
         </View>
 
-        <ProductLocation
-          lat={ad?.lat}
-          lng={ad?.lng}
-          zoomEnabled={false}
-          scrollEnabled={false}
-        />
+        <View style={styles.mapSection}>
+          <ProductLocation
+            lat={ad?.lat}
+            lng={ad?.lng}
+            zoomEnabled={false}
+            scrollEnabled={false}
+          />
+        </View>
         <CallInfo
           phone={ad?.contact_info}
           email={ad?.email}
@@ -360,6 +372,11 @@ export function SinlgeProduct() {
           onClose={toggleReportModal}
           advertisementId={params?.ads?.id}
         />
+        <ImageViewerModal
+          visible={!!viewerUri}
+          uri={viewerUri}
+          onClose={() => setViewerUri(null)}
+        />
       </Screen>
       <Row
         style={{
@@ -367,34 +384,51 @@ export function SinlgeProduct() {
         }}>
         <Button style={styles.button} onPress={toggleCallInfoModal}>
           <Row style={{alignItems: 'center'}}>
-            <Image source={require('../../../assets/images/phone.png')} />
-            <Divider style={{width: 5}} />
+            <Image
+              source={require('../../../assets/images/phone.png')}
+              style={{width: scaled(31), height: scaled(31)}}
+            />
+            <Divider style={{width: scaled(5)}} />
             <Text size={20} preset="bold">
               {t('callInfo.title')}
             </Text>
           </Row>
         </Button>
         {/* `chatEnabled` (see ContactInfoCard) defaults to true for new ads
-            and is undefined on ads posted before that field existed —
-            either way, chat only actually hides when the owner explicitly
-            turned it off. */}
-        {!isOwnAd && ad?.chatEnabled !== false && (
+            and is undefined on ads posted before that field existed — either
+            way, the button only disappears when the owner explicitly turned
+            chat off, and the backend refuses to open a thread on such an ad
+            too (ChatService.getOrCreateConversation), so turning the toggle
+            off really does remove the capability rather than just hide a
+            button.
+
+            On your own ad the button stays put — its absence was the one
+            thing that made an ad with chat *on* look like an ad with chat
+            off — but it leads to the conversations this ad has received
+            instead of a thread with yourself, which the backend has never
+            allowed. */}
+        {chatEnabled && (
           <>
-            <Divider style={{width: 30}} />
+            <Divider style={{width: scaled(30)}} />
             <Button
               onPress={() =>
-                navigate('chat', {
-                  title: data?.data?.title,
-                  advertisementId: data?.data?.id,
-                  avatar: data?.data?.user?.avatar,
-                })
+                isOwnAd
+                  ? navigate('userpanel', {mode: 'chats'})
+                  : navigate('chat', {
+                      title: data?.data?.title,
+                      advertisementId: data?.data?.id,
+                      avatar: data?.data?.user?.avatar,
+                    })
               }
               style={styles.button}>
               <Row style={{alignItems: 'center'}}>
-                <Image source={require('../../../assets/images/chat.png')} />
-                <Divider style={{width: 5}} />
+                <Image
+                  source={require('../../../assets/images/chat.png')}
+                  style={{width: scaled(27), height: scaled(27)}}
+                />
+                <Divider style={{width: scaled(5)}} />
                 <Text size={20} preset="bold">
-                  {t('product.chat')}
+                  {isOwnAd ? t('product.adChats') : t('product.chat')}
                 </Text>
               </Row>
             </Button>
@@ -410,13 +444,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    top: 50,
+    top: scaled(50),
   },
   topDetail: {
     backgroundColor: colors.pallete.gray1,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
-    padding: 16,
+    borderBottomLeftRadius: scaled(16),
+    borderBottomRightRadius: scaled(16),
+    padding: scaled(16),
   },
   // For تخفیف‌یاب the title sits on white and the gray price bar
   // (OfferPriceDetails) flows flush beneath it, matching the design.
@@ -424,29 +458,35 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    paddingBottom: 8,
+    paddingBottom: scaled(8),
   },
   ratingOverlay: {
     position: 'absolute',
-    left: 8,
-    bottom: 8,
+    left: scaled(8),
+    bottom: scaled(8),
     flexDirection: 'row',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: scaled(8),
+    paddingVertical: scaled(4),
+    borderRadius: scaled(12),
     backgroundColor: 'rgba(0,0,0,0.45)',
   },
   storeLogoDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: scaled(20),
+    height: scaled(20),
+    borderRadius: scaled(10),
     overflow: 'hidden',
     backgroundColor: colors.pallete.gray1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   section: {
-    marginTop: 20,
+    marginTop: scaled(20),
+  },
+  // The map is full-bleed and has no spacing of its own (ProductLocation is
+  // shared with the job screens), so the gap that separates it from whatever
+  // content precedes it lives here — same 20 rhythm as between the sections.
+  mapSection: {
+    marginTop: scaled(20),
   },
   // A tab that straddles the box's top edge: pulled down with a negative
   // margin so half its height sits over the box and half floats above it,
@@ -454,26 +494,26 @@ const styles = StyleSheet.create({
   sectionLabel: {
     alignSelf: 'flex-end',
     zIndex: 1,
-    marginBottom: -14,
+    marginBottom: scaled(-14),
     backgroundColor: colors.pallete.gray2,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    borderRadius: scaled(8),
+    paddingHorizontal: scaled(14),
+    paddingVertical: scaled(6),
   },
   sectionBox: {
     backgroundColor: colors.pallete.gray1,
-    borderRadius: 8,
-    padding: 12,
-    paddingTop: 20,
+    borderRadius: scaled(8),
+    padding: scaled(12),
+    paddingTop: scaled(20),
   },
   sectionLine: {
-    lineHeight: 24,
+    lineHeight: scaled(24),
     marginBottom: 2,
   },
   statusBanner: {
-    marginTop: 8,
-    padding: 8,
-    borderRadius: 8,
+    marginTop: scaled(8),
+    padding: scaled(8),
+    borderRadius: scaled(8),
   },
   statusBannerPending: {
     backgroundColor: '#E8A317',
@@ -482,23 +522,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.pallete.red2,
   },
   button: {
-    paddingHorizontal: 8,
+    paddingHorizontal: scaled(8),
     flex: 1,
-    height: 37,
+    height: scaled(37),
     backgroundColor: colors.main,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: scaled(8),
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
   },
   buttons: {
-    paddingHorizontal: 16,
+    paddingHorizontal: scaled(16),
     zIndex: 10001,
     backgroundColor: 'transparent',
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 10,
+    bottom: scaled(10),
   },
 });

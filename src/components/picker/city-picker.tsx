@@ -6,7 +6,13 @@ import {localizeCity} from '../../i18n/display-maps';
 // Single source of truth for city selection — replaces the 3 previously
 // separate implementations (element-dropdown in Settings, material-menu in
 // the header, Modal+FlatList in forms/filter).
-export function CityPicker({visible, onClose, onSelect}) {
+export interface CityPickerProps {
+  visible?: any;
+  onClose?: any;
+  onSelect?: any;
+}
+
+export function CityPicker({visible, onClose, onSelect}: CityPickerProps) {
   const {data} = useCities();
 
   return (

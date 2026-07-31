@@ -1,9 +1,8 @@
-import {View, StyleSheet, FlatList} from 'react-native';
+import {Alert, View, StyleSheet, FlatList} from 'react-native';
 import React, {useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Screen, Text, Row, Checkbox, Divider, Button} from '../../components';
-import {colors} from '../../theme';
-import {cities} from '../../utiles';
+import {colors, scaled} from '../../theme';
 import {localizeCity} from '../../i18n/display-maps';
 import {useDispatch} from 'react-redux';
 import {setUser} from '../../stateManager/reducers/user';
@@ -14,19 +13,37 @@ import {useCities} from '../../hooks/use-cached-cities';
 export function CitySelectionScreen() {
   const {t} = useTranslation();
   const dispatch = useDispatch();
-  const [state, setState] = useState({
+  // `city` holds the selected city object (id + title), not its name — an
+  // empty string as the initial value made every `state.city.id` read a type
+  // error while working at runtime only because handleValidation refuses to
+  // submit until one is picked.
+  const [state, setState] = useState<{gender: string; city: any}>({
     gender: '',
-    city: '',
+    city: null,
   });
 
-  const {mutate} = useMutation(updateUser);
+  const {mutateAsync, isLoading} = useMutation(updateUser);
   const {data} = useCities();
-  const handleNext = () => {
-    const data = {
-      city_id: state?.city?.id,
-      sex: state?.gender == 'man' ? 1 : 0,
-    };
-    mutate(data);
+  // mutateAsync + await rather than fire-and-forget mutate(): the dispatch
+  // below sets cityId, which flips RootNavigator to AppStack and unmounts this
+  // screen — and react-query v3 stops delivering a mutation's callbacks once
+  // its observer unmounts, so there was no way to tell whether the city and
+  // gender had actually been saved. Awaiting keeps the screen alive until the
+  // server has confirmed, so a failure can be surfaced instead of dropping the
+  // user into the app with a profile that silently never persisted.
+  const handleNext = async () => {
+    if (!handleValidation()) {
+      return;
+    }
+    try {
+      await mutateAsync({
+        city_id: state?.city?.id,
+        sex: state?.gender == 'man' ? 1 : 0,
+      });
+    } catch {
+      Alert.alert(t('common.error'), t('auth.citySaveError'));
+      return;
+    }
     // Setting cityId flips RootNavigator from OnboardingStack to AppStack
     // reactively — no explicit navigate('dashboard') needed.
     dispatch(
@@ -34,6 +51,11 @@ export function CitySelectionScreen() {
         cityId: state.city.id,
         city: state.city.title,
         sex: state.gender === 'man' ? 'MALE' : 'FEMALE',
+        // Seed the header's browse filter to the home city so the app opens
+        // scoped to the user's own city (they can switch to «کل استان» or
+        // another city from the header afterwards without changing this).
+        browseCityId: state.city.id,
+        browseCityName: state.city.title,
       }),
     );
   };
@@ -66,13 +88,13 @@ export function CitySelectionScreen() {
       </View>
       <View style={sytles.formContainer}>
         <Text size={18}>{t('auth.gender')}</Text>
-        <Row style={{paddingHorizontal: 32}}>
+        <Row style={{paddingHorizontal: scaled(32)}}>
           <Checkbox
             value={state.gender == 'man'}
             text={t('auth.male')}
             onToggle={() => setState(s => ({...s, gender: 'man'}))}
           />
-          <Divider style={{width: 20}} />
+          <Divider style={{width: scaled(20)}} />
           <Checkbox
             value={state.gender == 'woman'}
             text={t('auth.female')}
@@ -81,7 +103,7 @@ export function CitySelectionScreen() {
         </Row>
         <Divider />
         <Text size={18}>{t('auth.residenceCity')}</Text>
-        <View style={{paddingHorizontal: 32}}>
+        <View style={{paddingHorizontal: scaled(32)}}>
           <FlatList
             showsVerticalScrollIndicator={false}
             data={data?.data}
@@ -103,8 +125,9 @@ export function CitySelectionScreen() {
         </View>
       </View>
       <Button
+        loading={isLoading}
         onPress={handleNext}
-        disabled={!buttonEnabled()}
+        disabled={!buttonEnabled() || isLoading}
         style={{
           ...sytles.button,
           backgroundColor: buttonEnabled() ? colors.main : colors.pallete.gray1,
@@ -120,29 +143,29 @@ export function CitySelectionScreen() {
 const sytles = StyleSheet.create({
   topColor: {
     backgroundColor: colors.main,
-    height: 137,
-    padding: 16,
+    height: scaled(137),
+    padding: scaled(16),
     justifyContent: 'center',
   },
   cammeraButton: {
-    width: 94,
-    height: 94,
-    borderRadius: 50,
+    width: scaled(94),
+    height: scaled(94),
+    borderRadius: scaled(50),
     borderWidth: 1,
     borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -47,
+    marginTop: scaled(-47),
     alignSelf: 'center',
     backgroundColor: colors.pallete.gray1,
     overflow: 'hidden',
   },
   formContainer: {
-    paddingHorizontal: 32,
-    paddingTop: 16,
+    paddingHorizontal: scaled(32),
+    paddingTop: scaled(16),
   },
   button: {
-    height: 50,
+    height: scaled(50),
     position: 'absolute',
     left: 0,
     right: 0,

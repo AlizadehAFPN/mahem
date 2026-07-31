@@ -2,7 +2,7 @@ import {Image, View} from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Divider, MainHeader, Screen, Text} from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 
 export function PrivacyScreen() {
   const {t} = useTranslation();
@@ -12,7 +12,7 @@ export function PrivacyScreen() {
       <View
         style={{
           width: '100%',
-          paddingVertical: 20,
+          paddingVertical: scaled(20),
           backgroundColor: colors.pallete.gray1,
         }}>
         <Image
@@ -20,7 +20,7 @@ export function PrivacyScreen() {
           source={require('../../../assets/images/hlogo.png')}
         />
       </View>
-      <Screen unsafe style={{paddingHorizontal: 15}}>
+      <Screen unsafe style={{paddingHorizontal: scaled(15)}}>
         <Text color={colors.pallete.red}>{t('privacy.welcome')}</Text>
         <Divider />
         <Text size={15}>{t('privacy.body')}</Text>

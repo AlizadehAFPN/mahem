@@ -2,11 +2,17 @@ import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {Row} from '../row/row';
 import {Text} from '../text/text';
-import {colors} from '../../theme';
-export function TableRow({onPress, item, header = false}) {
+import {colors, scaled} from '../../theme';
+export interface TableRowProps {
+  onPress?: any;
+  item?: any;
+  header?: any;
+}
+
+export function TableRow({onPress, item, header = false}: TableRowProps) {
   return (
     <TouchableOpacity onPress={onPress}>
-      <Row style={{paddingHorizontal: 8, paddingVertical: 4}}>
+      <Row style={{paddingHorizontal: scaled(8), paddingVertical: scaled(4)}}>
         <View style={{...styles.cell1}}>
           <Text style={styles.text} size={15}>
             {item[0]}
@@ -49,19 +55,19 @@ export function TableRow({onPress, item, header = false}) {
 }
 const styles = StyleSheet.create({
   cell1: {
-    width: 35,
-    height: 25,
+    width: scaled(35),
+    height: scaled(25),
     backgroundColor: colors.pallete.gray1,
-    borderRadius: 4,
-    marginLeft: 12,
+    borderRadius: scaled(4),
+    marginLeft: scaled(12),
     alignItems: 'center',
     justifyContent: 'center',
   },
   cell2: {
-    height: 25,
+    height: scaled(25),
     backgroundColor: colors.pallete.gray1,
-    borderRadius: 4,
-    marginLeft: 8,
+    borderRadius: scaled(4),
+    marginLeft: scaled(8),
     justifyContent: 'center',
   },
   text: {

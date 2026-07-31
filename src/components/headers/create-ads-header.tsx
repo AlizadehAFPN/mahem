@@ -9,20 +9,20 @@ import {AdsImageSelection} from '../file-picker/ads-image-selection';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
-export function CreateAdsHeader({
+
+// The «ثبت رایگان آگهی» bar: back + title on one side, «ارسال» on the other.
+// Split out of CreateAdsHeader so a screen can pin it to the top and let the
+// image picker below scroll away with the form (see CreateAdsDetailsScreen).
+export function CreateAdsTopBar({
   onCreatePress,
-  onSelectImage,
-  onRemoveImage,
   onBack,
   isSending,
-  uploadingIndexes = [],
-  initialImages = [],
   title,
 }: any) {
   const {t} = useTranslation();
-  const {goBack} = useNavigation();
+  const {goBack} = useNavigation<any>();
   const headerTitle = title ?? t('createAds.postFreeAd');
   const handleBack = () => {
     if (onBack) {
@@ -45,14 +45,14 @@ export function CreateAdsHeader({
       <Row
         style={{
           justifyContent: 'space-between',
-          paddingHorizontal: 8,
-          paddingBottom: 4,
+          paddingHorizontal: scaled(8),
+          paddingBottom: scaled(4),
         }}>
         <Button onPress={handleBack}>
           <Row>
             <MaterialIcons
               color="white"
-              size={25}
+              size={scaled(25)}
               name="keyboard-arrow-right"
             />
             <Text color="white" size={17}>
@@ -65,7 +65,7 @@ export function CreateAdsHeader({
             <Text size={15} color="white">
               {t('common.send')}
             </Text>
-            <Feather color="white" name="check" size={20} />
+            <Feather color="white" name="check" size={scaled(20)} />
           </Row>
         </Button>
       </Row>
@@ -75,14 +75,27 @@ export function CreateAdsHeader({
         start={{x: 0, y: 0}}
         end={{x: 1, y: 0}}
       />
+    </View>
+  );
+}
+
+// «انتخاب تصویر مناسب برای آگهی» + the five image slots. Carries its own brand
+// background so it can live inside a ScrollView, on top of the white form.
+export function CreateAdsImagePicker({
+  onSelectImage,
+  onRemoveImage,
+  uploadingIndexes = [],
+  initialImages = [],
+}: any) {
+  const {t} = useTranslation();
+  return (
+    <View style={styles.continer}>
       <Divider height={10} />
       <Text preset="bold" size={20} style={{textAlign: 'center'}}>
         {t('createAds.chooseImage')}
       </Text>
       <Divider height={10} />
-      <Text style={{textAlign: 'center'}}>
-        {t('createAds.imageBoostHint')}
-      </Text>
+      <Text style={{textAlign: 'center'}}>{t('createAds.imageBoostHint')}</Text>
       <Divider />
       <Row style={{justifyContent: 'space-around'}}>
         {[...new Array(5)].map((item, index) => (
@@ -96,6 +109,36 @@ export function CreateAdsHeader({
         ))}
       </Row>
       <Divider height={10} />
+    </View>
+  );
+}
+
+// Both halves together, as one fixed block — what screens that don't need the
+// image picker to scroll (edit-ad) still use.
+export function CreateAdsHeader({
+  onCreatePress,
+  onSelectImage,
+  onRemoveImage,
+  onBack,
+  isSending,
+  uploadingIndexes = [],
+  initialImages = [],
+  title,
+}: any) {
+  return (
+    <View style={styles.continer}>
+      <CreateAdsTopBar
+        onCreatePress={onCreatePress}
+        onBack={onBack}
+        isSending={isSending}
+        title={title}
+      />
+      <CreateAdsImagePicker
+        onSelectImage={onSelectImage}
+        onRemoveImage={onRemoveImage}
+        uploadingIndexes={uploadingIndexes}
+        initialImages={initialImages}
+      />
     </View>
   );
 }

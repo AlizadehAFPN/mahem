@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 8+ launcher icon. Without this file the manifest had to point
+  android:icon straight at @mipmap/ic_launcher_foreground — the bare 432x432
+  foreground *layer*, whose canvas is transparent and whose mark is drawn at
+  the ~45% adaptive safe-zone scale. Launchers then drew it unmasked and
+  unbacked: a small black squiggle floating on the wallpaper, with the real
+  ic_launcher.png sitting unused next to it.
+
+  Composed properly, the mark keeps its safe-zone margin and the system masks
+  the white background to whatever shape the launcher uses (circle, squircle,
+  rounded square). Devices below API 26 ignore this file and fall back to the
+  ic_launcher.png / ic_launcher_round.png bitmaps in the density folders.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+  <background android:drawable="@color/ic_launcher_background" />
+  <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>

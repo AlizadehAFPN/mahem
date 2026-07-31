@@ -1,0 +1,17 @@
+diff --git a/node_modules/expo-modules-core/android/src/main/java/expo/modules/adapters/react/permissions/PermissionsService.kt b/node_modules/expo-modules-core/android/src/main/java/expo/modules/adapters/react/permissions/PermissionsService.kt
+index 29000ec..dc201aa 100644
+--- a/node_modules/expo-modules-core/android/src/main/java/expo/modules/adapters/react/permissions/PermissionsService.kt
++++ b/node_modules/expo-modules-core/android/src/main/java/expo/modules/adapters/react/permissions/PermissionsService.kt
+@@ -155,7 +155,11 @@ open class PermissionsService(val context: Context) : InternalModule, Permission
+   override fun isPermissionPresentInManifest(permission: String): Boolean {
+     try {
+       context.packageManager.getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)?.run {
+-        return requestedPermissions.contains(permission)
++        // requestedPermissions is @Nullable from the API 34+ platform stubs (it is
++        // null for a manifest that declares no permissions), so this cannot be an
++        // unsafe call — expo SDK 49 predates that annotation and fails to compile
++        // against compileSdk 35 without it.
++        return requestedPermissions?.contains(permission) ?: false
+       }
+       return false
+     } catch (e: PackageManager.NameNotFoundException) {

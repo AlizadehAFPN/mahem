@@ -14,6 +14,7 @@ export * from './notifications';
 export * from './chat';
 export * from './attribute-options';
 export * from './stores';
+export * from './app-settings';
 
 export async function handleRequest<T>(
   request: Promise<AxiosResponse<T>>,

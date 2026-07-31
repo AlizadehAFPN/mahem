@@ -5,23 +5,24 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  Share,
 } from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {MainHeader, Screen, Text} from '../../components';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {setFilters} from '../../stateManager/reducers/filters';
 import {removeUser} from '../../stateManager/reducers/user';
 import {RootState} from '../../stateManager';
 import {useAdsCategories} from '../../hooks/use-cached-categories';
+import {SocialShare} from '../../components/social-share/social-share';
+import {APP_STORE_URL} from '../../navigation/deep-links';
 const {width} = Dimensions.get('window');
 
 export function MenuScreen() {
   const {t} = useTranslation();
-  const {navigate} = useNavigation();
+  const {navigate} = useNavigation<any>();
   const user = useSelector((s: RootState) => s.user);
   const {data: categoriesData} = useAdsCategories();
 
@@ -105,8 +106,15 @@ export function MenuScreen() {
     }
     if (item.name) {
       if (item.name === 'share') {
-        await Share.share({
-          message: 'https://cafebazaar.ir/app/com.turner.asmajormayhem?l=en',
+        // Was a hardcoded Cafe Bazaar URL for `com.turner.asmajormayhem` — an
+        // unrelated game left over from the template — so "معرفی به دوستان"
+        // sent every user's friends to someone else's app. There is no store
+        // listing to point at yet; APP_STORE_URL is the single place to add
+        // one, and until it has a value the share is just the description.
+        await SocialShare({
+          message: t('menu.shareAppMessage'),
+          link: APP_STORE_URL || undefined,
+          dialogTitle: t('common.appName'),
         });
         return;
       }
@@ -139,7 +147,7 @@ export function MenuScreen() {
     }
   };
   const SeperatorComp = () => (
-    <View style={{height: 8, backgroundColor: colors.pallete.gray1}} />
+    <View style={{height: scaled(8), backgroundColor: colors.pallete.gray1}} />
   );
   return (
     <Screen withoutScroll statusbarBackgroundColor={colors.main}>
@@ -180,7 +188,7 @@ const styles = StyleSheet.create({
     borderColor: colors.pallete.gray1,
   },
   footer: {
-    height: 30,
+    height: scaled(30),
     borderTopWidth: 8,
     borderColor: colors.pallete.gray1,
   },

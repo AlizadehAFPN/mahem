@@ -1,15 +1,14 @@
-import {View, StyleSheet, Image, ScrollView, Alert} from 'react-native';
+import {View, StyleSheet, ScrollView, Alert} from 'react-native';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {MainModal} from './mainModal';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {Text} from '../text/text';
 import {Row} from '../row/row';
 import {Divider} from '../divider/divider';
 import {Button} from '../button/button';
 import {Checkbox} from '../checkbox/checkbox';
 import {TextField} from '../text-field/text-field';
-import {Screen} from '../screen/screen';
 import {useMutation} from 'react-query';
 import {createReport} from '../../services';
 
@@ -25,7 +24,17 @@ const checkOptions = [
   {titleKey: 'report.reasonOther', value: 'OTHER'},
 ];
 
-export function ReportProblem({visible, onClose, advertisementId}) {
+export interface ReportProblemProps {
+  visible?: any;
+  onClose?: any;
+  advertisementId?: any;
+}
+
+export function ReportProblem({
+  visible,
+  onClose,
+  advertisementId,
+}: ReportProblemProps) {
   const {t} = useTranslation();
   const [state, setState] = useState({
     checkProb: '',
@@ -73,14 +82,14 @@ export function ReportProblem({visible, onClose, advertisementId}) {
                 value={state.checkProb === item.value}
                 onToggle={() => setState(s => ({...s, checkProb: item.value}))}
                 text={t(item.titleKey)}
-                style={{marginVertical: 12}}
+                style={{marginVertical: scaled(12)}}
               />
             ))}
             <TextField
-              inputStyle={{textAlign: 'right'}}
               preset="underline"
               placeholder={t('common.phoneNumber')}
               inputMode="tel"
+              phoneNumber
               value={state.phone}
               onChangeText={text => setState(s => ({...s, phone: text}))}
               borderColor={colors.pallete.red2}
@@ -123,17 +132,17 @@ export function ReportProblem({visible, onClose, advertisementId}) {
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderRadius: 12,
-    marginBottom: 4,
+    borderRadius: scaled(12),
+    marginBottom: scaled(4),
     borderColor: colors.pallete.gray2,
-    paddingHorizontal: 8,
-    paddingTop: 16,
+    paddingHorizontal: scaled(8),
+    paddingTop: scaled(16),
     backgroundColor: colors.pallete.gray1,
   },
   textItem: {
-    paddingHorizontal: 10,
+    paddingHorizontal: scaled(10),
   },
   card2: {
-    paddingHorizontal: 16,
+    paddingHorizontal: scaled(16),
   },
 });

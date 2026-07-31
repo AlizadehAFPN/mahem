@@ -11,6 +11,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
+import com.mahem_app.textinput.ScrollFriendlyTextInputPackage;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -28,6 +29,10 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
+          // Added last on purpose: it re-registers "AndroidTextInput" over React Native's own
+          // manager so a drag that starts on a text field can scroll the form. See
+          // ScrollFriendlyReactEditText.
+          packages.add(new ScrollFriendlyTextInputPackage());
           return packages;
         }
 

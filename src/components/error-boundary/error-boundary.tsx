@@ -2,11 +2,12 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text} from '../text/text';
 import {Button} from '../button/button';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 // Class component — can't use the useTranslation hook, so read from the i18n
 // instance directly. This screen only renders on a caught error, so live
 // language switching here isn't a concern.
 import i18n from '../../i18n';
+import {reportError} from '../../services/sentry';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -27,8 +28,15 @@ export class ErrorBoundary extends React.Component<
     return {hasError: true};
   }
 
-  componentDidCatch(error: unknown) {
+  componentDidCatch(error: unknown, errorInfo: React.ErrorInfo) {
     console.error('Unhandled error caught by ErrorBoundary:', error);
+    // Reported explicitly. Catching the error here is what stops it from
+    // reaching the native crash handler, so without this call the most
+    // visible failure the app has — the whole tree replaced by «مشکلی پیش
+    // آمد» — would be the one class of failure Sentry never heard about.
+    // componentStack is what says *which* screen died; the stack trace alone
+    // often points only at a shared component several levels down.
+    reportError(error, {componentStack: errorInfo?.componentStack});
   }
 
   handleRetry = () => {
@@ -55,16 +63,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: scaled(24),
   },
   message: {
-    marginBottom: 16,
-    fontSize: 18,
+    marginBottom: scaled(16),
+    fontSize: scaled(18),
   },
   button: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingHorizontal: scaled(24),
+    paddingVertical: scaled(12),
+    borderRadius: scaled(8),
     backgroundColor: colors.main,
   },
 });

@@ -1,3 +1,20 @@
 {
-  "extends": "@tsconfig/react-native/tsconfig.json"
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  // Without an explicit exclude, tsc walks the whole working tree — so the
+  // only error `tsc --noEmit` reported was a parse failure inside
+  // delivery/api-docs/swagger-ui-bundle.js, a 1.5 MB vendored third-party
+  // bundle. One phantom error is enough to make a clean typecheck look dirty
+  // and stop being trusted. The app's own sources are unaffected: they type-
+  // check clean.
+  "exclude": [
+    "node_modules",
+    "android",
+    "ios",
+    "dist",
+    "web-build",
+    "coverage",
+    "delivery",
+    "delivery-report",
+    "patches"
+  ]
 }

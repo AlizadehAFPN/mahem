@@ -8,15 +8,22 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {FilePickerModal} from './file-picker';
 const {width} = Dimensions.get('window');
+export interface AdsImageSelectionProps {
+  onSelectImage?: any;
+  onRemoveImage?: any;
+  uploading?: any;
+  initialImageUri?: any;
+}
+
 export function AdsImageSelection({
   onSelectImage,
   onRemoveImage,
   uploading,
   initialImageUri,
-}) {
+}: AdsImageSelectionProps) {
   // initialImageUri only matters on mount (edit mode prefilling an existing
   // remote image into this slot) — the slot's own state takes over from
   // there, same as before.
@@ -24,7 +31,7 @@ export function AdsImageSelection({
     image: initialImageUri ? {uri: initialImageUri} : '',
     filepickerModal: false,
   }));
-  const onSelectFile = image => {
+  const onSelectFile = (image: any) => {
     onSelectImage(image);
     setState(s => ({...s, image}));
   };
@@ -70,7 +77,7 @@ const styles = StyleSheet.create({
   container: {
     width: (width - 40) / 5,
     aspectRatio: 1,
-    borderRadius: 8,
+    borderRadius: scaled(8),
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
@@ -92,16 +99,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 2,
     left: 2,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: scaled(20),
+    height: scaled(20),
+    borderRadius: scaled(10),
     backgroundColor: 'rgba(0,0,0,.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   removeButtonText: {
     color: 'white',
-    fontSize: 14,
-    lineHeight: 16,
+    fontSize: scaled(14),
+    lineHeight: scaled(16),
   },
 });

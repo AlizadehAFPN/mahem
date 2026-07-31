@@ -19,6 +19,8 @@ PODS:
     - ExpoModulesCore
   - Expo (49.0.23):
     - ExpoModulesCore
+  - ExpoDevice (5.4.0):
+    - ExpoModulesCore
   - ExpoKeepAwake (12.3.0):
     - ExpoModulesCore
   - ExpoModulesCore (1.5.13):
@@ -423,6 +425,8 @@ PODS:
     - React-Core
   - react-native-maps (1.14.0):
     - React-Core
+  - react-native-netinfo (9.3.10):
+    - React-Core
   - react-native-safe-area-context (4.7.1):
     - React-Core
   - react-native-slider (4.5.7):
@@ -558,11 +562,18 @@ PODS:
   - RNScreens (3.23.0):
     - React-Core
     - React-RCTImage
+  - RNSentry (5.36.0):
+    - hermes-engine
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+    - React-hermes
+    - Sentry/HybridSDK (= 8.41.0)
   - RNSVG (13.14.0):
     - React-Core
   - RNVectorIcons (10.0.3):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
+  - Sentry/HybridSDK (8.41.0)
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
 
@@ -578,6 +589,7 @@ DEPENDENCIES:
   - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
   - EXManifests (from `../node_modules/expo-manifests/ios`)
   - Expo (from `../node_modules/expo`)
+  - ExpoDevice (from `../node_modules/expo-device/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - EXStructuredHeaders (from `../node_modules/expo-structured-headers/ios`)
@@ -607,6 +619,7 @@ DEPENDENCIES:
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-maps (from `../node_modules/react-native-maps`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -632,6 +645,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -652,6 +666,7 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - ReachabilitySwift
+    - Sentry
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -677,6 +692,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-manifests/ios"
   Expo:
     :path: "../node_modules/expo"
+  ExpoDevice:
+    :path: "../node_modules/expo-device/ios"
   ExpoKeepAwake:
     :path: "../node_modules/expo-keep-awake/ios"
   ExpoModulesCore:
@@ -732,6 +749,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-picker"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-slider:
@@ -782,6 +801,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSentry:
+    :path: "../node_modules/@sentry/react-native"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
@@ -802,6 +823,7 @@ SPEC CHECKSUMS:
   EXJSONUtils: 6802be4282d42b97c51682468ddc1026a06f8276
   EXManifests: bb8592a34f5339c860b6c4bc71ad583d490374fb
   Expo: 7bde63b84d4f6502de1e7963182333f39bedbf94
+  ExpoDevice: 0333baa899c09213c1c6cb3d1a1b2061fb00594c
   ExpoKeepAwake: 8ab1087501f5ccb91146447756b787575b13f13e
   ExpoModulesCore: 9a77fac01d9abf1c5508fbc074b014c0c9c8ca5d
   EXStructuredHeaders: 324cc3130571d2696357fafd8be7fd9a0b5fdf6e
@@ -842,6 +864,7 @@ SPEC CHECKSUMS:
   react-native-geolocation: 637388c8c738a10b33fa6e4421421ff328249e46
   react-native-image-picker: 374592cecccdba7a7ddf6f5388b4f5a41c5fe71e
   react-native-maps: deb2adbdf309b622f15055b72b8742054929c740
+  react-native-netinfo: 66c9ac0d0ae92a57a9ed99ab8a75429740700c73
   react-native-safe-area-context: 8745463257fac6150abd2281b02de640b3595ec7
   react-native-slider: 128556a7e6762a69a31b4bb734a8b35f68f9f4e5
   React-NativeModulesApple: dc7bbd10f105a5a82780a340d5ca243e0dfa8326
@@ -867,11 +890,13 @@ SPEC CHECKSUMS:
   RNGestureHandler: a0080e8d4a11aeb46c8462002b28cd3e06b83680
   RNReanimated: 317ee612e31da8075ac5cdd09db562a42032d2e4
   RNScreens: f1a2bc1890623ba12ff757d72e54d04af1cb7842
+  RNSentry: ab5c24063d55ead4c29d762c1f6c8a07308a8d33
   RNSVG: 4cab00c621b328a4a2fedaaedc15d8822216723e
   RNVectorIcons: a563edb52090930e00329920edb6a1270e0b493e
+  Sentry: 54d0fe6c0df448497c8ed4cce66ccf7027e1823e
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 8796b55dba14d7004f980b54bcc9833ee45b28ce
 
-PODFILE CHECKSUM: c8683e1e96ba086b5199afbd7ee6f76923bfd4b9
+PODFILE CHECKSUM: ea357f0027c94a6bf820c02dc85f7672acb11d99
 
 COCOAPODS: 1.16.2

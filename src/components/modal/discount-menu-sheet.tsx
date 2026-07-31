@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {Text} from '../text/text';
 
 interface Props {
@@ -43,10 +43,10 @@ const LOGO_WIDTH = Math.round(DOME_WIDTH * 0.8);
 const LOGO_HEIGHT = Math.round((LOGO_WIDTH * 34) / 72); // logo.png is 72x34
 // Title sits just under the logo's lower (outside) half — hugging it, not
 // spaced out like a menu item.
-const CARD_PADDING_TOP = Math.round(LOGO_HEIGHT / 2) + 6;
+const CARD_PADDING_TOP = Math.round(LOGO_HEIGHT / 2) + scaled(6);
 // Thickness of the red band between the dome's flat edge and the white body
 // (the card's top border). The other three sides stay at 4.
-const TOP_BAND = 10;
+const TOP_BAND = scaled(10);
 
 // The تخفیف‌یاب hub (Figma node 106:4176), opened from the header menu button:
 // a red-bordered card, topped by the app logo on a red disc that peeks above
@@ -125,7 +125,12 @@ export function DiscountMenuSheet({visible, onClose}: Props) {
       </TouchableWithoutFeedback>
       <View style={styles.content}>
         <View style={styles.sheet}>
-          <Text style={{...styles.title, marginTop: -32, marginRight: 16}}>
+          <Text
+            style={{
+              ...styles.title,
+              marginTop: scaled(-32),
+              marginRight: scaled(16),
+            }}>
             {t('home.discountFinder')}
           </Text>
           {OPTIONS.map(option => (
@@ -174,14 +179,14 @@ const styles = StyleSheet.create({
     borderColor: colors.pallete.red3,
     // Compensate for the thicker top border so the caption/logo keep position.
     paddingTop: CARD_PADDING_TOP - (TOP_BAND - 4),
-    paddingBottom: 20,
+    paddingBottom: scaled(20),
   },
   title: {
     textAlign: 'center',
-    fontSize: 13,
+    fontSize: scaled(13),
     // Gap below the caption before the menu list's first divider, so it reads
     // as attached to the logo rather than as the first menu row.
-    paddingBottom: 12,
+    paddingBottom: scaled(12),
   },
   domeClip: {
     position: 'absolute',
@@ -207,15 +212,15 @@ const styles = StyleSheet.create({
   logoImage: {
     width: '100%',
     height: '100%',
-    marginTop: -10,
+    marginTop: scaled(-10),
   },
   row: {
-    paddingVertical: 14,
+    paddingVertical: scaled(14),
     borderTopWidth: 1,
     borderTopColor: '#DBDBDB',
   },
   rowText: {
     textAlign: 'center',
-    fontSize: 17,
+    fontSize: scaled(17),
   },
 });

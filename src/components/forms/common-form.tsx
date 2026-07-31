@@ -1,26 +1,16 @@
-import {Alert, FlatList, StyleSheet, View} from 'react-native';
-import React, {useEffect, useMemo, useState} from 'react';
+import {Alert, View} from 'react-native';
+import {AdFormProps} from './form.props';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import {localizeOption} from '../../i18n/display-maps';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
-import {Checkbox} from '../checkbox/checkbox';
 import {ContactInfoCard} from './contact-info-card';
 import {ContactInfoModal} from '../modal/contact-info-modal';
-import {CreateAdsHeader} from '../headers/create-ads-header';
 import {Divider} from '../divider/divider';
-import {DurationModal} from '../modal/duration-modal';
-import {MainHeader} from '../headers/mainHeader';
 import {LocationSelectModal} from '../modal/location-select-modal';
-import {Row} from '../row/row';
-import {Screen} from '../screen/screen';
-import {Text} from '../text/text';
-import {TextField} from '../text-field/text-field';
 import {UnderlineTextField} from '../text-field/underline-text-field';
-import {colors} from '../../theme';
-import {useNavigation} from '@react-navigation/native';
-import {SelectAdsCategory} from '../modal/select-ads-category';
 
 // `editItem` is the mapped ad returned from getSingleAds/getAds (see
 // mapAdvertisement) — its category-specific fields are already flattened
@@ -31,9 +21,13 @@ import {SelectAdsCategory} from '../modal/select-ads-category';
 // unset ("توافقی") rather than a mandatory sale price.
 const JOB_CATEGORY_TITLE = 'استخدامی';
 
-export function CommonForm({mainCategory, editItem, send, onSend}) {
+export function CommonForm({
+  mainCategory,
+  editItem,
+  send,
+  onSend,
+}: AdFormProps) {
   const {t} = useTranslation();
-  const {navigate} = useNavigation();
   const isJobListing = mainCategory?.title === JOB_CATEGORY_TITLE;
   const currentUser = useSelector((s: any) => s.user);
   const [state, setState] = useState(() =>
@@ -101,7 +95,7 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
           lng,
         } = state;
 
-        onSend({
+        onSend?.({
           title,
           description,
           // A job listing never blocks on a missing contact number — it
@@ -119,7 +113,7 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
             : {price, ad_type: adsType}),
         });
       } else {
-        onSend(false);
+        onSend?.(false);
       }
     }
   }, [send]);
@@ -241,6 +235,7 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
                   onChangeText={text => setState(s => ({...s, price: text}))}
                   placeholder={t('common.price')}
                   keyboardType="number-pad"
+                  thousandSeparator
                 />
                 <Divider />
                 <ContactInfoCard
@@ -269,7 +264,7 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
       <AdsOptionsModal
         type={state.optionType}
         visible={state.optionModal}
-        onSelect={item => setState(s => ({...s, [s.optionType]: item}))}
+        onSelect={(item: any) => setState(s => ({...s, [s.optionType]: item}))}
         onClose={() => setState(s => ({...s, optionModal: false}))}
       />
       {isJobListing && (
@@ -288,20 +283,3 @@ export function CommonForm({mainCategory, editItem, send, onSend}) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: colors.main,
-  },
-  form: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  duration: {
-    borderBottomWidth: 1,
-    borderColor: colors.pallete.red2,
-    marginHorizontal: 10,
-    height: 30,
-    paddingHorizontal: 5,
-  },
-});

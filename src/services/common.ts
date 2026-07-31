@@ -37,10 +37,34 @@ export const getBanner = (cityId?: string) => {
   }));
 };
 
-// Returns `{data: null}` when the city has no splash configured — caller
-// falls back to the bundled default image.
-export const getSplashScreen = (cityId?: string) => {
-  return axiosInstance
-    .get('/splash-screens', {params: {cityId}})
-    .then(res => ({data: res.data}));
+// Every city's splash image in one call, reduced to the cityId → url map the
+// app stores. Fetched whole rather than per city because the image has to be
+// cached *before* the user switches to that city — see reducers/splash.ts.
+// Cities with no splash configured are simply absent from the result.
+export const getSplashScreens = (): Promise<Record<string, string>> => {
+  return axiosInstance.get('/splash-screens').then(res => {
+    const rows: Array<{cityId?: string; imageUrl?: string}> = Array.isArray(
+      res.data,
+    )
+      ? res.data
+      : [];
+    return rows.reduce<Record<string, string>>((map, row) => {
+      if (row.cityId && row.imageUrl) {
+        map[row.cityId] = row.imageUrl;
+      }
+      return map;
+    }, {});
+  });
+};
+
+// Cheap poll target for SplashSyncBridge — the splash set changes only when
+// an admin edits it, so the app caches it locally and only refetches when
+// this counter (bumped server-side on every splash create/replace/delete)
+// has moved. Same scheme as getCitiesVersion.
+export const getSplashScreensVersion = (): Promise<number> => {
+  return axiosInstance.get('/splash-screens/version').then(res =>
+    // Older backends have no counter; treating that as version 0 makes the
+    // bridge fall through to a normal fetch rather than trusting the cache.
+    typeof res.data?.version === 'number' ? res.data.version : 0,
+  );
 };

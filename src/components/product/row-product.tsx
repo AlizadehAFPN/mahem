@@ -10,7 +10,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 import {Text} from '../text/text';
 import {Row} from '../row/row';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {
   formatRelativeTime,
   getLegacyImagePaths,
@@ -29,7 +29,12 @@ const imageSize = width / 3.4;
 // use `price` for a proposed salary rather than a sale price (see
 // CommonForm), which is often left blank — labeled/handled distinctly so it
 // doesn't read like an unpriced item.
-export function RowProduct({product, onPress}) {
+export interface RowProductProps {
+  product?: any;
+  onPress?: any;
+}
+
+export function RowProduct({product, onPress}: RowProductProps) {
   const {t} = useTranslation();
   const img = useMemo(() => getLegacyImagePaths(product)[0], [product]);
   const {data: categoriesData} = useAdsCategories();
@@ -70,7 +75,7 @@ export function RowProduct({product, onPress}) {
                 <Row style={styles.metaItem}>
                   <Ionicons
                     name="location-outline"
-                    size={13}
+                    size={scaled(13)}
                     color={colors.pallete.gray2}
                   />
                   <Text
@@ -96,7 +101,10 @@ export function RowProduct({product, onPress}) {
                 {numberWithCommas(product.price)} {t('common.toman')}
               </Text>
               {!!product?.originalPrice && (
-                <Text size={12} color={colors.pallete.gray2} style={styles.strikePrice}>
+                <Text
+                  size={12}
+                  color={colors.pallete.gray2}
+                  style={styles.strikePrice}>
                   {numberWithCommas(product.originalPrice)}
                 </Text>
               )}
@@ -112,7 +120,11 @@ export function RowProduct({product, onPress}) {
             </Text>
           ) : null}
           <Row style={styles.metaItem}>
-            <Ionicons name="time-outline" size={12} color={colors.pallete.blue} />
+            <Ionicons
+              name="time-outline"
+              size={scaled(12)}
+              color={colors.pallete.blue}
+            />
             <Text size={11} color={colors.pallete.blue} style={styles.metaText}>
               {product?.createdAt ? formatRelativeTime(product.createdAt) : ''}
             </Text>
@@ -125,13 +137,13 @@ export function RowProduct({product, onPress}) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    borderRadius: 12,
+    borderRadius: scaled(12),
     overflow: 'hidden',
     flexDirection: 'row',
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: colors.pallete.gray1,
-    padding: 8,
+    padding: scaled(8),
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.08,
@@ -141,36 +153,36 @@ const styles = StyleSheet.create({
   img: {
     height: imageSize,
     width: imageSize,
-    borderRadius: 8,
+    borderRadius: scaled(8),
     backgroundColor: colors.pallete.gray1,
     resizeMode: 'cover',
   },
   discountBadge: {
     position: 'absolute',
-    top: 4,
-    left: 4,
+    top: scaled(4),
+    left: scaled(4),
     backgroundColor: colors.main,
-    borderRadius: 4,
-    paddingHorizontal: 4,
+    borderRadius: scaled(4),
+    paddingHorizontal: scaled(4),
     paddingVertical: 2,
   },
   content: {
     flex: 1,
     height: imageSize,
-    marginLeft: 10,
+    marginLeft: scaled(10),
     justifyContent: 'space-between',
   },
   metaRow: {
-    marginTop: 4,
+    marginTop: scaled(4),
   },
   metaItem: {
-    marginLeft: 8,
+    marginLeft: scaled(8),
   },
   metaText: {
     marginRight: 2,
   },
   strikePrice: {
     textDecorationLine: 'line-through',
-    marginRight: 6,
+    marginRight: scaled(6),
   },
 });

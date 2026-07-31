@@ -1,17 +1,28 @@
-import {View, Text, StyleSheet, Platform, Linking} from 'react-native';
+import {StyleSheet, Platform, Linking} from 'react-native';
 import React, {useState} from 'react';
-import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import MapView, {Marker} from 'react-native-maps';
 
-export function SelectLocation({onSelect, ...prp}) {
-  const [region, setRegion] = useState({
+export interface SelectLocationProps {
+  onSelect?: any;
+  prp?: any;
+  // Everything else is forwarded verbatim to the component underneath
+  // (a `...prp` rest parameter, or the underlying library's own props).
+  // Declaring that here is what lets callers keep passing style,
+  // zoomEnabled, radius and the rest — they were never this component's
+  // props to begin with.
+  [key: string]: any;
+}
+
+export function SelectLocation({onSelect, ...prp}: SelectLocationProps) {
+  const [region] = useState({
     latitude: 36.841746,
     longitude: 54.43256,
     latitudeDelta: 0.005,
     longitudeDelta: 0.005,
   });
-  const [state, setState] = useState({
-    lat: '',
-    lng: '',
+  const [state, setState] = useState<{lat: number | null; lng: number | null}>({
+    lat: null,
+    lng: null,
   });
   const onPress = () => {
     const scheme = Platform.select({ios: 'maps:?q=', android: 'geo:0,0?q='});
@@ -22,9 +33,11 @@ export function SelectLocation({onSelect, ...prp}) {
       android: `${scheme}${latLng}(${label})`,
     });
     //
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    }
   };
-  const handleMapPress = ({nativeEvent}) => {
+  const handleMapPress = ({nativeEvent}: any) => {
     const {latitude, longitude} = nativeEvent.coordinate;
     onSelect(latitude, longitude);
     setState(s => ({...s, lat: latitude, lng: longitude}));
@@ -41,7 +54,7 @@ export function SelectLocation({onSelect, ...prp}) {
         longitudeDelta: 0.005,
       }}
       {...prp}>
-      {state.lat && state.lng && (
+      {state.lat !== null && state.lng !== null && (
         <Marker
           onPress={onPress}
           coordinate={{latitude: state.lat, longitude: state.lng}}

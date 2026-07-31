@@ -3,9 +3,11 @@ import {
   ChatScreen,
   CitySelectionScreen,
   CodeInput,
+  CompleteProfileScreen,
   CreateJobHelperScreen,
   CreateJobScreen,
   FilterScreen,
+  LoginScreen,
   RegisterScreen,
   SingleJobCategoryScreen,
   SingleJobScreen,
@@ -18,7 +20,6 @@ import {EditAdScreen} from '../screens/others/edit-ad/edit-ad-screen';
 import {EditProfile} from '../screens/others/editProfile/editProfile-screen';
 import {Settings} from '../screens/others/settings/settings-screen';
 import {AdViewStatsScreen} from '../screens/others/ad-view-stats/ad-view-stats-screen';
-import {NoInternetScreen} from '../screens/others/no-internet/no-internet-screen';
 import {NotifDetailScreen} from '../screens/others/notif/notif-detail-screen';
 import {JobCategoryGuideScreen} from '../screens/others/single-job-category/job-category-guide-screen';
 import {BankGatewayScreen} from '../screens/payment/bank-gateway-screen';
@@ -34,19 +35,49 @@ import {
   StoreProfileScreen,
 } from '../screens/menu/offer-detection';
 
-// Not authenticated yet.
+// Not authenticated yet. Sign-up comes first (it's the stack's initial route —
+// see RootNavigator) and sign-in is reached from its "already registered?"
+// link; both meet at the same OTP screen. The backend still keys accounts on
+// the mobile number alone, so what actually separates the two paths is the
+// availability check on the sign-up screen.
 export const authRoutes = [
   {
     name: 'register',
     component: RegisterScreen,
   },
   {
+    name: 'login',
+    component: LoginScreen,
+  },
+  {
     name: 'codeInput',
     component: CodeInput,
   },
+  // The rules are linked from the login screen, and each stack below is its
+  // own navigator — a route registered on AppStack isn't reachable from here,
+  // so the screen is listed again in every stack that links to it.
+  {
+    name: 'privacy',
+    component: PrivacyScreen,
+  },
 ];
 
-// Authenticated, but hasn't finished profile setup (no city yet).
+// Authenticated, but the account has no display name yet — a brand new
+// sign-up, or an older account whose name never saved.
+export const profileSetupRoutes = [
+  {
+    name: 'completeProfile',
+    component: CompleteProfileScreen,
+  },
+  // Linked from the "I accept the rules" tick, which has to be readable
+  // before it can be ticked.
+  {
+    name: 'privacy',
+    component: PrivacyScreen,
+  },
+];
+
+// Authenticated and named, but hasn't picked a city yet.
 export const onboardingRoutes = [
   {
     name: 'citySelection',
@@ -111,10 +142,6 @@ export const appRoutes = [
   {
     name: 'adViewStats',
     component: AdViewStatsScreen,
-  },
-  {
-    name: 'noInternet',
-    component: NoInternetScreen,
   },
   {
     name: 'notifDetail',

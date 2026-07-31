@@ -4,6 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {CategroyItem, Divider, MainHeader, Screen} from '../../../components';
 import {useNavigation} from '@react-navigation/native';
 import {useAdsCategories} from '../../../hooks/use-cached-categories';
+import {scaled} from '../../../theme';
 
 // "دسته‌بندی" from the تخفیف‌یاب hub sheet: "همه تخفیف‌ها" (categories.png
 // design) plus the list of تخفیف‌یاب subcategories (تخفیف آخر هفته، رستوران و
@@ -28,7 +29,7 @@ export function OfferCategoriesScreen() {
       <MainHeader title={t('home.discountFinder')} showLocation showBack />
       <FlatList
         data={rows}
-        style={{paddingHorizontal: 8}}
+        style={{paddingHorizontal: scaled(8)}}
         ListHeaderComponent={<Divider height={8} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         keyExtractor={(item: any) => item.id}
@@ -49,6 +50,6 @@ export function OfferCategoriesScreen() {
 
 const styles = StyleSheet.create({
   separator: {
-    height: 8,
+    height: scaled(8),
   },
 });

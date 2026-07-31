@@ -5,7 +5,17 @@ import {useJobCategories} from '../../hooks/use-cached-categories';
 // Thin backward-compatible wrapper: create-job-screen imports
 // `JobClasessModal` from here with the same {visible, onClose, onSelect}
 // props — the actual list-rendering now lives in the shared Picker.
-export function JobClasessModal({visible, onClose, onSelect}) {
+export interface JobClasessModalProps {
+  visible?: any;
+  onClose?: any;
+  onSelect?: any;
+}
+
+export function JobClasessModal({
+  visible,
+  onClose,
+  onSelect,
+}: JobClasessModalProps) {
   const {data} = useJobCategories();
 
   return (

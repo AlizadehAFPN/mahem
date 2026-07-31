@@ -75,6 +75,19 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+/**
+ * Upload-key credentials, kept out of source control (see .gitignore), so they
+ * are simply absent on a machine that has only ever built debug. Loading them
+ * must therefore stay optional — `assembleDebug` has to keep working without
+ * them. What must NOT stay optional is *using* them: see the release build
+ * type below, and the task-graph guard at the bottom of this file.
+ */
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -86,7 +99,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
     }
     signingConfigs {
         debug {
@@ -95,15 +108,29 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        if (keystoreProperties['MAHEM_UPLOAD_STORE_FILE']) {
+            release {
+                storeFile file(keystoreProperties['MAHEM_UPLOAD_STORE_FILE'])
+                storePassword keystoreProperties['MAHEM_UPLOAD_STORE_PASSWORD']
+                keyAlias keystoreProperties['MAHEM_UPLOAD_KEY_ALIAS']
+                keyPassword keystoreProperties['MAHEM_UPLOAD_KEY_PASSWORD']
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // No `?: signingConfigs.debug` fallback. That fallback meant a
+            // machine without keystore.properties — which is every machine but
+            // the one that generated it, since the file is gitignored — still
+            // produced a "release" APK, signed with the debug key that ships
+            // with the Android SDK and whose password is public. Play rejects
+            // it, and anything sideloaded from it is signed by a key anyone
+            // can forge. Left null here and enforced below, so the build fails
+            // with an explanation instead of emitting that artifact.
+            signingConfig signingConfigs.findByName('release')
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -128,3 +155,31 @@ dependencies {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+
+/**
+ * Refuse to build an unsigned/mis-signed release.
+ *
+ * Checked against the resolved task graph rather than at configuration time,
+ * so `assembleDebug` and `./gradlew tasks` still work on a machine that has no
+ * upload key — only a build that would actually package a release artifact
+ * fails, and it fails before any of it is written.
+ */
+gradle.taskGraph.whenReady { graph ->
+    def packagesRelease = graph.allTasks.any { task ->
+        task.project == project && task.name ==~ /(?i)^(package|bundle)[A-Z].*Release$/
+    }
+    if (packagesRelease && android.buildTypes.release.signingConfig == null) {
+        throw new GradleException(
+            "Refusing to build a release artifact with no upload key.\n" +
+            "  android/keystore.properties is missing (it is gitignored, so it does not\n" +
+            "  travel with a clone) or does not define MAHEM_UPLOAD_STORE_FILE.\n" +
+            "  It must contain:\n" +
+            "    MAHEM_UPLOAD_STORE_FILE=mahem-release.keystore\n" +
+            "    MAHEM_UPLOAD_STORE_PASSWORD=...\n" +
+            "    MAHEM_UPLOAD_KEY_ALIAS=mahem\n" +
+            "    MAHEM_UPLOAD_KEY_PASSWORD=...\n" +
+            "  with the keystore itself at android/app/. Both are handed over out of\n" +
+            "  band — see README.md. Google Play only ever accepts updates signed by\n" +
+            "  this key, so it cannot be regenerated if lost.")
+    }
+}

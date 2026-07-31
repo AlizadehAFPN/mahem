@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useQuery} from 'react-query';
 import {useTranslation} from 'react-i18next';
 import {MainHeader, Row, Screen, Text} from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {useRoute} from '@react-navigation/native';
 import {getAdViewStats} from '../../../services';
 
@@ -31,9 +31,12 @@ export function AdViewStatsScreen() {
     return Math.ceil(max / 10) * 10;
   }, [stats]);
 
-  const genderTotal = (stats?.genderBreakdown.male ?? 0) + (stats?.genderBreakdown.female ?? 0);
+  const genderTotal =
+    (stats?.genderBreakdown.male ?? 0) + (stats?.genderBreakdown.female ?? 0);
   const femalePercent =
-    genderTotal > 0 ? Math.round(((stats?.genderBreakdown.female ?? 0) / genderTotal) * 100) : 0;
+    genderTotal > 0
+      ? Math.round(((stats?.genderBreakdown.female ?? 0) / genderTotal) * 100)
+      : 0;
   const malePercent = genderTotal > 0 ? 100 - femalePercent : 0;
 
   return (
@@ -45,7 +48,7 @@ export function AdViewStatsScreen() {
         </Text>
 
         {isLoading ? (
-          <Text style={{textAlign: 'center', marginTop: 40}}>
+          <Text style={{textAlign: 'center', marginTop: scaled(40)}}>
             {t('common.loading')}
           </Text>
         ) : (
@@ -67,7 +70,12 @@ export function AdViewStatsScreen() {
                           <View
                             style={[
                               styles.bar,
-                              {height: `${Math.min(100, (day.count / maxDaily) * 100)}%`},
+                              {
+                                height: `${Math.min(
+                                  100,
+                                  (day.count / maxDaily) * 100,
+                                )}%`,
+                              },
                             ]}
                           />
                         </View>
@@ -79,24 +87,38 @@ export function AdViewStatsScreen() {
                   </Row>
                 </ScrollView>
               </View>
-              <Text size={12} color={colors.pallete.grayText} style={styles.xAxisLabel}>
+              <Text
+                size={12}
+                color={colors.pallete.grayText}
+                style={styles.xAxisLabel}>
                 {t('common.day')}
               </Text>
-              <Text size={12} color={colors.pallete.grayText} style={styles.yAxisLabel}>
+              <Text
+                size={12}
+                color={colors.pallete.grayText}
+                style={styles.yAxisLabel}>
                 {t('stats.people')}
               </Text>
             </View>
 
             <Row style={styles.genderRow}>
               <Row style={styles.genderItem}>
-                <Ionicons name="female" size={22} color={colors.pallete.red2} />
-                <Text size={16} style={{marginHorizontal: 6}}>
+                <Ionicons
+                  name="female"
+                  size={scaled(22)}
+                  color={colors.pallete.red2}
+                />
+                <Text size={16} style={{marginHorizontal: scaled(6)}}>
                   {t('stats.femalePercent', {percent: femalePercent})}
                 </Text>
               </Row>
               <Row style={styles.genderItem}>
-                <Ionicons name="male" size={22} color={colors.pallete.blue} />
-                <Text size={16} style={{marginHorizontal: 6}}>
+                <Ionicons
+                  name="male"
+                  size={scaled(22)}
+                  color={colors.pallete.blue}
+                />
+                <Text size={16} style={{marginHorizontal: scaled(6)}}>
                   {t('stats.malePercent', {percent: malePercent})}
                 </Text>
               </Row>
@@ -110,41 +132,41 @@ export function AdViewStatsScreen() {
 
 const styles = StyleSheet.create({
   content: {
-    padding: 16,
+    padding: scaled(16),
   },
   total: {
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: scaled(24),
   },
   chartCard: {
-    paddingTop: 8,
-    paddingBottom: 24,
+    paddingTop: scaled(8),
+    paddingBottom: scaled(24),
   },
   chartArea: {
     flexDirection: 'row-reverse',
-    height: 160,
+    height: scaled(160),
   },
   yAxis: {
     justifyContent: 'space-between',
-    paddingLeft: 6,
-    width: 28,
+    paddingLeft: scaled(6),
+    width: scaled(28),
   },
   bars: {
     alignItems: 'flex-end',
-    height: 160,
-    paddingHorizontal: 4,
+    height: scaled(160),
+    paddingHorizontal: scaled(4),
   },
   barColumn: {
-    width: 14,
+    width: scaled(14),
     alignItems: 'center',
     marginHorizontal: 2,
   },
   barTrack: {
-    width: 8,
-    height: 140,
+    width: scaled(8),
+    height: scaled(140),
     justifyContent: 'flex-end',
     backgroundColor: colors.pallete.gray1,
-    borderRadius: 4,
+    borderRadius: scaled(4),
     overflow: 'hidden',
   },
   bar: {
@@ -153,16 +175,16 @@ const styles = StyleSheet.create({
   },
   xAxisLabel: {
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: scaled(4),
   },
   yAxisLabel: {
     position: 'absolute',
-    top: -4,
+    top: scaled(-4),
     left: 0,
   },
   genderRow: {
     justifyContent: 'space-around',
-    marginTop: 24,
+    marginTop: scaled(24),
   },
   genderItem: {
     alignItems: 'center',

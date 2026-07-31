@@ -14,7 +14,7 @@ import {
   RowProduct,
   ListState,
 } from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
@@ -25,7 +25,7 @@ import {RootState} from '../../../stateManager';
 
 export function BookmarkScreen() {
   const {t} = useTranslation();
-  const {goBack, navigate} = useNavigation();
+  const {goBack, navigate} = useNavigation<any>();
   const {data, isLoading, isError} = useQuery(['bookmarks'], getBookmarks);
   const bookmarks = data?.data;
   const user = useSelector((s: RootState) => s.user);
@@ -33,7 +33,11 @@ export function BookmarkScreen() {
     <Screen withoutScroll>
       <Row style={styles.header}>
         <TouchableOpacity onPress={goBack}>
-          <MaterialIcons size={25} color="white" name="arrow-forward-ios" />
+          <MaterialIcons
+            size={scaled(25)}
+            color="white"
+            name="arrow-forward-ios"
+          />
         </TouchableOpacity>
       </Row>
       <View style={styles.avatarCon}>
@@ -53,7 +57,7 @@ export function BookmarkScreen() {
 
       <FlatList
         data={bookmarks}
-        style={{paddingHorizontal: 4}}
+        style={{paddingHorizontal: scaled(4)}}
         ItemSeparatorComponent={<Divider height={8} />}
         renderItem={({item}) => (
           <RowProduct
@@ -77,31 +81,31 @@ export function BookmarkScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    height: 77,
+    height: scaled(77),
     backgroundColor: colors.main,
   },
   avatarCon: {
-    height: 83,
+    height: scaled(83),
     backgroundColor: colors.pallete.gray1,
     alignItems: 'center',
   },
   avatar: {
-    height: 94,
-    width: 94,
-    borderRadius: 50,
-    marginTop: -47,
+    height: scaled(94),
+    width: scaled(94),
+    borderRadius: scaled(50),
+    marginTop: scaled(-47),
     overflow: 'hidden',
     borderWidth: 1,
   },
   absButtons: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    bottom: scaled(20),
+    right: scaled(20),
   },
   circle: {
-    height: 50,
-    width: 50,
-    borderRadius: 50,
+    height: scaled(50),
+    width: scaled(50),
+    borderRadius: scaled(50),
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.main,

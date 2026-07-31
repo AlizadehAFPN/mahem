@@ -9,20 +9,13 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {useMutation, useQueryClient} from 'react-query';
-import {RootState} from '../../stateManager';
-import {setUserCity} from '../../stateManager/reducers/user';
-import {setFilters} from '../../stateManager/reducers/filters';
-import {updateUser} from '../../services';
-import {useCities, CITIES_QUERY_KEY} from '../../hooks/use-cached-cities';
-import {ATTRIBUTE_OPTIONS_QUERY_KEY} from '../../hooks/use-cached-attribute-options';
-import {
-  ADS_CATEGORIES_QUERY_KEY,
-  JOB_CATEGORIES_QUERY_KEY,
-} from '../../hooks/use-cached-categories';
+import {useDispatch} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+import {ALL_CITIES_ID, setBrowseCity} from '../../stateManager/reducers/user';
+import {useCities} from '../../hooks/use-cached-cities';
+import {useBrowseCity} from '../../hooks/use-browse-city';
 import {Text} from '../text/text';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {localizeCity} from '../../i18n/display-maps';
 
 const {width: screenWidth} = Dimensions.get('window');
@@ -41,23 +34,30 @@ interface CitySelectionMenuProps {
   anchor: CityAnchor | null;
 }
 
+interface CityRow {
+  id: string;
+  title: string;
+}
+
 // Header's city selector — a small dropdown that opens directly below the
 // city trigger (measured via `anchor`) instead of a full-width modal
 // disconnected from where the user tapped.
+//
+// This only sets the *browse* filter (which city's listings to view), never
+// the account's home/posting city — that's the Settings screen's job. Picking
+// a city here dispatches setBrowseCity, so every list screen (whose queries
+// key on the browse city, see useBrowseCity) re-fetches for the new city; no
+// updateUser call and no full app remount. The «کل استان» row clears the city
+// filter entirely, showing every city's listings.
 export function CitySelectionMenu({
   visible,
   onClose,
   anchor,
 }: CitySelectionMenuProps) {
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
-  const {mutate} = useMutation(updateUser);
+  const {t} = useTranslation();
   const {data} = useCities();
-  const cachedCategories = useSelector((s: RootState) => s.categories);
-  const cachedAttributeOptions = useSelector(
-    (s: RootState) => s.attributeOptions,
-  );
-  const cachedCities = useSelector((s: RootState) => s.cities);
+  const {cityKey, isAllCities} = useBrowseCity();
   const translateY = useRef(new Animated.Value(-12)).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -80,38 +80,12 @@ export function CitySelectionMenu({
     }
   }, [visible]);
 
-  const onSelectCity = (city: {id: string; title: string}) => {
-    mutate({city_id: city.id}, {onSuccess: () => {}});
-    // Wipe every cached query so the freshly-remounted app (RootNavigator
-    // keys the app stack on cityId) pulls ads/banners/splash/etc. fresh
-    // from the server for the new city instead of a stale previous-city
-    // cache lingering around.
-    queryClient.clear();
-    // categories/attribute-options/cities aren't city-scoped — re-prime them
-    // from the persisted copy right away so the clear() above doesn't undo
-    // the whole point of *SyncBridge (every screen would otherwise cold-fetch
-    // them again the moment it next renders).
-    if (cachedCategories.adsCategories) {
-      queryClient.setQueryData(ADS_CATEGORIES_QUERY_KEY, {
-        data: cachedCategories.adsCategories,
-      });
+  const onSelectCity = (city: CityRow) => {
+    if (city.id === ALL_CITIES_ID) {
+      dispatch(setBrowseCity({cityId: ALL_CITIES_ID}));
+    } else {
+      dispatch(setBrowseCity({cityId: city.id, cityName: city.title}));
     }
-    if (cachedCategories.jobCategories) {
-      queryClient.setQueryData(JOB_CATEGORIES_QUERY_KEY, {
-        data: cachedCategories.jobCategories,
-      });
-    }
-    if (cachedAttributeOptions.optionsByGroup) {
-      queryClient.setQueryData(
-        ATTRIBUTE_OPTIONS_QUERY_KEY,
-        cachedAttributeOptions.optionsByGroup,
-      );
-    }
-    if (cachedCities.cities) {
-      queryClient.setQueryData(CITIES_QUERY_KEY, {data: cachedCities.cities});
-    }
-    dispatch(setUserCity({city: city.title, cityId: city.id}));
-    dispatch(setFilters({city: undefined}));
     onClose();
   };
 
@@ -123,6 +97,13 @@ export function CitySelectionMenu({
     Math.max(8, anchor.x + anchor.width - DROPDOWN_WIDTH),
     screenWidth - DROPDOWN_WIDTH - 8,
   );
+
+  // «کل استان» is pinned to the top so the "show everything" option is always
+  // the first thing in the list, above the alphabetical cities.
+  const rows: CityRow[] = [
+    {id: ALL_CITIES_ID, title: t('home.allProvince')},
+    ...((data?.data || []) as CityRow[]),
+  ];
 
   return (
     <Modal
@@ -145,16 +126,24 @@ export function CitySelectionMenu({
           },
         ]}>
         <FlatList
-          data={data?.data || []}
+          data={rows}
           keyExtractor={item => String(item.id)}
           style={styles.list}
-          renderItem={({item}) => (
-            <TouchableOpacity
-              style={styles.item}
-              onPress={() => onSelectCity(item)}>
-              <Text>{localizeCity(item.title)}</Text>
-            </TouchableOpacity>
-          )}
+          renderItem={({item}) => {
+            const isAllRow = item.id === ALL_CITIES_ID;
+            const selected = isAllRow ? isAllCities : cityKey === item.id;
+            return (
+              <TouchableOpacity
+                style={styles.item}
+                onPress={() => onSelectCity(item)}>
+                <Text
+                  color={selected ? colors.main : undefined}
+                  style={selected ? styles.selectedText : undefined}>
+                  {isAllRow ? item.title : localizeCity(item.title)}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
         />
       </Animated.View>
     </Modal>
@@ -165,24 +154,27 @@ const styles = StyleSheet.create({
   dropdown: {
     position: 'absolute',
     backgroundColor: 'white',
-    borderRadius: 10,
-    paddingVertical: 4,
+    borderRadius: scaled(10),
+    paddingVertical: scaled(4),
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: {width: 0, height: scaled(4)},
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 6,
   },
   list: {
-    maxHeight: 320,
+    maxHeight: scaled(320),
   },
   item: {
-    height: 44,
+    height: scaled(44),
     justifyContent: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: scaled(14),
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.pallete.gray2,
+  },
+  selectedText: {
+    fontWeight: 'bold',
   },
 });

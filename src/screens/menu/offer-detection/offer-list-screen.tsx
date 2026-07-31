@@ -9,9 +9,10 @@ import {
 } from '../../../components';
 import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
 import {getAds} from '../../../services';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
+import {useBrowseCity} from '../../../hooks/use-browse-city';
+import {scaled} from '../../../theme';
 
 // Lists the discounts under one تخفیف‌یاب subcategory the user tapped in
 // OfferCategoriesScreen, as the same full-width discount cards the main feed
@@ -22,7 +23,7 @@ export function OfferListScreen() {
   const {navigate} = useNavigation<any>();
   const {params} = useRoute<any>();
   const category = params?.category;
-  const cityId = useSelector((s: any) => s.user.cityId);
+  const {cityIdParam: browseCityId, cityKey: browseCityKey} = useBrowseCity();
   const hasChildren = (category?.sub_categories?.length ?? 0) > 0;
 
   const {
@@ -33,7 +34,7 @@ export function OfferListScreen() {
     hasNextPage,
     onEndReached,
   } = usePaginatedList({
-    queryKey: ['discounts', 'category', category?.id, cityId],
+    queryKey: ['discounts', 'category', category?.id, browseCityKey],
     queryFn: ({pageParam = 1}) =>
       getAds({
         page: pageParam,
@@ -41,10 +42,10 @@ export function OfferListScreen() {
         ...(hasChildren
           ? {parentCategoryId: category?.id}
           : {categoryId: category?.id}),
-        cityId,
+        cityId: browseCityId,
       }),
     selectItems: (page: any) => page?.data?.ads,
-    enabled: !!category?.id && !!cityId,
+    enabled: !!category?.id,
   });
 
   return (
@@ -54,8 +55,8 @@ export function OfferListScreen() {
         data={offers}
         onEndReached={onEndReached}
         keyExtractor={(item: any) => item.id}
-        contentContainerStyle={{padding: 12}}
-        ItemSeparatorComponent={() => <View style={{height: 12}} />}
+        contentContainerStyle={{padding: scaled(12)}}
+        ItemSeparatorComponent={() => <View style={{height: scaled(12)}} />}
         renderItem={({item}) => (
           <OfferCard
             item={item}
@@ -80,4 +81,3 @@ export function OfferListScreen() {
     </Screen>
   );
 }
-

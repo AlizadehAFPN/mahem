@@ -1,23 +1,32 @@
-import {Alert, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {useQuery} from 'react-query';
 import {
   Button,
   CarForm,
   Checkbox,
   CommonForm,
-  CreateAdsHeader,
+  CreateAdsImagePicker,
+  CreateAdsTopBar,
   Divider,
   EstateForm,
   OfferForm,
   Screen,
   SelectAdsCategory,
+  TAB_BAR_BUTTON_CLEARANCE,
   Text,
   UnderlineTextField,
 } from '../../components';
-import {boldFont, colors} from '../../theme';
-import {createAdsWithImages} from '../../services';
+import {boldFont, colors, scaled} from '../../theme';
+import {createAdsWithImages, getMyStore} from '../../services';
 import {
   isSupportedImageType,
   UNSUPPORTED_IMAGE_TYPE_MESSAGE,
@@ -38,12 +47,24 @@ export function CreateAdsDetailsScreen() {
   const {params} = useRoute<any>();
   const path: any[] = params?.path ?? [];
   const presetMainCategory = params?.presetMainCategory;
-  const storeId = params?.storeId;
 
   const [mainCategory, setMainCategory] = useState<any>(
     presetMainCategory ?? path[0] ?? '',
   );
   const isJobListing = mainCategory?.title === 'استخدامی';
+  const isOffer = mainCategory?.title === 'تخفیف یاب';
+
+  // Reaching this screen via MyStoreScreen's "ثبت تخفیف" shortcut pins the
+  // ad to that store outright. Otherwise, a store owner who walks the normal
+  // category picker into تخفیف‌یاب still means "a discount from my shop", so
+  // their storefront is attached automatically and the discount also shows
+  // up on their store page. Posting a discount is free either way now (see
+  // Category.adFeeToman — تخفیف‌یاب carries no fee), so this no longer
+  // affects what the user is charged.
+  const {data: myStore} = useQuery(['myStore'], getMyStore, {
+    enabled: !params?.storeId,
+  });
+  const storeId = params?.storeId ?? (isOffer ? myStore?.id : undefined);
   const [subCategory, setSubCategory] = useState<any>(path[1] ?? '');
   const [subsubCategory, setSubsubCategory] = useState<any>(path[2] ?? '');
 
@@ -107,12 +128,13 @@ export function CreateAdsDetailsScreen() {
     const categoryId = (subsubCategory || subCategory || mainCategory)?.id;
     const payload = {category_id: categoryId, ...data};
 
-    // Fee-required categories (استخدامی/تخفیف‌یاب — see
+    // Fee-required categories (استخدامی is the only one now — see
     // Category.adFeeToman, seeded on the root category and carried through
     // untouched by buildCategoryTree) show the fee before anything is
     // created, mirroring StoreTermsScreen: hand off to the payment step
-    // instead of submitting here.
-    if (mainCategory?.adFeeToman > 0) {
+    // instead of submitting here. Kept data-driven rather than hardcoded to
+    // استخدامی so re-pricing a category is a backend-only change.
+    if (mainCategory?.adFeeToman > 0 && !storeId) {
       navigate('createAdsPayment', {
         images: state.images,
         payload,
@@ -149,19 +171,28 @@ export function CreateAdsDetailsScreen() {
 
   return (
     <Screen withoutScroll>
-      <CreateAdsHeader
-        onBack={
-          presetMainCategory ? () => goBack() : () => navigate('home')
-        }
+      {/* Only the «ثبت رایگان آگهی»/«ارسال» bar is pinned. The image picker
+          scrolls with the form so an open keyboard leaves the fields as much
+          room as possible — the brand-coloured ScrollView background is what
+          the picker overscrolls against at the top. */}
+      <CreateAdsTopBar
+        onBack={presetMainCategory ? () => goBack() : () => navigate('home')}
         onCreatePress={onSendPress}
-        onSelectImage={handleSelectImage}
-        onRemoveImage={handleRemoveImage}
         isSending={state.isSubmitting}
-        uploadingIndexes={state.uploadingIndexes}
       />
       <ScrollView
-        style={{flex: 1, backgroundColor: 'white'}}
+        style={{flex: 1, backgroundColor: colors.main}}
+        contentContainerStyle={{flexGrow: 1}}
         keyboardShouldPersistTaps="handled">
+        <CreateAdsImagePicker
+          onSelectImage={handleSelectImage}
+          onRemoveImage={handleRemoveImage}
+          uploadingIndexes={state.uploadingIndexes}
+        />
+        {/* The bottom padding is what stops the form's last row — the «با
+            قوانین و شرایط موافقم» checkbox, centred, right where the tab bar's
+            «+» button floats — from scrolling to a stop underneath that
+            button. */}
         <View style={styles.form}>
           {isJobListing ? (
             <Button
@@ -200,7 +231,7 @@ export function CreateAdsDetailsScreen() {
               subsubCategory={subsubCategory}
               editItem={undefined}
             />
-          ) : mainCategory?.title === 'تخفیف یاب' ? (
+          ) : isOffer ? (
             <OfferForm
               send={state.send}
               onSend={handleFormResult}
@@ -246,11 +277,14 @@ export function CreateAdsDetailsScreen() {
 
 const styles = StyleSheet.create({
   form: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    flexGrow: 1,
+    backgroundColor: 'white',
+    paddingHorizontal: scaled(12),
+    paddingVertical: scaled(10),
+    paddingBottom: TAB_BAR_BUTTON_CLEARANCE,
   },
   groupField: {
-    paddingVertical: 4,
+    paddingVertical: scaled(4),
     alignSelf: 'center',
     borderBottomColor: colors.main,
     borderBottomWidth: 1,
@@ -259,8 +293,8 @@ const styles = StyleSheet.create({
   },
   groupText: {
     textAlign: 'right',
-    paddingBottom: 6,
+    paddingBottom: scaled(6),
     fontFamily: boldFont,
-    fontSize: 16,
+    fontSize: scaled(16),
   },
 });

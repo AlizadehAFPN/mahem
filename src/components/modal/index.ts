@@ -8,3 +8,4 @@ export * from './duration-modal';
 export * from './select-ads-category';
 export * from './ads-options-modal';
 export * from './discount-menu-sheet';
+export * from './image-viewer-modal';

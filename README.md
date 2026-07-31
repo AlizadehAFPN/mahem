@@ -1,79 +1,169 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# ماهم — اپلیکیشن موبایل
 
-# Getting Started
+سامانه نیازمندی‌ها، بانک مشاغل و تخفیف‌یاب استان گلستان. اپلیکیشن React Native
+(iOS + Android) که به بک‌اند NestJS پروژه وصل می‌شود.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+> **مستند تحویل کارفرما:** [`docs/گزارش-پروژه-ماهم.md`](docs/گزارش-پروژه-ماهم.md)
+> — چشم‌انداز، دامنه، معماری، شرح کامل فیچرها و APIها.
+> این README مستند **توسعه‌دهنده** است: چطور پروژه را بالا بیاورید و بیلد بگیرید.
 
-## Step 1: Start the Metro Server
+---
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## اجزای سامانه
 
-To start Metro, run the following command from the _root_ of your React Native project:
+| بخش | مخزن | استقرار |
+|---|---|---|
+| اپ موبایل | همین مخزن | بیلد دستی / EAS |
+| بک‌اند (NestJS + Prisma + Postgres) | `mahem-backend` | سرور Hetzner، Docker Compose |
+| پنل مدیریت (Next.js) | `mahem-admin` | Vercel |
+
+آدرس API در [`src/services/axios-config.ts`](src/services/axios-config.ts) تعریف
+شده: `http://2.28.2.151:3000` — **IP خام، نه دامنه.**
+
+هر سرویس DNS رایگان (`sslip.io`، `nip.io` و مانندشان) در ایران فیلتر است. وقتی آن
+نام resolve نشود اپ کند نمی‌شود، **کامل می‌میرد**: نه آگهی، نه ورود، نه عکس. خود IP
+در دسترس است، پس همان استفاده می‌شود. یک بار روی `sslip.io` رفت و برگشت — تکرارش
+نکنید.
+
+هزینه‌اش این است که TLS نداریم: توکن، کد ورود و پیام‌های چت رمزنگاری‌نشده می‌روند.
+به همین دلیل `usesCleartextTraffic` در اندروید و یک استثنای محدود به همان IP در
+`NSAppTransportSecurity` iOS **لازم‌اند** — برداشتنشان اپ را از کار می‌اندازد.
+
+راه‌حل واقعی یک **دامنهٔ `.ir`** است (فیلتر نمی‌شود). با گرفتنش: یک خط در
+`axios-config.ts`، یک خط در `Caddyfile` بک‌اند، `APP_URL` در `.env`، و مهاجرت
+URL عکس‌های ذخیره‌شده در دیتابیس.
+
+---
+
+## پیش‌نیازها
+
+| ابزار | نسخه |
+|---|---|
+| Node.js | ≥ ۱۶ |
+| Yarn | ۱.x |
+| JDK | ۱۷ |
+| Android SDK | build-tools **۳۵.۰.۰** (اجباری — توضیح در `android/gradle.properties`) |
+| Xcode | ≥ ۱۵ (فقط برای iOS) |
+| CocoaPods | برای `pod install` |
+
+## راه‌اندازی
 
 ```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
+yarn install          # postinstall خودش patch-package را اجرا می‌کند
+cd ios && pod install && cd ..
 ```
 
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
+## اجرا
 
 ```bash
-# using npm
-npm run android
-
-# OR using Yarn
+yarn start            # Metro
 yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
 yarn ios
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+## بررسی کیفیت
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+```bash
+yarn test             # ۱۹ سوییت / ۳۱۸ تست
+yarn lint
+npx tsc --noEmit      # باید صفر خطا بدهد
+```
 
-## Step 3: Modifying your App
+---
 
-Now that you have successfully run the app, let's modify it.
+## بیلد ریلیز
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+### اندروید
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+نیازمند کلید امضاست. کلید و پسوردهایش **در گیت نیستند** (`.gitignore`) و باید
+دستی سر جایشان گذاشته شوند:
 
-## Congratulations! :tada:
+- `android/app/mahem-release.keystore`
+- `android/keystore.properties` با کلیدهای
+  `MAHEM_UPLOAD_STORE_FILE` / `MAHEM_UPLOAD_STORE_PASSWORD` /
+  `MAHEM_UPLOAD_KEY_ALIAS` / `MAHEM_UPLOAD_KEY_PASSWORD`
 
-You've successfully run and modified your React Native App. :partying_face:
+هر دو در پوشهٔ «فایل های حساس» تحویل داده می‌شوند — به بخش
+[تحویل کلیدها](#تحویل-کلیدها) نگاه کنید.
 
-### Now what?
+```bash
+cd android && ./gradlew assembleRelease   # APK
+cd android && ./gradlew bundleRelease     # AAB برای گوگل‌پلی
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+اگر کی‌استور نباشد، بیلد **عمداً** با پیام توضیح‌دار متوقف می‌شود و خروجی تولید
+نمی‌کند. قبلاً به‌جای این کار بی‌سروصدا با کلید debug امضا می‌کرد — یعنی خروجی‌ای
+که گوگل‌پلی رد می‌کند و امضایش را هر کسی می‌تواند جعل کند.
 
-# Troubleshooting
+مسیر `aapt2` دیگر هاردکد نیست؛ `android/settings.gradle` آن را از روی SDK همان
+ماشین پیدا می‌کند (`local.properties` → `ANDROID_HOME` → مسیر پیش‌فرض سیستم‌عامل).
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### iOS
 
-# Learn More
+```bash
+cd ios && pod install
+# سپس در Xcode: Product → Archive
+```
 
-To learn more about React Native, take a look at the following resources:
+`aps-environment` بسته به Configuration تعیین می‌شود (`APS_ENVIRONMENT` در
+`project.pbxproj`): `development` برای Debug و `production` برای Release. اگر یک
+مقدار ثابت بگذارید، پوش‌نوتیفیکیشن در TestFlight/App Store بی‌صدا از کار می‌افتد.
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+
+## نکاتی که قبل از دست‌کاری باید بدانید
+
+**جهت چیدمان (RTL).** اپ خودش راست‌به‌چپ را می‌کشد: هر ردیف یک
+`flexDirection: 'row-reverse'` روی پایهٔ چپ‌به‌راست است. این ساخت فقط وقتی درست
+است که پایه واقعاً LTR باشد، برای همین جهت پایه در `AppDelegate.mm` و
+`MainActivity.java` پین شده و به زبان گوشی وابسته نیست. `I18nManager.forceRTL`
+را روشن نکنید.
+
+**تاریخ‌ها.** هر تاریخی که نمایش داده می‌شود باید شمسی باشد. تنها فرمت‌کننده
+`formatJalaliDate()` در `src/utiles/date.ts` است و یک قانون eslint جلوی
+فرمت‌کننده‌های میلادی را می‌گیرد.
+
+**اندازهٔ فونت.** مقیاس فونت سیستم‌عامل عمداً خنثی شده (`src/bootstrap.ts`) —
+صفحه‌ها روی اندازه‌های ثابت فیگما چیده شده‌اند.
+
+**دادهٔ مرجع.** دسته‌بندی‌ها، گزینه‌های ویژگی، شهرها، تنظیمات و اسپلش هرکدام یک
+اندپوینت `…/version` دارند و فقط وقتی دوباره گرفته می‌شوند که آن عدد جابه‌جا شود
+(`src/components/*-sync-bridge`).
+
+**آپدیت OTA خاموش است** (`expo.modules.updates.ENABLED=false`). اگر روشنش کردید،
+`expo_runtime_version` باید در همان کامیتِ هر تغییر نیتیو بالا برود.
+
+**دیپ‌لینک.** `mahem://ad/<id>`، `mahem://store/<id>`، `mahem://job/<id>` —
+تعریف در `src/navigation/deep-links.ts`، ثبت نیتیو در `AndroidManifest.xml` و
+`Info.plist`، و مسیریابی در `src/navigation/navigation-ref.ts` (که تپ روی
+پوش‌نوتیفیکیشن هم از همان‌جا رد می‌شود). وقتی دامنه گرفتید، اسکیم فعلی را نگه
+دارید — نسخه‌های نصب‌شده همین را می‌فرستند — و لینک https را کنارش اضافه کنید.
+
+---
+
+## تحویل کلیدها
+
+پوشهٔ «فایل های حساس» در ریشهٔ پروژه (ignore شده در گیت) شامل کلید امضای اندروید،
+کلید APNs اپل و سرویس‌اکانت Firebase است. `README.md` داخل همان پوشه توضیح
+می‌دهد هرکدام چیست، کجا باید بنشیند و کدام‌شان غیرقابل بازتولید است.
+
+این پوشه با `git clone` منتقل نمی‌شود و باید جداگانه و از کانال امن تحویل شود.
+
+---
+
+## کارهای باقی‌مانده قبل از انتشار عمومی
+
+این موارد آگاهانه انجام نشده‌اند و به تصمیم یا حساب کارفرما وابسته‌اند:
+
+- **پیامک OTP.** بک‌اند با `OTP_MOCK=true` کار می‌کند و کد را در پاسخ API
+  برمی‌گرداند، یعنی احراز هویت عملاً باز است. قبل از انتشار باید یک سرویس پیامک
+  واقعی پیاده شود و `OTP_MOCK=false` شود.
+- **درگاه پرداخت.** `BankGatewayScreen` یک فرم آزمایشی است و هیچ تراکنش واقعی
+  انجام نمی‌دهد؛ تأیید پرداخت دستی توسط ادمین انجام می‌شود.
+- **دامنه و TLS.** مهم‌ترین مورد این فهرست. اپ روی IP خام و بدون TLS کار می‌کند
+  چون هیچ نام دامنه‌ای در دسترس نیست که در ایران resolve شود. یک دامنهٔ `.ir`
+  این را حل می‌کند — جزئیاتش در بخش «اجزای سامانه» بالا.
+- **لینک فروشگاه.** `APP_STORE_URL` در `src/navigation/deep-links.ts` خالی است؛
+  بعد از انتشار پرش کنید تا «معرفی به دوستان» و «امتیاز به ماهم» فعال شوند.
+- **گزارش کرش.** هیچ Sentry/Crashlytics وصل نیست.
+- **محدودسازی کلید Google Maps** در Google Cloud به package name و SHA-1.

@@ -8,7 +8,7 @@ import {
   OfferForm,
   Screen,
 } from '../../../components';
-import {colors} from '../../../theme';
+import {scaled} from '../../../theme';
 import {useTranslation} from 'react-i18next';
 import {useMutation, useQueryClient} from 'react-query';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -25,8 +25,8 @@ import {
 // title/price/contact/description and had no image management at all.
 export function EditAdScreen() {
   const {t} = useTranslation();
-  const {goBack} = useNavigation();
-  const {params} = useRoute();
+  const {goBack} = useNavigation<any>();
+  const {params} = useRoute<any>();
   const ad = params?.ad;
   const queryClient = useQueryClient();
 
@@ -196,7 +196,7 @@ export function EditAdScreen() {
 
 const styles = StyleSheet.create({
   form: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: scaled(12),
+    paddingVertical: scaled(10),
   },
 });

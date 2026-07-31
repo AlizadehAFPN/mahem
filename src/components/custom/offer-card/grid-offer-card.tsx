@@ -1,7 +1,7 @@
 import {StyleSheet, TouchableOpacity, View, Image} from 'react-native';
 import React, {useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {CirleSlider} from '../../cicle-slider/circle-slider';
 import {Row} from '../../row/row';
 import {Text} from '../../text/text';
@@ -13,7 +13,12 @@ import {getLegacyImagePaths} from '../../../utiles/utiles_funcs';
 // detail page; this is the compact 2-column version, just enough to compare
 // offers at a glance: image, title, discount ring, discounted price, and
 // the struck-through original.
-export function GridOfferCard({item, onPress}) {
+export interface GridOfferCardProps {
+  item?: any;
+  onPress?: any;
+}
+
+export function GridOfferCard({item, onPress}: GridOfferCardProps) {
   const {t} = useTranslation();
   const img = useMemo(() => getLegacyImagePaths(item)[0], [item]);
   const offerPersent = item?.discountPercent ?? 0;
@@ -67,7 +72,7 @@ export function GridOfferCard({item, onPress}) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    borderRadius: 12,
+    borderRadius: scaled(12),
     overflow: 'hidden',
     backgroundColor: 'white',
     borderWidth: 1,
@@ -89,14 +94,14 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   body: {
-    padding: 8,
+    padding: scaled(8),
   },
   priceRow: {
-    marginTop: 8,
+    marginTop: scaled(8),
     justifyContent: 'flex-end',
   },
   priceTexts: {
-    marginRight: 8,
+    marginRight: scaled(8),
     alignItems: 'flex-end',
   },
   strikePrice: {

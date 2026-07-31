@@ -2,7 +2,7 @@ import {ScrollView, StyleSheet} from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Divider, MainHeader, Screen, Text} from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {
   JOB_CATEGORY_GUIDE_EN,
   JOB_CATEGORY_GUIDE_FA,
@@ -41,17 +41,17 @@ export function JobCategoryGuideScreen() {
 
 const styles = StyleSheet.create({
   content: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: scaled(16),
+    paddingTop: scaled(16),
   },
   intro: {
     textAlign: 'right',
-    lineHeight: 26,
+    lineHeight: scaled(26),
   },
   examples: {
     textAlign: 'right',
-    lineHeight: 24,
-    marginTop: 4,
+    lineHeight: scaled(24),
+    marginTop: scaled(4),
     color: colors.pallete.grayText,
   },
 });

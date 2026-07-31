@@ -1,8 +1,7 @@
-import {Alert, Switch, TouchableOpacity, View} from 'react-native';
+import {Alert, View} from 'react-native';
+import {AdFormProps} from './form.props';
 import React, {useEffect, useState} from 'react';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
-import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {ContactInfoCard} from './contact-info-card';
 import {Divider} from '../divider/divider';
@@ -11,17 +10,20 @@ import {LocationSelectModal} from '../modal/location-select-modal';
 import {Row} from '../row/row';
 import {Text} from '../text/text';
 import {UnderlineTextField} from '../text-field/underline-text-field';
-import {colors} from '../../theme';
+import {scaled} from '../../theme';
 
-// تخفیف‌یاب's own fields on top of the common ones (title/city/contact/
-// description/location) every other category already collects: the price
-// before/after discount and how long the discount lasts. originalPrice and
-// discountPercent are sent as category-specific attributes (see ads.ts'
-// createAds — anything not one of its known fields is auto-nested under
-// `attributes`, same as CarForm/EstateForm's fields); `price` itself is set
-// to the discounted price so this ad behaves like any other in price
-// search/sort. Duration is collected as days/hours/minutes (matching the
-// old create-offer-screen.tsx) and converted to an absolute `expiresAt`.
+// "ثبت آگهی- تخفیف یاب" (Figma node 106:8559) — the field list and their
+// order come straight from that frame: عنوان / درصد تخفیف / قیمت اصلی /
+// مدت زمان تخفیف / اطلاعات تماس / تعیین موقعیت / ویژگی ها / توضیحات. The
+// category line above them is drawn by CreateAdsDetailsScreen, not here.
+//
+// originalPrice, discountPercent and features are sent as category-specific
+// attributes (see ads.ts' createAds — anything not one of its known fields
+// is auto-nested under `attributes`, same as CarForm/EstateForm's fields);
+// `price` itself is set to the discounted price so this ad behaves like any
+// other in price search/sort. Duration is collected as days/hours/minutes
+// and converted to an absolute `expiresAt`.
+//
 // expiresAt is stored as an absolute timestamp, not a duration — reverse it
 // back into days/houres/minutes so re-saving without touching the duration
 // fields resends (approximately) the same expiry instead of silently
@@ -48,7 +50,17 @@ function remainingDuration(expiresAt?: string | null) {
   };
 }
 
-export function OfferForm({editItem, send, onSend, storeId}) {
+// ویژگی‌ها is a single free-text line like CarForm/EstateForm's, but ads
+// created before that change stored it as a list — flatten those so editing
+// an old discount doesn't blank the field out.
+function featuresToText(features: unknown) {
+  if (Array.isArray(features)) {
+    return features.join('، ');
+  }
+  return typeof features === 'string' ? features : '';
+}
+
+export function OfferForm({editItem, send, onSend, storeId}: AdFormProps) {
   const {t} = useTranslation();
   const [state, setState] = useState(() =>
     editItem
@@ -67,11 +79,7 @@ export function OfferForm({editItem, send, onSend, storeId}) {
             editItem.discountPercent != null
               ? String(editItem.discountPercent)
               : '',
-          features: Array.isArray(editItem.features) ? editItem.features : [],
-          featureInput: '',
-          installment: !!editItem.installment,
-          usagePeriodText: editItem.usagePeriodText ?? '',
-          testPeriodText: editItem.testPeriodText ?? '',
+          features: featuresToText(editItem.features),
           locationModal: false,
           durationModal: false,
           duration: remainingDuration(editItem.expiresAt),
@@ -87,11 +95,7 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           hideEmail: false,
           originalPrice: '',
           discountPercent: '',
-          features: [] as string[],
-          featureInput: '',
-          installment: false,
-          usagePeriodText: '',
-          testPeriodText: '',
+          features: '',
           locationModal: false,
           durationModal: false,
           duration: {
@@ -103,24 +107,6 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           lng: undefined as number | undefined,
         },
   );
-
-  const addFeature = () => {
-    const value = state.featureInput.trim();
-    if (!value) {
-      return;
-    }
-    setState(s => ({
-      ...s,
-      features: [...s.features, value],
-      featureInput: '',
-    }));
-  };
-  const removeFeature = (index: number) => {
-    setState(s => ({
-      ...s,
-      features: s.features.filter((_: string, i: number) => i !== index),
-    }));
-  };
 
   const handleToggleDurationModal = () => {
     setState(s => ({...s, durationModal: !s.durationModal}));
@@ -154,15 +140,12 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           originalPrice,
           discountPercent,
           features,
-          installment,
-          usagePeriodText,
-          testPeriodText,
           lat,
           lng,
         } = state;
         const discount = Number(discountPercent) || 0;
         const price = Math.round(Number(originalPrice) * (1 - discount / 100));
-        onSend({
+        onSend?.({
           title,
           description,
           price,
@@ -173,16 +156,13 @@ export function OfferForm({editItem, send, onSend, storeId}) {
           originalPrice: Number(originalPrice),
           discountPercent: discount,
           features,
-          installment,
-          usagePeriodText,
-          testPeriodText,
           expiresAt: durationToExpiresAt(),
           lat,
           lng,
           ...(storeId ? {store_id: storeId} : {}),
         });
       } else {
-        onSend(false);
+        onSend?.(false);
       }
     }
   }, [send]);
@@ -194,21 +174,21 @@ export function OfferForm({editItem, send, onSend, storeId}) {
     if (!title) {
       isValid = false;
       Alert.alert(t('forms.validation.enterTitle'));
-      // Backend rejects anything shorter (CreateAdvertisementDto:
-      // @Length(10, 5000) on description) — catching it here instead of
-      // letting the request 400 after the fee's already been "paid".
-    } else if (description.trim().length < 10) {
-      isValid = false;
-      Alert.alert(t('forms.validation.descriptionMinLength'));
-    } else if (!originalPrice) {
-      isValid = false;
-      Alert.alert(t('forms.validation.enterOriginalPrice'));
     } else if (!discountPercent) {
       isValid = false;
       Alert.alert(t('forms.validation.enterDiscountPercent'));
+    } else if (!originalPrice) {
+      isValid = false;
+      Alert.alert(t('forms.validation.enterOriginalPrice'));
     } else if (!contact_info) {
       isValid = false;
       Alert.alert(t('forms.validation.enterContactInfo'));
+      // Backend rejects anything shorter (CreateAdvertisementDto:
+      // @Length(10, 5000) on description) — catching it here instead of
+      // letting the request 400 after the whole form's been filled in.
+    } else if (description.trim().length < 10) {
+      isValid = false;
+      Alert.alert(t('forms.validation.descriptionMinLength'));
     }
     return isValid;
   };
@@ -223,17 +203,18 @@ export function OfferForm({editItem, send, onSend, storeId}) {
         />
         <Divider />
         <UnderlineTextField
-          value={state.originalPrice}
-          onChangeText={text => setState(s => ({...s, originalPrice: text}))}
-          keyboardType="number-pad"
-          placeholder={t('forms.originalPrice')}
-        />
-        <Divider />
-        <UnderlineTextField
           value={state.discountPercent}
           onChangeText={text => setState(s => ({...s, discountPercent: text}))}
           keyboardType="number-pad"
           placeholder={t('forms.discountPercent')}
+        />
+        <Divider />
+        <UnderlineTextField
+          value={state.originalPrice}
+          onChangeText={text => setState(s => ({...s, originalPrice: text}))}
+          keyboardType="number-pad"
+          thousandSeparator
+          placeholder={t('forms.originalPrice')}
         />
         <Divider />
         <Button onPress={handleToggleDurationModal}>
@@ -245,12 +226,18 @@ export function OfferForm({editItem, send, onSend, storeId}) {
               placeholder={t('forms.discountDurationOptional')}
             />
           ) : (
-            <Row style={{paddingVertical: 8}}>
-              <Text>{state.duration.days || '0'} {t('common.day')}</Text>
-              <Divider style={{width: 10}} />
-              <Text>{state.duration.houres || '0'} {t('common.hour')}</Text>
-              <Divider style={{width: 10}} />
-              <Text>{state.duration.minutes || '0'} {t('common.minute')}</Text>
+            <Row style={{paddingVertical: scaled(8)}}>
+              <Text>
+                {state.duration.days || '0'} {t('common.day')}
+              </Text>
+              <Divider style={{width: scaled(10)}} />
+              <Text>
+                {state.duration.houres || '0'} {t('common.hour')}
+              </Text>
+              <Divider style={{width: scaled(10)}} />
+              <Text>
+                {state.duration.minutes || '0'} {t('common.minute')}
+              </Text>
             </Row>
           )}
         </Button>
@@ -274,68 +261,16 @@ export function OfferForm({editItem, send, onSend, storeId}) {
         </Button>
         <Divider />
         <UnderlineTextField
+          value={state.features}
+          onChangeText={text => setState(s => ({...s, features: text}))}
+          placeholder={t('forms.features')}
+        />
+        <Divider />
+        <UnderlineTextField
           value={state.description}
           onChangeText={text => setState(s => ({...s, description: text}))}
           placeholder={t('common.description')}
         />
-        <Divider />
-        <UnderlineTextField
-          value={state.usagePeriodText}
-          onChangeText={text => setState(s => ({...s, usagePeriodText: text}))}
-          placeholder={t('forms.usageDateRangeOptional')}
-        />
-        <Divider />
-        <UnderlineTextField
-          value={state.testPeriodText}
-          onChangeText={text => setState(s => ({...s, testPeriodText: text}))}
-          placeholder={t('forms.testPeriodOptional')}
-        />
-        <Divider />
-        <Row style={{justifyContent: 'space-between', paddingVertical: 8}}>
-          <Text size={15}>{t('forms.installmentEnabled')}</Text>
-          <Switch
-            value={state.installment}
-            onValueChange={v => setState(s => ({...s, installment: v}))}
-            trackColor={{
-              false: colors.pallete.gray3,
-              true: colors.pallete.green1,
-            }}
-            thumbColor={state.installment ? colors.pallete.green : '#f4f3f4'}
-          />
-        </Row>
-        <Divider />
-        <Row style={{alignItems: 'center'}}>
-          <View style={{flex: 1}}>
-            <UnderlineTextField
-              value={state.featureInput}
-              onChangeText={text => setState(s => ({...s, featureInput: text}))}
-              placeholder={t('forms.addFeatureHint')}
-              onSubmitEditing={addFeature}
-              returnKeyType="done"
-            />
-          </View>
-          <Button onPress={addFeature}>
-            <Ionicons name="add-circle" size={32} color={colors.main} />
-          </Button>
-        </Row>
-        {state.features.map((feature: string, index: number) => (
-          <Row
-            key={`${feature}-${index}`}
-            style={{
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingVertical: 4,
-            }}>
-            <Text size={15}>• {feature}</Text>
-            <Button onPress={() => removeFeature(index)}>
-              <Ionicons
-                name="close-circle"
-                size={22}
-                color={colors.pallete.red2}
-              />
-            </Button>
-          </Row>
-        ))}
       </View>
       <LocationSelectModal
         visible={state.locationModal}
@@ -346,6 +281,7 @@ export function OfferForm({editItem, send, onSend, storeId}) {
         visible={state.durationModal}
         onClose={handleToggleDurationModal}
         onChangeText={handleChangeDuration}
+        value={state.duration}
       />
     </>
   );

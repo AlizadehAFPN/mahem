@@ -8,7 +8,7 @@ import {
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {MainModal} from '../modal/mainModal';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {Text} from '../text/text';
 import {UnderlineTextField} from '../text-field/underline-text-field';
 
@@ -77,7 +77,7 @@ export function Picker({
         )
       : currentLevel;
 
-  const onPressItem = item => {
+  const onPressItem = (item: any) => {
     const children = getChildren?.(item);
     const nextPath = [...path, item];
     if (children && children.length > 0) {
@@ -119,11 +119,13 @@ export function Picker({
           ListHeaderComponent={
             allowSelectParent && !query ? (
               <TouchableOpacity onPress={onSelectAll} style={styles.item}>
-                <Text preset="bold">{allItemsLabel ?? t('common.allItems')}</Text>
+                <Text preset="bold">
+                  {allItemsLabel ?? t('common.allItems')}
+                </Text>
               </TouchableOpacity>
             ) : null
           }
-          ListFooterComponent={<View style={{height: 100}} />}
+          ListFooterComponent={<View style={{height: scaled(100)}} />}
         />
       </View>
     </MainModal>
@@ -133,20 +135,20 @@ export function Picker({
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderRadius: 10,
-    marginBottom: 4,
+    borderRadius: scaled(10),
+    marginBottom: scaled(4),
     borderColor: colors.pallete.gray2,
-    paddingHorizontal: 12,
-    paddingTop: 16,
+    paddingHorizontal: scaled(12),
+    paddingTop: scaled(16),
     backgroundColor: colors.pallete.gray1,
     maxHeight: height * 0.75,
   },
   title: {
     textAlign: 'center',
-    paddingBottom: 8,
+    paddingBottom: scaled(8),
   },
   item: {
-    height: 44,
+    height: scaled(44),
     justifyContent: 'center',
     alignItems: 'center',
   },

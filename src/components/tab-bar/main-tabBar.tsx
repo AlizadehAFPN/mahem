@@ -1,50 +1,78 @@
-import React, {FunctionComponent} from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import {
   View,
   TouchableOpacity,
   // StyleSheet,
   Dimensions,
+  Keyboard,
+  Platform,
   // Platform,
 } from 'react-native';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import {CommonActions} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import type {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 
-const {width, height} = Dimensions.get('window');
-const SCREEN_WIDTH = width;
-const sortObj = {
-  home: 2,
-  menuStack: 1,
-  newAdvertising: 3,
-  search: 4,
-  employee: 5,
-};
+// The «ثبت آگهی» button is a circle pulled up out of the bar so it straddles
+// its top edge — half sunk into the bar, the lifted part floating free above
+// it and over whatever the screen behind it ends with.
+const CREATE_BUTTON_SIZE = scaled(73);
+const CREATE_BUTTON_LIFT = scaled(40);
+// How far a scrollable tab screen has to pad the bottom of its content for its
+// last row to clear that floating part: the lift itself, plus enough room that
+// the row isn't left sitting flush against the circle.
+export const TAB_BAR_BUTTON_CLEARANCE = CREATE_BUTTON_LIFT + scaled(16);
 
-export const MainTabBar: FunctionComponent = ({
+// React Navigation's `tabBarHideOnKeyboard` option lives inside its default
+// bottom-tab bar, so a custom `tabBar` like this one has to duck out of the way
+// itself. Without it, Android's adjustResize parks the whole bar — «+» button
+// and all — right on top of the open keyboard, stealing the room a form (ثبت
+// آگهی) needs while it's being filled in.
+function useKeyboardShown() {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const isIos = Platform.OS === 'ios';
+    const subscriptions = [
+      Keyboard.addListener(isIos ? 'keyboardWillShow' : 'keyboardDidShow', () =>
+        setShown(true),
+      ),
+      Keyboard.addListener(isIos ? 'keyboardWillHide' : 'keyboardDidHide', () =>
+        setShown(false),
+      ),
+    ];
+    return () => subscriptions.forEach(subscription => subscription.remove());
+  }, []);
+  return shown;
+}
+
+export const MainTabBar: FunctionComponent<BottomTabBarProps> = ({
   state,
   descriptors,
   navigation,
 }) => {
   // const { newRequests } = useSelector(state => state.requests)
   const insets = useSafeAreaInsets();
-  const renderIcon = (route: string, isFocused: boolean) => {
+  const keyboardShown = useKeyboardShown();
+  const renderIcon = (route: string) => {
     switch (route) {
       case 'home':
-        return <SimpleLineIcons size={25} name="menu" color="white" />;
+        return <SimpleLineIcons size={scaled(25)} name="menu" color="white" />;
       case 'menuStack':
-        return <Entypo size={25} name="home" color="white" />;
+        return <Entypo size={scaled(25)} name="home" color="white" />;
       case 'search':
-        return <MaterialIcons size={25} name="search" color="white" />;
+        return <MaterialIcons size={scaled(25)} name="search" color="white" />;
       case 'employee':
-        return <IonIcon size={25} color="white" name="grid" />;
+        return <IonIcon size={scaled(25)} color="white" name="grid" />;
       default:
         return null;
     }
   };
+  if (keyboardShown) {
+    return null;
+  }
   return (
     <View style={{zIndex: 0}}>
       <View
@@ -52,33 +80,17 @@ export const MainTabBar: FunctionComponent = ({
           flexDirection: 'row-reverse',
           alignItems: 'flex-end',
           justifyContent: 'space-around',
-          paddingVertical: 10,
+          paddingVertical: scaled(10),
           elevation: 10,
           backgroundColor: colors.main,
-          paddingBottom: insets.bottom,
+          paddingBottom:
+            Platform.OS === 'ios' ? insets.bottom : insets.bottom + 10,
         }}>
-        {state.routes.map((route, index) => {
+        {state.routes.map((route: any, index: any) => {
           const {options} = descriptors[route.key];
-          const label =
-            options.tabBarLabel !== undefined
-              ? options.tabBarLabel
-              : options.title !== undefined
-              ? options.title
-              : route.name;
-
           const isFocused = state.index === index;
 
           const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-
-            if (event.defaultPrevented) {
-              return;
-            }
-
             const navTarget =
               route.name == 'home'
                 ? 'menuStack'
@@ -86,37 +98,36 @@ export const MainTabBar: FunctionComponent = ({
                 ? 'home'
                 : route.name;
 
-            // `index`/`isFocused` above are keyed by this button's own slot
-            // (route.name), not navTarget — home/menuStack swap their icons
-            // vs. their underlying tab, so "is the tab this button leads to
-            // already showing" has to be checked against navTarget instead.
-            const isTargetFocused =
-              state.routes[state.index].name === navTarget;
-            const nestedState = state.routes.find(r => r.name === navTarget)
-              ?.state as
-              | {index: number; key: string; routes: {name: string}[]}
-              | undefined;
+            // home/menuStack swap their icons vs. their underlying tab, so the
+            // press has to be announced on the route it actually opens, not on
+            // this button's own slot (`route.key`). Each nested native-stack
+            // listens for `tabPress` on its own tab route and pops itself back
+            // to its first screen when it's already focused — re-tapping the
+            // current tab therefore resets it without us dispatching anything.
+            // Switching in from another tab preserves whatever screen was left
+            // open there (the stack sees itself as unfocused and stays put).
+            const targetRoute = state.routes.find(
+              (r: any) => r.name === navTarget,
+            );
 
-            // Re-tapping the tab you're already on pops its nested stack
-            // back to its first screen (standard bottom-tab behavior).
-            // Switching in from a different tab (the branch below, via
-            // `merge: true`) always preserves whatever screen was left open
-            // there — nothing to do for tabs with no nested stack history
-            // (home/search) or ones that already reset on every focus via
-            // `unmountOnBlur` (newAdvertising/employee).
-            if (isTargetFocused && nestedState && nestedState.index > 0) {
-              navigation.dispatch({
-                ...CommonActions.reset({
-                  index: 0,
-                  routes: [{name: nestedState.routes[0].name}],
-                }),
-                target: nestedState.key,
-              });
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: targetRoute?.key ?? route.key,
+              canPreventDefault: true,
+            });
+
+            if (event.defaultPrevented) {
               return;
             }
 
             // The `merge: true` option makes sure that the params inside the tab screen are preserved
-            navigation.navigate({name: navTarget, merge: true});
+            //
+            // Cast because `navTarget` is computed at runtime: home and
+            // menuStack deliberately swap which tab their button opens, so the
+            // destination is not a literal TypeScript can match against the
+            // navigator's route names. The values it can hold are exactly the
+            // names in `state.routes`.
+            navigation.navigate({name: navTarget, merge: true} as never);
           };
 
           const onLongPress = () => {
@@ -133,19 +144,19 @@ export const MainTabBar: FunctionComponent = ({
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
-                // accessibilityRole="button"
-                // accessibilityState={isFocused ? { selected: true } : {}}
-                // accessibilityLabel={options.tabBarAccessibilityLabel}
+                accessibilityRole="button"
+                accessibilityState={{selected: isFocused}}
+                accessibilityLabel={options.tabBarAccessibilityLabel}
                 testID={options.tabBarTestID}
                 onPress={onPress}
                 onLongPress={onLongPress}
                 key={index}>
                 <View
                   style={{
-                    width: 73,
-                    height: 73,
-                    borderRadius: 40,
-                    marginTop: -40,
+                    width: CREATE_BUTTON_SIZE,
+                    height: CREATE_BUTTON_SIZE,
+                    borderRadius: scaled(40),
+                    marginTop: -CREATE_BUTTON_LIFT,
                     backgroundColor: colors.main,
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -153,8 +164,8 @@ export const MainTabBar: FunctionComponent = ({
                   <Entypo
                     name="plus"
                     color="white"
-                    size={40}
-                    style={{marginTop: -8}}
+                    size={scaled(40)}
+                    style={{marginTop: scaled(-8)}}
                   />
                 </View>
               </TouchableOpacity>
@@ -163,15 +174,19 @@ export const MainTabBar: FunctionComponent = ({
 
           return (
             <TouchableOpacity
-              style={{paddingHorizontal: 20, alignItems: 'center', flex: 1}}
-              // accessibilityRole="button"
-              // accessibilityState={isFocused ? { selected: true } : {}}
-              // accessibilityLabel={options.tabBarAccessibilityLabel}
+              style={{
+                paddingHorizontal: scaled(20),
+                alignItems: 'center',
+                flex: 1,
+              }}
+              accessibilityRole="button"
+              accessibilityState={{selected: isFocused}}
+              accessibilityLabel={options.tabBarAccessibilityLabel}
               testID={options.tabBarTestID}
               onPress={onPress}
               onLongPress={onLongPress}
               key={index}>
-              <View style={{}}>{renderIcon(route.name, isFocused)}</View>
+              <View style={{}}>{renderIcon(route.name)}</View>
             </TouchableOpacity>
           );
         })}

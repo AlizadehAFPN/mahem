@@ -10,7 +10,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
 import {MainHeader, Text} from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {localizeCategory} from '../../../i18n/display-maps';
 
 export interface CategoryNode {
@@ -121,7 +121,7 @@ export function FilterCategorySelect({
         data={level}
         keyExtractor={(item, index) => String(item.id ?? item.title ?? index)}
         contentContainerStyle={{
-          padding: 16,
+          padding: scaled(16),
           paddingBottom: insets.bottom + 24,
         }}
         showsVerticalScrollIndicator={false}
@@ -148,7 +148,7 @@ export function FilterCategorySelect({
             style={styles.card}>
             <Ionicons
               name="chevron-back"
-              size={18}
+              size={scaled(18)}
               color={colors.pallete.gray2}
             />
             <Text size={15} style={styles.cardText}>
@@ -168,16 +168,17 @@ const styles = StyleSheet.create({
     zIndex: 20,
     elevation: 20,
   },
-  // Native layout is LTR (the app never forces I18nManager RTL — it uses
-  // row-reverse where needed), so a plain 'row' keeps the chevron on the left
-  // and lets the right-aligned title fill the rest, exactly like Figma.
+  // The base layout direction is pinned left-to-right (AppDelegate.mm /
+  // MainActivity.java) and the app reverses individual rows where it wants
+  // them right-to-left, so a plain 'row' keeps the chevron on the left and
+  // lets the right-aligned title fill the rest, exactly like Figma.
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 52,
-    marginBottom: 6,
-    paddingHorizontal: 16,
-    borderRadius: 6,
+    height: scaled(52),
+    marginBottom: scaled(6),
+    paddingHorizontal: scaled(16),
+    borderRadius: scaled(6),
     borderWidth: 1,
     borderColor: '#E3E3E3',
     backgroundColor: '#F2F2F2',

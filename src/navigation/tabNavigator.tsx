@@ -7,12 +7,15 @@ import {
   CreateAdsStack,
 } from '../screens';
 import {MainTabBar} from '../components';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {
+  createBottomTabNavigator,
+  BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 const Tab = createBottomTabNavigator();
 export function Dashboard() {
   return (
     <Tab.Navigator
-      tabBar={props => <MainTabBar {...props} />}
+      tabBar={(props: BottomTabBarProps) => <MainTabBar {...props} />}
       initialRouteName="home"
       screenOptions={{headerShown: false}}>
       <Tab.Screen name="home" component={HomeScreen} />

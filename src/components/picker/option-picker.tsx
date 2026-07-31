@@ -11,7 +11,19 @@ import {localizeOption} from '../../i18n/display-maps';
 // Every groupKey's options are fetched together and cached app-wide (see
 // useAttributeOptions/AttributeOptionsSyncBridge) instead of this component
 // firing its own network request per type on first open.
-export function OptionPicker({visible, onClose, onSelect, type}) {
+export interface OptionPickerProps {
+  visible?: any;
+  onClose?: any;
+  onSelect?: any;
+  type?: any;
+}
+
+export function OptionPicker({
+  visible,
+  onClose,
+  onSelect,
+  type,
+}: OptionPickerProps) {
   const {data} = useAttributeOptions();
   const options = (type && data?.[type]) || [];
 

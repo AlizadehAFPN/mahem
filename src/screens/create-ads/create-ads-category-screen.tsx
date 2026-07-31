@@ -1,10 +1,20 @@
-import {ActivityIndicator, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
-import {MainHeader, Screen, Text} from '../../components';
-import {colors} from '../../theme';
+import {
+  MainHeader,
+  Screen,
+  TAB_BAR_BUTTON_CLEARANCE,
+  Text,
+} from '../../components';
+import {colors, scaled} from '../../theme';
 import {useAdsCategories} from '../../hooks/use-cached-categories';
 import {localizeCategory} from '../../i18n/display-maps';
 
@@ -29,7 +39,10 @@ export function CreateAdsCategoryScreen() {
     <Screen withoutScroll>
       <MainHeader title={t('createAds.postAd')} />
       {!data ? (
-        <ActivityIndicator style={{marginTop: 24}} color={colors.main} />
+        <ActivityIndicator
+          style={{marginTop: scaled(24)}}
+          color={colors.main}
+        />
       ) : (
         <FlatList
           data={categories}
@@ -41,7 +54,7 @@ export function CreateAdsCategoryScreen() {
               onPress={() => onPressCategory(item)}>
               <MaterialIcons
                 name="keyboard-arrow-left"
-                size={22}
+                size={scaled(22)}
                 color={colors.text}
                 style={styles.chevron}
               />
@@ -56,28 +69,31 @@ export function CreateAdsCategoryScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    paddingHorizontal: 5,
-    paddingTop: 8,
+    paddingHorizontal: scaled(5),
+    paddingTop: scaled(8),
+    // Enough room for the last category to scroll clear of the tab bar's «+»
+    // button, which floats above the bar and over the end of this list.
+    paddingBottom: TAB_BAR_BUTTON_CLEARANCE,
   },
   row: {
-    height: 52,
+    height: scaled(52),
     marginBottom: 2,
-    borderRadius: 5,
+    borderRadius: scaled(5),
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
     backgroundColor: colors.pallete.gray1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: scaled(8),
   },
   chevron: {
     position: 'absolute',
-    left: 8,
+    left: scaled(8),
   },
   rowText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 17,
+    fontSize: scaled(17),
     color: 'black',
   },
 });

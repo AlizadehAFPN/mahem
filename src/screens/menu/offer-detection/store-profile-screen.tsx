@@ -14,8 +14,9 @@ import {
   Text,
 } from '../../../components';
 import {getAds, getStore} from '../../../services';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
+import {buildStoreLink} from '../../../navigation/deep-links';
 
 const {width} = Dimensions.get('window');
 
@@ -65,6 +66,7 @@ export function StoreProfileScreen() {
           <GradiantHeader
             title=""
             shareText={store?.name ?? t('common.appName')}
+            shareLink={storeId ? buildStoreLink(storeId) : undefined}
             details={false}
             onCreatePress={undefined}
             onBookMark={undefined}
@@ -79,9 +81,9 @@ export function StoreProfileScreen() {
           keyExtractor={(item: any) => item.id}
           columnWrapperStyle={{
             justifyContent: 'space-between',
-            paddingHorizontal: 12,
+            paddingHorizontal: scaled(12),
           }}
-          ItemSeparatorComponent={() => <View style={{height: 12}} />}
+          ItemSeparatorComponent={() => <View style={{height: scaled(12)}} />}
           ListHeaderComponent={
             storeLoading || !store ? null : (
               <View>
@@ -103,7 +105,7 @@ export function StoreProfileScreen() {
                     ) : (
                       <Ionicons
                         name="storefront-outline"
-                        size={26}
+                        size={scaled(26)}
                         color={colors.pallete.gray3}
                       />
                     )}
@@ -164,8 +166,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.pallete.gray1,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: scaled(16),
+    paddingVertical: scaled(8),
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
@@ -173,10 +175,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   logoBox: {
-    width: 69,
-    height: 69,
-    marginTop: -46,
-    borderRadius: 8,
+    width: scaled(69),
+    height: scaled(69),
+    marginTop: scaled(-46),
+    borderRadius: scaled(8),
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
@@ -185,6 +187,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   storeName: {
-    marginRight: 12,
+    marginRight: scaled(12),
   },
 });

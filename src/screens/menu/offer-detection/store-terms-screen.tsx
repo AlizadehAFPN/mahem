@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import {useMutation} from 'react-query';
 import {Button, Row, Screen, Text} from '../../../components';
 import {createStore, upload} from '../../../services';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {useAdsCategories} from '../../../hooks/use-cached-categories';
 
 const STORE_FEE_TOMAN = 300000;
@@ -85,7 +85,7 @@ export function StoreTermsScreen() {
             <Row style={{alignItems: 'center'}}>
               <MaterialIcons
                 color="white"
-                size={25}
+                size={scaled(25)}
                 name="keyboard-arrow-right"
               />
               <Text color="white" size={17}>
@@ -125,29 +125,29 @@ const styles = StyleSheet.create({
   headerRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 10,
+    paddingHorizontal: scaled(8),
+    paddingVertical: scaled(10),
   },
   logo: {
-    width: 32,
-    height: 32,
+    width: scaled(32),
+    height: scaled(32),
   },
   body: {
     flex: 1,
-    padding: 20,
+    padding: scaled(20),
   },
   paragraph: {
     textAlign: 'right',
-    lineHeight: 26,
-    marginBottom: 16,
+    lineHeight: scaled(26),
+    marginBottom: scaled(16),
   },
   fee: {
     textAlign: 'center',
-    marginTop: 24,
+    marginTop: scaled(24),
   },
   payButton: {
     backgroundColor: colors.main,
-    paddingVertical: 16,
+    paddingVertical: scaled(16),
     alignItems: 'center',
   },
 });

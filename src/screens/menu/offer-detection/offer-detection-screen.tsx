@@ -18,12 +18,12 @@ import {
 } from '../../../components';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
 import {useQuery} from 'react-query';
 import {getAds, getMyStore, getStores} from '../../../services';
 import {usePaginatedList} from '../../../hooks/use-paginated-list';
 import {useAdsCategories} from '../../../hooks/use-cached-categories';
-import {colors} from '../../../theme';
+import {useBrowseCity} from '../../../hooks/use-browse-city';
+import {colors, scaled} from '../../../theme';
 
 // Landing screen for تخفیف‌یاب: a horizontal row of the city's storefronts
 // (main_entry.png design) above the vertical feed of every discount in the
@@ -34,7 +34,9 @@ export function OfferDetectionScreen() {
   const {t} = useTranslation();
   const {navigate} = useNavigation<any>();
   const [menu, setMenu] = useState(false);
-  const cityId = useSelector((s: any) => s.user.cityId);
+  // The header's browse city (or «کل استان» → whole province) scopes both the
+  // storefront row and the discount feed.
+  const {cityIdParam: browseCityId, cityKey: browseCityKey} = useBrowseCity();
   const {data: cats} = useAdsCategories();
 
   // تخفیف‌یاب is a top-level GENERAL category; the feed shows every ad under
@@ -44,10 +46,8 @@ export function OfferDetectionScreen() {
     [cats],
   );
 
-  const {data: storesData} = useQuery(
-    ['stores', cityId],
-    () => getStores({cityId, limit: 20}),
-    {enabled: !!cityId},
+  const {data: storesData} = useQuery(['stores', browseCityKey], () =>
+    getStores({cityId: browseCityId, limit: 20}),
   );
   const stores = storesData?.items ?? [];
   const {data: myStore} = useQuery(['myStore'], getMyStore);
@@ -60,16 +60,16 @@ export function OfferDetectionScreen() {
     hasNextPage,
     onEndReached,
   } = usePaginatedList({
-    queryKey: ['discounts', 'all', discountParentId, cityId],
+    queryKey: ['discounts', 'all', discountParentId, browseCityKey],
     queryFn: ({pageParam = 1}) =>
       getAds({
         page: pageParam,
         limit: 10,
         parentCategoryId: discountParentId,
-        cityId,
+        cityId: browseCityId,
       }),
     selectItems: (page: any) => page?.data?.ads,
-    enabled: !!discountParentId && !!cityId,
+    enabled: !!discountParentId,
   });
 
   return (
@@ -84,8 +84,8 @@ export function OfferDetectionScreen() {
         data={offers}
         onEndReached={onEndReached}
         keyExtractor={(item: any) => item.id}
-        contentContainerStyle={{padding: 12}}
-        ItemSeparatorComponent={() => <View style={{height: 12}} />}
+        contentContainerStyle={{padding: scaled(12)}}
+        ItemSeparatorComponent={() => <View style={{height: scaled(12)}} />}
         ListHeaderComponent={
           <FlatList
             horizontal
@@ -94,16 +94,18 @@ export function OfferDetectionScreen() {
             keyExtractor={(item: any) => item.id}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.storesRow}
-            style={{marginBottom: 12}}
+            style={{marginBottom: scaled(12)}}
             ListHeaderComponent={
               <TouchableOpacity
                 style={styles.storeItem}
                 onPress={() => navigate(myStore ? 'myStore' : 'createStore')}>
                 <View style={[styles.storeAvatar, styles.storeAddAvatar]}>
-                  <Ionicons name="add" size={28} color={colors.main} />
+                  <Ionicons name="add" size={scaled(28)} color={colors.main} />
                 </View>
                 <Text size={11} numberOfLines={1} style={styles.storeName}>
-                  {myStore ? t('discountMenu.myStore') : t('store.createStoreShort')}
+                  {myStore
+                    ? t('discountMenu.myStore')
+                    : t('store.createStoreShort')}
                 </Text>
               </TouchableOpacity>
             }
@@ -120,7 +122,7 @@ export function OfferDetectionScreen() {
                   ) : (
                     <Ionicons
                       name="storefront-outline"
-                      size={22}
+                      size={scaled(22)}
                       color={colors.pallete.gray3}
                     />
                   )}
@@ -160,18 +162,18 @@ export function OfferDetectionScreen() {
 
 const styles = StyleSheet.create({
   storesRow: {
-    paddingHorizontal: 12,
-    paddingTop: 12,
+    paddingHorizontal: scaled(12),
+    paddingTop: scaled(12),
   },
   storeItem: {
     alignItems: 'center',
-    width: 64,
-    marginHorizontal: 6,
+    width: scaled(64),
+    marginHorizontal: scaled(6),
   },
   storeAvatar: {
-    width: 61,
-    height: 61,
-    borderRadius: 30.5,
+    width: scaled(61),
+    height: scaled(61),
+    borderRadius: scaled(30.5),
     overflow: 'hidden',
     backgroundColor: colors.pallete.gray1,
     borderWidth: 1,
@@ -185,7 +187,7 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   storeName: {
-    marginTop: 4,
+    marginTop: scaled(4),
     textAlign: 'center',
   },
 });

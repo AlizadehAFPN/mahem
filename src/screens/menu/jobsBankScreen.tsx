@@ -13,6 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import {getJobCategoryIcon} from '../../utiles';
 import {useJobCategories} from '../../hooks/use-cached-categories';
 import {localizeCategory} from '../../i18n/display-maps';
+import {scaled} from '../../theme';
 
 const {width} = Dimensions.get('window');
 
@@ -29,7 +30,7 @@ export function JobsBankScreen() {
   const handleNavigation = (item: any) => {
     navigate('singleJobCategory', {category: item});
   };
-  const ItemSeperator = () => <View style={{height: 8}} />;
+  const ItemSeperator = () => <View style={{height: scaled(8)}} />;
   return (
     <Screen withoutScroll>
       <MainHeader showLocation={true} title={t('home.jobsBank')} showBack />
@@ -37,6 +38,12 @@ export function JobsBankScreen() {
       <FlatList
         data={listData}
         numColumns={4}
+        // The base layout direction is pinned left-to-right (AppDelegate.mm /
+        // MainActivity.java), so rows would otherwise start on the left —
+        // including on a Persian phone. Reversing each row makes the
+        // grid read right-to-left: "همه موارد" sits top-right and the trailing
+        // partial row hugs the right edge.
+        columnWrapperStyle={styles.row}
         keyExtractor={item => String(item?.id ?? item?.title)}
         ItemSeparatorComponent={ItemSeperator}
         renderItem={({item}) => {
@@ -68,18 +75,21 @@ export function JobsBankScreen() {
 }
 
 const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row-reverse',
+  },
   itemContainer: {
     borderWidth: 1,
-    borderRadius: 4,
+    borderRadius: scaled(4),
     overflow: 'hidden',
-    marginHorizontal: 4,
+    marginHorizontal: scaled(4),
     width: (width - 32) / 4,
     aspectRatio: 0.9,
     alignItems: 'center',
     justifyContent: 'space-around',
   },
   img: {
-    width: 60,
-    height: 60,
+    width: scaled(60),
+    height: scaled(60),
   },
 });

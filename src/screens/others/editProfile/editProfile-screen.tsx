@@ -1,14 +1,15 @@
-import {Alert, View, StyleSheet, TouchableOpacity, Image, Share} from 'react-native';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {Alert, View, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import React, {useCallback, useState} from 'react';
 import {
   Button,
   Divider,
   FilePickerModal,
+  HeaderBackButton,
   Screen,
   Text,
   TextField,
 } from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
@@ -27,7 +28,7 @@ export function EditProfile() {
   const user = useSelector((s: RootState) => s.user);
   const dispatch = useDispatch();
 
-  const {goBack} = useNavigation();
+  const {goBack} = useNavigation<any>();
   const [state, setState] = useState({
     username: user?.username,
     pickerModal: false,
@@ -88,6 +89,10 @@ export function EditProfile() {
   return (
     <Screen statusbarBackgroundColor={colors.main}>
       <View style={sytles.topColor}>
+        {/* Pushed from the user panel and from settings — the only other way
+            off this screen was saving, which meant a user who opened it by
+            mistake had to edit something to get out. */}
+        <HeaderBackButton style={sytles.back} />
         <Text preset="default" size={20} color="white">
           {t('editProfile.title')}
         </Text>
@@ -102,15 +107,19 @@ export function EditProfile() {
               style={{width: '100%', height: '100%', overflow: 'hidden'}}
             />
           ) : (
-            <SimpleLineIcons name="camera" color="black" size={45} />
+            <SimpleLineIcons name="camera" color="black" size={scaled(45)} />
           )}
         </TouchableOpacity>
       </View>
 
       <View style={sytles.formContainer}>
         <TextField
-          style={{borderRadius: 8, borderColor: colors.pallete.gray2}}
-          labelStyle={{color: 'black', fontSize: 17, marginTop: -5}}
+          style={{borderRadius: scaled(8), borderColor: colors.pallete.gray2}}
+          labelStyle={{
+            color: 'black',
+            fontSize: scaled(17),
+            marginTop: scaled(-5),
+          }}
           label={t('auth.username')}
           value={state?.username}
           onChangeText={text => handleChangeText(text, 'username')}
@@ -143,19 +152,25 @@ export function EditProfile() {
 const sytles = StyleSheet.create({
   topColor: {
     backgroundColor: colors.main,
-    height: 137,
-    padding: 16,
+    height: scaled(137),
+    padding: scaled(16),
     alignItems: 'center',
   },
+  back: {
+    position: 'absolute',
+    top: scaled(6),
+    right: scaled(8),
+    zIndex: 1,
+  },
   cammeraButton: {
-    width: 94,
-    height: 94,
-    borderRadius: 50,
+    width: scaled(94),
+    height: scaled(94),
+    borderRadius: scaled(50),
     borderWidth: 1,
     borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -47,
+    marginTop: scaled(-47),
     alignSelf: 'center',
     backgroundColor: colors.pallete.gray1,
     overflow: 'hidden',
@@ -163,14 +178,14 @@ const sytles = StyleSheet.create({
   grayCard: {
     backgroundColor: colors.pallete.gray1,
     alignItems: 'center',
-    paddingBottom: 10,
+    paddingBottom: scaled(10),
   },
   formContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: scaled(16),
+    paddingTop: scaled(16),
   },
   button: {
-    height: 50,
+    height: scaled(50),
     width: '50%',
     alignSelf: 'center',
     borderWidth: 1,
@@ -178,6 +193,6 @@ const sytles = StyleSheet.create({
     backgroundColor: colors.pallete.gray1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: scaled(8),
   },
 });

@@ -17,6 +17,8 @@ import filterReducer from './reducers/filters';
 import categoriesReducer from './reducers/categories';
 import attributeOptionsReducer from './reducers/attribute-options';
 import citiesReducer from './reducers/cities';
+import appSettingsReducer from './reducers/app-settings';
+import splashReducer from './reducers/splash';
 // ...
 
 const rootReducer = combineReducers({
@@ -25,17 +27,27 @@ const rootReducer = combineReducers({
   categories: categoriesReducer,
   attributeOptions: attributeOptionsReducer,
   cities: citiesReducer,
+  appSettings: appSettingsReducer,
+  splash: splashReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
   // Only auth/profile state and the rarely-changing reference data cached
-  // by the *SyncBridge components (categories, attribute options, cities —
-  // see reducers/categories.ts, reducers/attribute-options.ts,
-  // reducers/cities.ts) survive an app restart. Search filters are
-  // ephemeral UI state and shouldn't outlive the session they were set in.
-  whitelist: ['user', 'categories', 'attributeOptions', 'cities'],
+  // by the *SyncBridge components (categories, attribute options, cities,
+  // per-city splash images — see reducers/categories.ts,
+  // reducers/attribute-options.ts, reducers/cities.ts, reducers/splash.ts)
+  // survive an app restart. Search filters are ephemeral UI state and
+  // shouldn't outlive the session they were set in.
+  whitelist: [
+    'user',
+    'categories',
+    'attributeOptions',
+    'cities',
+    'appSettings',
+    'splash',
+  ],
 };
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

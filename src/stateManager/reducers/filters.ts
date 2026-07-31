@@ -13,14 +13,26 @@ interface Category {
 
 // Matches the backend's AdvertisementSort enum (find-advertisements.dto.ts)
 // so it can be passed straight through to GET /advertisements.
-type SortOrder = 'new' | 'old' | 'price_asc' | 'price_desc' | 'most_viewed' | '';
+type SortOrder =
+  | 'new'
+  | 'old'
+  | 'price_asc'
+  | 'price_desc'
+  | 'most_viewed'
+  | '';
 
 interface filterState {
   mainCategory?: Category;
   subCategory?: Category;
   subSubCategory?: Category;
   sort: SortOrder;
-  onlyImages: boolean;
+  // "نمایش فقط آگهی های عکس‌دار" — a general filter, offered for every
+  // category and sub-category (see FilterScreen). Three states, because Figma
+  // draws it as a بله/خیر field rather than a checkbox: undefined = never
+  // chosen (field shows its placeholder), false = خیر, true = بله. Only `true`
+  // narrows the results — the other two both mean "don't filter" — but they
+  // are kept apart so reopening the filter still shows what was picked.
+  onlyImages?: boolean;
   minPrice?: number | string;
   maxPrice?: number | string;
   // "تعیین موقعیت" (FilterScreen) — an explicit near-me override; when
@@ -56,7 +68,7 @@ const initialState: filterState = {
   subCategory: undefined,
   subSubCategory: undefined,
   sort: '',
-  onlyImages: false,
+  onlyImages: undefined,
   minPrice: undefined,
   maxPrice: undefined,
   lat: undefined,

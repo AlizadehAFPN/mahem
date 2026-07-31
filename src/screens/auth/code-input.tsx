@@ -1,85 +1,87 @@
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   Screen,
   Text,
-  CodeFields,
   Divider,
   Button,
+  HeaderBackButton,
   TextField,
 } from '../../components';
-import {colors} from '../../theme';
-import {useRoute} from '@react-navigation/native';
-import {useDispatch} from 'react-redux';
+import {colors, scaled} from '../../theme';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {useMutation} from 'react-query';
-import {sendActivationCode, updateUser, upload} from '../../services';
-import {setUser} from '../../stateManager/reducers/user';
+import {PickedImage, sendActivationCode} from '../../services';
+
+// The route isn't typed anywhere (this stack is built from a plain array of
+// name/component pairs), so the shape is asserted here — `username` and
+// `profileImage` only arrive from the sign-up screen, which collects them
+// before there is an account to attach them to.
+interface CodeInputParams {
+  mobile: string;
+  username?: string;
+  profileImage?: PickedImage;
+  otpCode?: string;
+}
 
 export function CodeInput() {
   const {t} = useTranslation();
-  const dispatch = useDispatch();
-  const {params} = useRoute();
+  const params = useRoute<any>().params as CodeInputParams | undefined;
+  const {goBack} = useNavigation<any>();
   const [state, setState] = useState({
     code: '',
+    codeError: '',
   });
 
   const {mutate, isLoading} = useMutation(sendActivationCode);
-  const {mutate: uploadMutate} = useMutation(upload);
-  const {mutate: updateUserMutate} = useMutation(updateUser);
 
-  // Uploading the avatar picked on the register screen needs an access
-  // token, which only exists once OTP verification succeeds — so it happens
-  // here, right after login, instead of at pick time.
-  const uploadProfileImageIfAny = () => {
-    const profileImage = params?.profileImage;
-    if (!profileImage?.uri) {
-      return;
+  // A rejected mutation isn't necessarily a bad code — sendActivationCode also
+  // reads the profile back afterwards, so a dropped connection at that point
+  // would otherwise be reported as "wrong code". Only errors coming from the
+  // verify call itself are translated to a code-specific message; anything
+  // else falls back to a generic "try again".
+  const describeError = (error: any) => {
+    const url: string = error?.config?.url ?? '';
+    if (!url.includes('/auth/otp/verify')) {
+      return t('auth.codeGenericError');
     }
-    const {fileName, type, uri} = profileImage;
-    const form = new FormData();
-    form.append('file', {name: fileName, type, uri} as any);
-    uploadMutate(form, {
-      onSuccess: uploaded => {
-        const avatarUrl = uploaded?.data?.id;
-        updateUserMutate({avatar: avatarUrl});
-        dispatch(setUser({avatar: avatarUrl}));
-      },
-    });
-  };
-
-  // The username typed on the register screen only reaches the backend
-  // here — register()'s POST /auth/otp/request never accepts it (see
-  // auth.ts), and there was previously no call anywhere that persisted it,
-  // so every new account silently kept the backend's default/empty
-  // username. Runs independently of uploadProfileImageIfAny() (parallel,
-  // not merged into the same updateUser call) so a slow/failed avatar
-  // upload can't also block the username from being saved.
-  const persistUsernameIfAny = () => {
-    const username = params?.username;
-    if (!username) {
-      return;
+    const message = String(error?.response?.data?.message ?? '');
+    if (message.includes('expired')) {
+      return t('auth.codeExpired');
     }
-    updateUserMutate(
-      {username},
-      {onSuccess: () => dispatch(setUser({username}))},
-    );
+    if (message.includes('Too many attempts')) {
+      return t('auth.codeTooManyAttempts');
+    }
+    if (error?.response?.status === 401) {
+      return t('auth.codeInvalid');
+    }
+    return t('auth.codeGenericError');
   };
 
   const handleNext = () => {
     const isValid = handleValidation();
     if (isValid) {
-      const data = {mobile: params.mobile, activation_code: state.code};
-      mutate(data, {
-        onSuccess: data => {
-          // Setting `token` flips RootNavigator from AuthStack to
-          // OnboardingStack (or AppStack, if cityId is already set)
-          // reactively — no explicit navigate needed.
-          dispatch(setUser(data.data));
-          uploadProfileImageIfAny();
-          persistUsernameIfAny();
+      // Only onError is wired up. On success sendActivationCode writes the
+      // token to redux itself, which swaps the whole auth stack out and
+      // unmounts this screen — and react-query v3 stops delivering a
+      // mutation's callbacks the moment its observer unmounts, so an
+      // onSuccess here would never run. On failure the screen is still
+      // mounted, so this callback does arrive.
+      mutate(
+        {
+          mobile: params!.mobile,
+          activation_code: state.code,
+          // Only set when arriving from the sign-up screen; sendActivationCode
+          // writes them onto the new account before the session reaches redux.
+          username: params!.username,
+          profileImage: params!.profileImage,
         },
-      });
+        {
+          onError: error =>
+            setState(s => ({...s, codeError: describeError(error)})),
+        },
+      );
     }
   };
   const handleValidation = () => {
@@ -92,16 +94,20 @@ export function CodeInput() {
   return (
     <Screen style={{flex: 1}} statusbarBackgroundColor={colors.main}>
       <View style={sytles.topColor}>
+        {/* The «تغییر شماره» link below does the same goBack(), but it reads as
+            an action on the number rather than as leaving the screen — this is
+            the plain back affordance every pushed screen gets. */}
+        <HeaderBackButton style={sytles.back} />
         <Text
           style={{textAlign: 'center'}}
           preset="default"
           size={20}
           color="white">
-          {t('auth.codeIntro')}
+          {t('auth.codeIntro', {mobile: params?.mobile})}
         </Text>
         {params?.otpCode ? (
           <Text
-            style={{textAlign: 'center', marginTop: 8}}
+            style={{textAlign: 'center', marginTop: scaled(8)}}
             preset="default"
             size={18}
             color="white">
@@ -114,22 +120,35 @@ export function CodeInput() {
         <View style={sytles.codeContainer}>
           <TextField
             style={{
-              borderRadius: 8,
+              borderRadius: scaled(8),
               borderColor: colors.pallete.gray2,
               width: '100%',
             }}
-            labelStyle={{color: 'black', fontSize: 17, marginTop: -5}}
+            labelStyle={{
+              color: 'black',
+              fontSize: scaled(17),
+              marginTop: scaled(-5),
+            }}
             label={t('auth.verificationCode')}
             inputMode="tel"
-            // error={state.code}
-            onChangeText={text => setState(s => ({...s, code: text}))}
+            error={state.codeError}
+            // Same reason as the mobile field on the login screen: the failure
+            // message sits above the confirm button, so its slot is reserved
+            // up-front instead of pushing the button down (27 of the 60pt gap
+            // below belongs to it).
+            reserveErrorSpace
+            // Clear the previous failure as soon as the code is edited, so a
+            // stale "wrong code" doesn't sit under a freshly typed one.
+            onChangeText={text =>
+              setState(s => ({...s, code: text, codeError: ''}))
+            }
             // No hard cap here: OTP_CODE_LENGTH on the backend is
             // configurable (currently 5), so a fixed maxLength would silently
             // truncate the code and make verification always fail.
             maxLength={8}
           />
         </View>
-        <Divider height={100} />
+        <Divider height={33} />
         <Button
           loading={isLoading}
           disabled={!enableButton() || isLoading}
@@ -140,10 +159,25 @@ export function CodeInput() {
               ? colors.main
               : colors.pallete.gray1,
           }}>
-          <Text color={enableButton() ? 'white' : 'black'} size={20}>
+          <Text
+            color={enableButton() ? 'white' : colors.pallete.gray2}
+            size={19}>
             {t('auth.finalConfirm')}
           </Text>
         </Button>
+        <Divider height={20} />
+        {/* A mistyped number is only recoverable before verification — after
+            it, the account already exists and the only way out is the
+            sign-out action on the complete-profile screen. This is a plain
+            goBack() within the auth stack, so the number can be corrected. */}
+        <TouchableOpacity onPress={goBack}>
+          <Text
+            size={14}
+            color={colors.pallete.gray2}
+            style={sytles.changeNumber}>
+            {t('auth.changeNumber')}
+          </Text>
+        </TouchableOpacity>
       </View>
     </Screen>
   );
@@ -151,36 +185,29 @@ export function CodeInput() {
 const sytles = StyleSheet.create({
   topColor: {
     backgroundColor: colors.main,
-    height: 137,
-    padding: 16,
-  },
-  cammeraButton: {
-    width: 94,
-    height: 94,
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: 'black',
+    height: scaled(137),
+    padding: scaled(16),
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: -47,
-    alignSelf: 'center',
-    backgroundColor: colors.pallete.gray1,
-    overflow: 'hidden',
+  },
+  back: {
+    position: 'absolute',
+    top: scaled(6),
+    right: scaled(8),
+    zIndex: 1,
   },
   formContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: scaled(24),
+    paddingTop: scaled(16),
   },
   button: {
-    height: 50,
-    width: '50%',
-    alignSelf: 'center',
-    borderWidth: 1,
-    borderColor: colors.pallete.gray2,
-    backgroundColor: colors.pallete.gray1,
+    height: scaled(52),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: scaled(12),
+  },
+  changeNumber: {
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
   codeContainer: {
     alignItems: 'center',

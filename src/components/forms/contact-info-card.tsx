@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {Row} from '../row/row';
 import {Text} from '../text/text';
 import {UnderlineTextField} from '../text-field/underline-text-field';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 
 export interface ContactInfoValue {
   contact_info: string;
@@ -36,13 +36,17 @@ export function ContactInfoCard({value, onChange}: ContactInfoCardProps) {
         onChangeText={text => set({contact_info: text})}
         placeholder={t('forms.contact.mobilePlaceholder')}
         keyboardType="number-pad"
+        phoneNumber
       />
       <Text style={styles.helper}>{t('forms.contact.mobileHelper')}</Text>
       <Row style={styles.toggleRow}>
         <Switch
           value={value.chatEnabled}
           onValueChange={v => set({chatEnabled: v})}
-          trackColor={{false: colors.pallete.gray3, true: colors.pallete.green1}}
+          trackColor={{
+            false: colors.pallete.gray3,
+            true: colors.pallete.green1,
+          }}
           thumbColor={value.chatEnabled ? colors.pallete.green : '#f4f3f4'}
         />
         <Text size={15} style={styles.toggleLabel}>
@@ -63,7 +67,10 @@ export function ContactInfoCard({value, onChange}: ContactInfoCardProps) {
         <Switch
           value={value.hideEmail}
           onValueChange={v => set({hideEmail: v})}
-          trackColor={{false: colors.pallete.gray3, true: colors.pallete.green1}}
+          trackColor={{
+            false: colors.pallete.gray3,
+            true: colors.pallete.green1,
+          }}
           thumbColor={value.hideEmail ? colors.pallete.green : '#f4f3f4'}
         />
         <Text size={15} style={styles.toggleLabel}>
@@ -77,32 +84,32 @@ export function ContactInfoCard({value, onChange}: ContactInfoCardProps) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.pallete.gray1,
-    borderRadius: 10,
-    padding: 12,
-    marginVertical: 8,
+    borderRadius: scaled(10),
+    padding: scaled(12),
+    marginVertical: scaled(8),
   },
   label: {
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: scaled(15),
     opacity: 0.5,
-    marginBottom: 4,
+    marginBottom: scaled(4),
   },
   emailLabel: {
-    marginTop: 16,
+    marginTop: scaled(16),
   },
   helper: {
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: scaled(12),
     opacity: 0.5,
-    marginTop: 4,
-    marginBottom: 8,
+    marginTop: scaled(4),
+    marginBottom: scaled(8),
   },
   toggleRow: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: scaled(4),
   },
   toggleLabel: {
-    marginHorizontal: 8,
+    marginHorizontal: scaled(8),
   },
 });

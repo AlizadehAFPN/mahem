@@ -3,8 +3,13 @@
  *
  * Design notes for this codebase:
  * - Default language is Persian; English is opt-in via the settings screen.
- * - Layout direction is intentionally left RTL for both languages for now
- *   (we translate copy only), so we never touch I18nManager here.
+ * - Layout direction does not follow the language: both languages get the same
+ *   right-to-left composition, which the components draw themselves with
+ *   `flexDirection: 'row-reverse'` over a left-to-right base. Changing the
+ *   language therefore changes copy only. Nothing here touches I18nManager —
+ *   the base direction is pinned once, natively, at launch (AppDelegate.mm and
+ *   MainActivity.java), because it has to be settled before the first view is
+ *   created and must not vary with the phone's own language setting.
  * - Persistence lives in LanguageContext (reads/writes AsyncStorage and calls
  *   changeLanguage); this module just wires up the instance and resources.
  * - `useSuspense: false` because React Native has no Suspense fallback here and

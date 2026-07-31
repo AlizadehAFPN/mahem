@@ -1,14 +1,8 @@
-import {View, StyleSheet, Text as RNText} from 'react-native';
+import {Text as RNText} from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {
-  Divider,
-  GradiantHeader,
-  MainHeader,
-  Screen,
-  Text,
-} from '../../../components';
-import {colors} from '../../../theme';
+import {Divider, MainHeader, Screen, Text} from '../../../components';
+import {colors, scaled} from '../../../theme';
 import {
   CREATE_JOB_HELPER_GUIDE_EN,
   CREATE_JOB_HELPER_GUIDE_FA,
@@ -25,28 +19,22 @@ export function CreateJobHelperScreen() {
       : CREATE_JOB_HELPER_GUIDE_FA;
   return (
     <Screen withoutScroll>
-      <MainHeader title={t('home.jobsBank')} showBack />
-      <View style={styles.nav}>
-        <GradiantHeader
-          details={false}
-          colors={['rgba(0,0,0,.1)', 'rgba(0,0,0,.7)']}
-        />
-      </View>
-      <Screen style={{paddingHorizontal: 16}}>
+      <MainHeader showLocation showBack title={t('home.jobsBank')} />
+      <Screen style={{paddingHorizontal: scaled(16)}}>
         <Divider height={40} />
         <Text
           size={17}
           color={colors.pallete.red2}
-          style={{textAlign: 'center', lineHeight: 26}}>
+          style={{textAlign: 'center', lineHeight: scaled(26)}}>
           {t('jobs.guideIntro')}
         </Text>
         <Divider height={16} />
         {categoryGuides.map(item => (
-          <RNText key={item.title} style={{marginBottom: 10}}>
+          <RNText key={item.title} style={{marginBottom: scaled(10)}}>
             <Text size={15} color={colors.pallete.red2}>
               {item.title}:{' '}
             </Text>
-            <Text size={15} style={{lineHeight: 22}}>
+            <Text size={15} style={{lineHeight: scaled(22)}}>
               {item.description}
             </Text>
           </RNText>
@@ -56,12 +44,3 @@ export function CreateJobHelperScreen() {
     </Screen>
   );
 }
-const styles = StyleSheet.create({
-  nav: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    top: 47,
-  },
-});

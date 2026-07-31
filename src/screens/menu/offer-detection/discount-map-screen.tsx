@@ -11,13 +11,13 @@ import MapView, {Marker} from 'react-native-maps';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
 import {useQuery} from 'react-query';
 import {DiscountMenuSheet, MainHeader, Screen, Text} from '../../../components';
 import {getAds} from '../../../services';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {useAdsCategories} from '../../../hooks/use-cached-categories';
 import {useCities} from '../../../hooks/use-cached-cities';
+import {useBrowseCity} from '../../../hooks/use-browse-city';
 import {localizeCategory} from '../../../i18n/display-maps';
 
 // Gorgan (this app only serves Golestan province — see src/utiles/cities.ts —
@@ -38,7 +38,16 @@ const DEFAULT_REGION = {
 export function DiscountMapScreen() {
   const {t} = useTranslation();
   const {navigate} = useNavigation<any>();
-  const cityId = useSelector((s: any) => s.user.cityId);
+  // The camera needs a single point, so it opens on the browse city — the
+  // same city the pins below are filtered to — falling back to the account's
+  // own city for «کل استان», which has no center of its own. It used to open
+  // on the home city unconditionally, which meant that browsing another city
+  // put every pin off-screen and left the user panning to find them.
+  const {
+    cityIdParam: browseCityId,
+    cityKey: browseCityKey,
+    concreteCityId: cameraCityId,
+  } = useBrowseCity();
   const [menu, setMenu] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
@@ -48,8 +57,8 @@ export function DiscountMapScreen() {
   // very first frame, not jump there after ads/GPS resolve.
   const {data: citiesData} = useCities();
   const currentCity = useMemo(
-    () => citiesData?.data?.find((c: any) => c.id === cityId),
-    [citiesData, cityId],
+    () => citiesData?.data?.find((c: any) => c.id === cameraCityId),
+    [citiesData, cameraCityId],
   );
   const cityRegion = useMemo(() => {
     if (currentCity?.lat != null && currentCity?.lng != null) {
@@ -88,9 +97,10 @@ export function DiscountMapScreen() {
   }, [subCategories.length]);
 
   const {data} = useQuery(
-    ['discounts', 'map', parentId, cityId],
-    () => getAds({parentCategoryId: parentId, cityId, limit: 100}),
-    {enabled: !!parentId && !!cityId},
+    ['discounts', 'map', parentId, browseCityKey],
+    () =>
+      getAds({parentCategoryId: parentId, cityId: browseCityId, limit: 100}),
+    {enabled: !!parentId},
   );
 
   const ads = useMemo(
@@ -165,7 +175,7 @@ export function DiscountMapScreen() {
               ? t('offers.allDiscounts')
               : t('offers.categoriesSelected', {value: selected.length})}
           </Text>
-          <Ionicons name="chevron-down" size={14} color="#030303" />
+          <Ionicons name="chevron-down" size={scaled(14)} color="#030303" />
         </TouchableOpacity>
       </View>
 
@@ -181,7 +191,9 @@ export function DiscountMapScreen() {
           </TouchableWithoutFeedback>
           <View style={styles.sheet}>
             <View style={styles.sheetHandle} />
-            <Text preset="bold" style={{textAlign: 'center', marginBottom: 8}}>
+            <Text
+              preset="bold"
+              style={{textAlign: 'center', marginBottom: scaled(8)}}>
               {t('offers.categoriesSheetTitle')}
             </Text>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -200,7 +212,7 @@ export function DiscountMapScreen() {
                       ? 'checkmark-circle'
                       : 'ellipse-outline'
                   }
-                  size={18}
+                  size={scaled(18)}
                   color={
                     selected.length === subCategories.length
                       ? colors.pallete.green
@@ -210,7 +222,7 @@ export function DiscountMapScreen() {
                 <Text
                   size={14}
                   preset="bold"
-                  style={{flex: 1, textAlign: 'right', marginRight: 6}}>
+                  style={{flex: 1, textAlign: 'right', marginRight: scaled(6)}}>
                   {t('offers.allDiscounts')}
                 </Text>
               </TouchableOpacity>
@@ -223,7 +235,7 @@ export function DiscountMapScreen() {
                     onPress={() => toggle(cat.id)}>
                     <Ionicons
                       name={active ? 'checkmark-circle' : 'ellipse-outline'}
-                      size={18}
+                      size={scaled(18)}
                       color={
                         active ? colors.pallete.green : colors.pallete.gray3
                       }
@@ -231,7 +243,11 @@ export function DiscountMapScreen() {
                     <Text
                       size={13}
                       numberOfLines={1}
-                      style={{flex: 1, textAlign: 'right', marginRight: 6}}>
+                      style={{
+                        flex: 1,
+                        textAlign: 'right',
+                        marginRight: scaled(6),
+                      }}>
                       {localizeCategory(cat.title)}
                     </Text>
                     <View
@@ -256,16 +272,16 @@ export function DiscountMapScreen() {
 const styles = StyleSheet.create({
   filterPill: {
     position: 'absolute',
-    bottom: 8,
-    right: 4,
+    bottom: scaled(8),
+    right: scaled(4),
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(168,161,161,0.5)',
     borderWidth: 1,
     borderColor: colors.pallete.gray3,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    borderRadius: scaled(10),
+    paddingHorizontal: scaled(14),
+    paddingVertical: scaled(8),
   },
   filterOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -276,32 +292,32 @@ const styles = StyleSheet.create({
   },
   sheet: {
     backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 24,
+    borderTopLeftRadius: scaled(20),
+    borderTopRightRadius: scaled(20),
+    paddingHorizontal: scaled(16),
+    paddingTop: scaled(8),
+    paddingBottom: scaled(24),
     maxHeight: '70%',
   },
   sheetHandle: {
     alignSelf: 'center',
-    width: 44,
-    height: 4,
+    width: scaled(44),
+    height: scaled(4),
     borderRadius: 2,
     backgroundColor: colors.pallete.gray3,
-    marginBottom: 8,
+    marginBottom: scaled(8),
   },
   filterRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: scaled(10),
     borderTopWidth: 1,
     borderTopColor: colors.pallete.gray1,
   },
   colorDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginLeft: 6,
+    width: scaled(12),
+    height: scaled(12),
+    borderRadius: scaled(6),
+    marginLeft: scaled(6),
   },
 });

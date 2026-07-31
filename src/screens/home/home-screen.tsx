@@ -9,19 +9,34 @@ import {
 } from '../../components';
 import {useNavigation} from '@react-navigation/native';
 import {useQuery, useQueryClient} from 'react-query';
-import {collectLeafCategoryIds, getAds, getAllJobs, getBanner} from '../../services';
-import {useDispatch, useSelector} from 'react-redux';
+import {
+  collectLeafCategoryIds,
+  getAds,
+  getAllJobs,
+  getBanner,
+} from '../../services';
+import {useDispatch} from 'react-redux';
 import {setFilters} from '../../stateManager/reducers/filters';
-import {RootState} from '../../stateManager';
 import {useLanguage} from '../../Context/LanguageContext';
 import {useAdsCategories} from '../../hooks/use-cached-categories';
+import {useBrowseCity} from '../../hooks/use-browse-city';
+import {scaled} from '../../theme';
 
 export function HomeScreen() {
-  const {navigate} = useNavigation();
-  const user = useSelector((s: RootState) => s.user);
+  const {navigate} = useNavigation<any>();
+  // The header dropdown drives everything on this screen. The two ids differ
+  // only in what «کل استان» means: for the ad/job feeds it means "no city
+  // filter" (cityIdParam is undefined, the whole province is listed), while
+  // banners have no province-wide set to show, so concreteCityId keeps them
+  // on the account's own city instead of leaving the strip empty.
+  const {
+    cityIdParam: browseCityId,
+    cityKey: browseCityKey,
+    concreteCityId: bannerCityId,
+  } = useBrowseCity();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const {translate, changeLanguage, language} = useLanguage();
+  const {translate} = useLanguage();
   const handlePress = (item: any) => {
     //@ts-ignore
     navigate('singleProduct', {ads: item});
@@ -30,10 +45,17 @@ export function HomeScreen() {
     //@ts-ignore
     navigate('singleJob', {job: item});
   };
+  // Keyed on the browse city, not the account's home city. Banners used to
+  // follow user.cityId, so picking another city from the header dropdown
+  // changed every list on this screen except the banners — a city's own
+  // banner was unreachable unless you made it your home city in Settings.
+  // concreteCityId is what «کل استان» resolves to a real city with: banners
+  // are uploaded per city and there is no province-wide set, so the account's
+  // own city stands in rather than the strip going empty.
   const {data, isFetching: isBannersFetching} = useQuery(
-    ['banners', user.cityId],
-    () => getBanner(user.cityId),
-    {enabled: !!user.cityId},
+    ['banners', bannerCityId],
+    () => getBanner(bannerCityId),
+    {enabled: !!bannerCityId},
   );
   // تخفیف‌یاب and استخدامی ads are Advertisements tagged with one of their
   // subcategories, never the parent category itself — resolve each parent's
@@ -50,65 +72,69 @@ export function HomeScreen() {
   // Waits on both categories so a تخفیف‌یاب/استخدامی ad is never briefly (or
   // permanently, if this never refetched) shown in the general row too.
   const {data: estateAds, isFetching: isAdsFetching} = useQuery(
-    ['ads', user.cityId, discountCategory?.id, employmentCategory?.id],
+    ['ads', browseCityKey, discountCategory?.id, employmentCategory?.id],
     () =>
       getAds({
         limit: 100,
-        cityId: user.cityId,
+        cityId: browseCityId,
         excludeParentCategoryId: [discountCategory?.id, employmentCategory?.id]
           .filter(Boolean)
           .join(','),
       }),
     {
-      enabled:
-        !!user.cityId && !!discountCategory?.id && !!employmentCategory?.id,
+      enabled: !!discountCategory?.id && !!employmentCategory?.id,
     },
   );
 
   const {data: discountAds, isFetching: isDiscountsFetching} = useQuery(
-    ['ads', 'discounts', user.cityId],
+    ['ads', 'discounts', browseCityKey],
     () =>
       getAds({
         limit: 100,
-        cityId: user.cityId,
+        cityId: browseCityId,
         parentCategoryId: discountCategory?.id,
       }),
-    {enabled: !!user.cityId && !!discountCategory?.id},
+    {enabled: !!discountCategory?.id},
   );
 
   const {data: employmentAds, isFetching: isEmploymentFetching} = useQuery(
-    ['ads', 'employment', user.cityId],
+    ['ads', 'employment', browseCityKey],
     () =>
       getAds({
         limit: 100,
-        cityId: user.cityId,
+        cityId: browseCityId,
         parentCategoryId: employmentCategory?.id,
       }),
-    {enabled: !!user.cityId && !!employmentCategory?.id},
+    {enabled: !!employmentCategory?.id},
   );
 
   const {data: jobs, isFetching: isJobsFetching} = useQuery(
-    ['jobs', 'home', user.cityId],
-    () => getAllJobs({limit: 100, cityId: user.cityId}),
-    {enabled: !!user.cityId},
+    ['jobs', 'home', browseCityKey],
+    () => getAllJobs({limit: 100, cityId: browseCityId}),
   );
 
   const onRefresh = () => {
-    queryClient.invalidateQueries(['banners', user.cityId]);
-    queryClient.invalidateQueries(['ads', user.cityId]);
-    queryClient.invalidateQueries(['ads', 'discounts', user.cityId]);
-    queryClient.invalidateQueries(['ads', 'employment', user.cityId]);
-    queryClient.invalidateQueries(['jobs', 'home', user.cityId]);
+    // Must be the same id the query above is keyed on, or pull-to-refresh
+    // invalidates a key nothing is subscribed to and the banner strip silently
+    // stops refreshing.
+    queryClient.invalidateQueries(['banners', bannerCityId]);
+    queryClient.invalidateQueries(['ads', browseCityKey]);
+    queryClient.invalidateQueries(['ads', 'discounts', browseCityKey]);
+    queryClient.invalidateQueries(['ads', 'employment', browseCityKey]);
+    queryClient.invalidateQueries(['jobs', 'home', browseCityKey]);
   };
 
   const onPressEmploymentMore = () => {
-    navigate('employee' as never, {
-      screen: 'employeeAds',
-      params: {
-        categoryIds: collectLeafCategoryIds(employmentCategory),
-        title: employmentCategory?.title,
-      },
-    } as never);
+    navigate(
+      'employee' as never,
+      {
+        screen: 'employeeAds',
+        params: {
+          categoryIds: collectLeafCategoryIds(employmentCategory),
+          title: employmentCategory?.title,
+        },
+      } as never,
+    );
   };
 
   const onPressMore = (mainCategory: {
@@ -127,7 +153,7 @@ export function HomeScreen() {
     navigate('search' as never);
   };
 
-  const SeparatorComponent = () => <View style={{width: 8}} />;
+  const SeparatorComponent = () => <View style={{width: scaled(8)}} />;
   return (
     <Screen withoutScroll>
       <MainHeader showLocation={true} title={''} showNews={true} />
@@ -163,8 +189,8 @@ export function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               ItemSeparatorComponent={SeparatorComponent}
               data={employmentAds?.data?.ads?.slice(0, 5)}
-              ListHeaderComponent={<View style={{width: 4}} />}
-              ListFooterComponent={<View style={{width: 4}} />}
+              ListHeaderComponent={<View style={{width: scaled(4)}} />}
+              ListFooterComponent={<View style={{width: scaled(4)}} />}
               inverted
               renderItem={({item}) => (
                 <GridProduct product={item} onPress={() => handlePress(item)} />
@@ -185,8 +211,8 @@ export function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               ItemSeparatorComponent={SeparatorComponent}
               data={estateAds?.data?.ads?.slice(0, 5)}
-              ListHeaderComponent={<View style={{width: 4}} />}
-              ListFooterComponent={<View style={{width: 4}} />}
+              ListHeaderComponent={<View style={{width: scaled(4)}} />}
+              ListFooterComponent={<View style={{width: scaled(4)}} />}
               inverted
               renderItem={({item}) => (
                 <GridProduct product={item} onPress={() => handlePress(item)} />
@@ -210,8 +236,8 @@ export function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               ItemSeparatorComponent={SeparatorComponent}
               data={discountAds?.data?.ads?.slice(0, 5)}
-              ListHeaderComponent={<View style={{width: 4}} />}
-              ListFooterComponent={<View style={{width: 4}} />}
+              ListHeaderComponent={<View style={{width: scaled(4)}} />}
+              ListFooterComponent={<View style={{width: scaled(4)}} />}
               inverted
               renderItem={({item}) => (
                 <GridProduct product={item} onPress={() => handlePress(item)} />
@@ -232,11 +258,14 @@ export function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               ItemSeparatorComponent={SeparatorComponent}
               data={jobs?.data?.jobs?.slice(0, 5)}
-              ListHeaderComponent={<View style={{width: 4}} />}
-              ListFooterComponent={<View style={{width: 4}} />}
+              ListHeaderComponent={<View style={{width: scaled(4)}} />}
+              ListFooterComponent={<View style={{width: scaled(4)}} />}
               inverted
               renderItem={({item}) => (
-                <GridProduct product={item} onPress={() => handleJobPress(item)} />
+                <GridProduct
+                  product={item}
+                  onPress={() => handleJobPress(item)}
+                />
               )}
             />
           </RowCategories>

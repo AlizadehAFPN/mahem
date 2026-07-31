@@ -12,7 +12,7 @@ import {
   Text,
   UnderlineTextField,
 } from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 
 type PickerTarget = 'cover' | 'logo' | null;
 
@@ -58,7 +58,7 @@ export function CreateStoreScreen() {
             iconColor="white"
           />
         </View>
-        <ScrollView contentContainerStyle={{paddingBottom: 40}}>
+        <ScrollView contentContainerStyle={{paddingBottom: scaled(40)}}>
           <Button
             style={styles.coverBox}
             onPress={() => setPickerTarget('cover')}>
@@ -68,7 +68,7 @@ export function CreateStoreScreen() {
                 style={StyleSheet.absoluteFill}
               />
             ) : (
-              <Ionicons name="camera-outline" size={80} color="black" />
+              <Ionicons name="camera-outline" size={scaled(80)} color="black" />
             )}
           </Button>
 
@@ -84,7 +84,7 @@ export function CreateStoreScreen() {
               ) : (
                 <Ionicons
                   name="camera-outline"
-                  size={26}
+                  size={scaled(26)}
                   color={colors.pallete.gray3}
                 />
               )}
@@ -139,8 +139,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.pallete.gray1,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: scaled(16),
+    paddingVertical: scaled(8),
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
@@ -148,10 +148,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   logoBox: {
-    width: 69,
-    height: 69,
-    marginTop: -46,
-    borderRadius: 8,
+    width: scaled(69),
+    height: scaled(69),
+    marginTop: scaled(-46),
+    borderRadius: scaled(8),
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
@@ -161,18 +161,18 @@ const styles = StyleSheet.create({
   },
   nameField: {
     flex: 1,
-    marginRight: 12,
+    marginRight: scaled(12),
   },
   nameInput: {
     color: colors.main,
     fontWeight: 'bold',
     textAlign: 'right',
-    paddingVertical: 4,
+    paddingVertical: scaled(4),
     flex: 1,
   },
   hint: {
     textAlign: 'center',
     color: colors.pallete.grayText,
-    marginTop: 24,
+    marginTop: scaled(24),
   },
 });

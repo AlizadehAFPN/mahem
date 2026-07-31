@@ -1,24 +1,15 @@
-import {Alert, FlatList, StyleSheet, View} from 'react-native';
-import React, {useEffect, useMemo, useState} from 'react';
+import {Alert, View} from 'react-native';
+import {AdFormProps} from './form.props';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {localizeOption} from '../../i18n/display-maps';
 import {AdsOptionsModal} from '../modal/ads-options-modal';
 import {Button} from '../button/button';
 import {Checkbox} from '../checkbox/checkbox';
 import {ContactInfoCard} from './contact-info-card';
-import {CreateAdsHeader} from '../headers/create-ads-header';
 import {Divider} from '../divider/divider';
-import {DurationModal} from '../modal/duration-modal';
-import {MainHeader} from '../headers/mainHeader';
 import {LocationSelectModal} from '../modal/location-select-modal';
-import {Row} from '../row/row';
-import {Screen} from '../screen/screen';
-import {Text} from '../text/text';
-import {TextField} from '../text-field/text-field';
 import {UnderlineTextField} from '../text-field/underline-text-field';
-import {colors} from '../../theme';
-import {useNavigation} from '@react-navigation/native';
-import {SelectAdsCategory} from '../modal/select-ads-category';
 
 // Booleans (parking/elevator/suburbs/by_person) are stored as plain
 // booleans on the ad but presented as one of two Persian labels here — this
@@ -34,9 +25,14 @@ function boolToLabel(
   return '';
 }
 
-export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}) {
+export function EstateForm({
+  subCategory,
+  subsubCategory,
+  editItem,
+  send,
+  onSend,
+}: AdFormProps) {
   const {t} = useTranslation();
-  const {navigate} = useNavigation();
   const [state, setState] = useState(() =>
     editItem
       ? {
@@ -141,7 +137,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
         const tempParking = parking == 'دارد';
         const tempEelevator = elevator == 'دارد';
         const by_person = adsCreator == 'شخصی';
-        onSend({
+        onSend?.({
           title,
           suburbs,
           parking: tempParking,
@@ -174,7 +170,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
           lng,
         });
       } else {
-        onSend(false);
+        onSend?.(false);
       }
     }
   }, [send]);
@@ -223,9 +219,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
             <Divider />
             <UnderlineTextField
               value={state.product_year}
-              onChangeText={text =>
-                setState(s => ({...s, product_year: text}))
-              }
+              onChangeText={text => setState(s => ({...s, product_year: text}))}
               keyboardType="number-pad"
               placeholder={t('forms.buildYear')}
             />
@@ -239,6 +233,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                   value={state.rehn}
                   onChangeText={text => setState(s => ({...s, rehn: text}))}
                   keyboardType="number-pad"
+                  thousandSeparator
                   placeholder={t('forms.enterMortgageToman')}
                 />
                 <Divider />
@@ -246,6 +241,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                   value={state.ejare}
                   onChangeText={text => setState(s => ({...s, ejare: text}))}
                   keyboardType="number-pad"
+                  thousandSeparator
                   placeholder={t('forms.enterRentToman')}
                 />
                 <Divider />
@@ -263,6 +259,7 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
                 value={state.price}
                 onChangeText={text => setState(s => ({...s, price: text}))}
                 keyboardType="number-pad"
+                thousandSeparator
                 placeholder={t('common.price')}
               />
             )}
@@ -416,26 +413,9 @@ export function EstateForm({subCategory, subsubCategory, editItem, send, onSend}
       <AdsOptionsModal
         type={state.optionType}
         visible={state.optionModal}
-        onSelect={item => setState(s => ({...s, [s.optionType]: item}))}
+        onSelect={(item: any) => setState(s => ({...s, [s.optionType]: item}))}
         onClose={() => setState(s => ({...s, optionModal: false}))}
       />
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: colors.main,
-  },
-  form: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  duration: {
-    borderBottomWidth: 1,
-    borderColor: colors.pallete.red2,
-    marginHorizontal: 10,
-    height: 30,
-    paddingHorizontal: 5,
-  },
-});

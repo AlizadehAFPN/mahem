@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {TextStyle, TouchableOpacity, View, ViewStyle} from 'react-native';
 import {Text} from '../text/text';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {CheckboxProps} from './checkbox.props';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 
 const ROOT: ViewStyle = {
   flexDirection: 'row-reverse',
-  marginVertical: 4,
+  marginVertical: scaled(4),
   alignSelf: 'flex-end',
   alignItems: 'center',
 };
@@ -20,7 +20,7 @@ const OUTLINE: ViewStyle = {
   justifyContent: 'center',
   alignItems: 'center',
   borderColor: colors.text,
-  borderRadius: 10,
+  borderRadius: scaled(10),
   overflow: 'hidden',
 };
 
@@ -32,7 +32,7 @@ const FILL: ViewStyle = {
   alignItems: 'center',
 };
 
-const LABEL: TextStyle = {paddingHorizontal: 8, fontSize: 17};
+const LABEL: TextStyle = {paddingHorizontal: scaled(8), fontSize: scaled(17)};
 const LABEL_LINK: TextStyle = {
   color: colors.main,
   textDecorationLine: 'underline',
@@ -83,7 +83,9 @@ export function Checkbox(props: CheckboxProps) {
       style={rootStyle}>
       <View style={outlineStyle}>
         <View style={fillStyle}>
-          {props.value && <IonIcon name="checkmark" color="white" size={16} />}
+          {props.value && (
+            <IonIcon name="checkmark" color="white" size={scaled(16)} />
+          )}
         </View>
       </View>
       {props.onTextPress ? (

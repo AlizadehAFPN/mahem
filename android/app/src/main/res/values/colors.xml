@@ -1,0 +1,7 @@
+<resources>
+  <!-- Background layer of the adaptive launcher icon (mipmap-anydpi-v26).
+       White, because ic_launcher_foreground.png is the ماهم mark drawn in
+       black on a fully transparent canvas — the same white field the legacy
+       ic_launcher.png bakes in for pre-Android-8 launchers. -->
+  <color name="ic_launcher_background">#FFFFFFFF</color>
+</resources>

@@ -61,17 +61,58 @@ export const fa = {
     genericError: 'خطایی رخ داد، لطفا دوباره تلاش کنید',
   },
   auth: {
-    registerIntro:
-      'برای ثبت نام کافیست شماره همراه خود را وارد نمایید تا کد فعال سازی برایتان ارسال شود.',
     username: 'نام کاربری',
     mobile: 'شماره همراه',
-    register: 'ثبت نام',
+    mobilePlaceholder: '۰۹۱۲۳۴۵۶۷۸۹',
     mobileError: 'شماره موبایل خود را به درستی وارد کنید!',
-    codeIntro:
-      'لطفا برای تکمیل ثبت نام در ماهم کد فعال سازی ارسال شده را وارد نمایید.',
+    usernameLengthError: 'نام کاربری باید حداقل {{min}} حرف باشد!',
+    // صفحه ثبت‌نام: نقطه شروع اپ. متن معرفی، عیناً از فیگما (نود 106:145).
+    registerIntro:
+      'برای ثبت نام کافیست شماره همراه خود را وارد نمایید تا کد فعال سازی برایتان ارسال شود',
+    registerAction: 'ثبت‌نام',
+    usernameTaken: 'این نام کاربری قبلاً استفاده شده است',
+    mobileTaken: 'این شماره موبایل قبلاً ثبت شده است',
+    accountExists:
+      'این کاربر موجود است. در صورتی که قبلاً ثبت‌نام کرده‌اید، از صفحه ورود وارد شوید.',
+    goToLogin: 'رفتن به صفحه ورود',
+    alreadyRegistered: 'قبلاً ثبت‌نام کرده‌اید؟',
+    loginAction: 'ورود',
+    // صفحه ورود: فقط شماره موبایلِ حسابِ موجود. متن هم‌لحنِ متنِ ثبت‌نام.
+    loginIntro:
+      'برای ورود کافیست شماره همراه خود را وارد نمایید تا کد تایید برایتان ارسال شود',
+    getCode: 'دریافت کد تایید',
+    noAccountFound:
+      'حسابی با این شماره موبایل پیدا نشد. برای ساخت حساب، ابتدا ثبت‌نام کنید.',
+    goToRegister: 'رفتن به صفحه ثبت‌نام',
+    noAccount: 'حساب کاربری ندارید؟',
+    // سه تکه، چون بخش میانی روی صفحه «قوانین و مقررات» لینک می‌شود.
+    loginTermsPrefix: 'با ادامه، ',
+    loginTermsLink: 'قوانین و مقررات ماهم',
+    loginTermsSuffix: ' را می‌پذیرید',
+    // تیک تاییدِ صریح در صفحه ثبت‌نام و تکمیل حساب.
+    acceptTerms: 'قوانین و مقررات ماهم را می‌پذیرم',
+    codeIntro: 'کد تایید ارسال‌شده به شماره {{mobile}} را وارد کنید',
+    changeNumber: 'ویرایش شماره',
     testCode: 'کد تست: {{code}}',
     verificationCode: 'کد تایید',
-    finalConfirm: 'تایید نهایی',
+    codeInvalid: 'کد وارد شده صحیح نیست.',
+    codeExpired: 'مهلت کد به پایان رسیده است. لطفا کد جدید درخواست کنید.',
+    codeTooManyAttempts:
+      'تعداد تلاش‌های ناموفق زیاد شد. لطفا کد جدید درخواست کنید.',
+    codeGenericError: 'ارتباط برقرار نشد. لطفا دوباره تلاش کنید.',
+    citySaveError: 'ذخیره اطلاعات انجام نشد. لطفا دوباره تلاش کنید.',
+    finalConfirm: 'تایید و ادامه',
+    completeProfileTitle: 'تکمیل حساب کاربری',
+    completeProfileIntro:
+      'خوش آمدید! برای ادامه، نام کاربری خود را انتخاب کنید.',
+    profilePhotoOptional: 'انتخاب تصویر پروفایل (اختیاری)',
+    avatarUploading: 'در حال بارگذاری تصویر...',
+    avatarUploadError: 'بارگذاری تصویر انجام نشد. لطفا دوباره تلاش کنید.',
+    profileSaveError: 'ذخیره اطلاعات انجام نشد. لطفا دوباره تلاش کنید.',
+    usernameHint: 'این نام در اپلیکیشن به دیگران نمایش داده می‌شود.',
+    useAnotherNumber: 'ورود با شماره دیگر',
+    useAnotherNumberBody:
+      'از این حساب خارج می‌شوید و می‌توانید با شماره دیگری وارد شوید. ادامه می‌دهید؟',
     citySelectionIntro: 'برای سرویس دهی بهتر لطفا فرم زیر را پر کنید.',
     gender: 'جنسیت:',
     male: 'مرد',
@@ -84,10 +125,13 @@ export const fa = {
     discountFinder: 'تخفیف یاب',
     jobsBank: 'بانک مشاغل',
     allAds: 'کل آگهی ها',
+    allProvince: 'کل استان',
   },
   settings: {
     title: 'تنظیمات',
+    chooseLanguage: 'انتخاب زبان',
     chooseCity: 'انتخاب شهر',
+    cityHint: 'شهر مورد نظر خود را انتخاب کنید',
     editProfile: 'ویرایش حساب کاربری',
     rateMahem: 'امتیاز دهی به ماهم',
     exit: 'خروج',
@@ -100,6 +144,11 @@ export const fa = {
     rules: 'قوانین',
     manageAds: 'مدیریت آگهی ها',
     share: 'اشتراک گزاری',
+    // The body of the "معرفی به دوستان" share. Sent on its own until
+    // APP_STORE_URL (deep-links.ts) has a value, so it has to stand alone as
+    // a message rather than read as a caption for a missing link.
+    shareAppMessage:
+      'ماهم — آگهی، فروشگاه و تخفیف‌های استان گلستان. نصبش کن و ببین.',
     bookmarks: 'آگهی نشان شده',
     aboutUs: 'درباره ما',
     contactUs: 'تماس با ما',
@@ -114,7 +163,8 @@ export const fa = {
     deleteConfirmBody: 'آیا از حذف این آگهی مطمئن هستید؟',
     deleteCompletely: 'حذف کامل',
     renewAdDescription: 'تمدید آگهی «{{title}}»',
-    renewRequestedBody: 'پس از تایید پرداخت توسط مدیریت، آگهی شما تمدید می‌شود.',
+    renewRequestedBody:
+      'پس از تایید پرداخت توسط مدیریت، آگهی شما تمدید می‌شود.',
     statusRejected: 'رد شده',
     statusExpired: 'منقضی شده',
     statusPending: 'در انتظار تایید',
@@ -136,6 +186,7 @@ export const fa = {
     telegramId: 'ایدی تلگرام',
     emailAddress: 'آدرس ایمیل',
     instagramId: 'ایدی اینستاگرام',
+    phoneNumber: 'شماره تماس',
     officeNotice:
       'تیم مدیریت و پشتیبانی ماهم در حال حاضر در تهران اقامت دارند و اقـدامات لازمه جهت انتقال دفتر به شـهر گنبد کاووس در دست اقـدام بوده و آدرس دقیق دفتر در گنبد کاووس اعلام خواهـد شد.',
     cyberpoliceNotice:
@@ -149,6 +200,7 @@ export const fa = {
     body: PRIVACY_BODY_FA,
   },
   jobs: {
+    jobDeleted: 'این آگهی استخدام حذف شده است و دیگر در دسترس نیست.',
     searchPlaceholder: 'جستجو برای ...',
     noResults: 'هیچ موردی پیدا نشد',
     colRow: 'ردیف',
@@ -203,9 +255,11 @@ export const fa = {
     adRejectedWithReason: 'این آگهی رد شده است: {{reason}}',
     adPending:
       'این آگهی در انتظار تایید مدیر است و فقط برای شما نمایش داده می‌شود.',
+    adDeleted: 'این آگهی حذف شده است و دیگر در دسترس نیست.',
     reportProblem: 'گزارش مشکل آگهی',
     features: 'ویژگی‌ها',
     chat: 'چت',
+    adChats: 'چت‌های آگهی',
   },
   fields: {
     description: 'توضیحات',
@@ -270,7 +324,8 @@ export const fa = {
     discountCategoryNotFound: 'دسته‌بندی تخفیف‌یاب یافت نشد',
     createStoreDescription: 'ثبت فروشگاه «{{name}}»',
     createStoreError: 'ثبت فروشگاه با خطا مواجه شد. لطفا دوباره تلاش کنید',
-    termsParagraph1: 'ثبت فروشگاه تخفیف یاب رایگان نیست و بصورت اشتراک ماهانه است.',
+    termsParagraph1:
+      'ثبت فروشگاه تخفیف یاب رایگان نیست و بصورت اشتراک ماهانه است.',
     termsParagraph2:
       'هر فروشگاه فقط میتواند توی یک صنف فعالیت کند در غیر اینصورت شرکت ماهم میتواند فروشگاه اش را ببندد.',
     feeAmount: 'هزینه ثبت فروشگاه {{amount}} تومان',
@@ -280,7 +335,7 @@ export const fa = {
   callInfo: {
     title: 'اطلاعات تماس',
     callWith: 'تماس با {{phone}}',
-    sendSms: 'ارسال پیامک به...',
+    sendSms: 'ارسال پیامک به {{phone}}',
     emailTo: 'ایمیل به {{email}}',
     policeWarning:
       'هشدار پلیس: لطفا پس از انجام معامله و پرداخت وجه از صحت کالا یا خدمات ارایه شده به صورت حضوری اطمینان حاصل نمیایید. ',
@@ -346,6 +401,9 @@ export const fa = {
   chat: {
     mahemUser: 'کاربر ماهم',
     inputPlaceholder: 'افزودن متن',
+    attachImage: 'ارسال عکس',
+    imageSendFailed: 'ارسال عکس انجام نشد، لطفا دوباره تلاش کنید',
+    threadDeleted: 'این گفتگو حذف شده است و دیگر در دسترس نیست.',
   },
   search: {
     adsTitle: 'آگهی‌ها',
@@ -393,6 +451,13 @@ export const fa = {
     title: 'پیام ها',
     empty: 'پیامی برای شما ثبت نشده است',
     messageFallback: 'پیام',
+    yesterday: 'دیروز',
+    daysAgo: '{{value}} روز پیش',
+    weekAgo: 'هفته پیش',
+    twoWeeksAgo: 'دو هفته پیش',
+    weeksAgo: '{{value}} هفته پیش',
+    monthsAgo: '{{value}} ماه پیش',
+    yearsAgo: '{{value}} سال پیش',
   },
   noInternet: {
     message: 'اتصال اینترنت برقرار نیست',
@@ -418,7 +483,7 @@ export const fa = {
     mileageFrom: 'کارکرد از',
     mileageTo: 'کارکرد تا',
     setLocation: 'تعیین موقعیت',
-    onlyWithImagesCheckbox: 'نمایش فقط آگهی های عکس دار',
+    onlyWithImages: 'نمایش فقط آگهی های عکس دار',
     clearAll: 'پاک کردن همه فیلترها',
     apply: 'اعـمـال',
     personal: 'شخصی',
@@ -446,10 +511,6 @@ export const fa = {
     originalPrice: 'قیمت اصلی',
     discountPercent: 'درصد تخفیف',
     discountDurationOptional: 'مدت زمان تخفیف (اختیاری)',
-    usageDateRangeOptional: 'بازه تاریخ استفاده (اختیاری)',
-    testPeriodOptional: 'مهلت تست (اختیاری)',
-    addFeatureHint: 'افزودن ویژگی (مثلاً گارانتی)',
-    installmentEnabled: 'امکان خرید اقساطی',
     brand: 'برند',
     chassisType: 'نوع شاسی',
     cashOrInstallment: 'نقد/اقساط',

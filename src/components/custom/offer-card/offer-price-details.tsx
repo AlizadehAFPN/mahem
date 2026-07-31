@@ -1,21 +1,19 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Image,
-  Text as RNText,
-} from 'react-native';
+import {StyleSheet, View, Text as RNText} from 'react-native';
 import React, {useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {CirleSlider} from '../../cicle-slider/circle-slider';
-import {Rate} from '../../rating/rate';
 import {Row} from '../../row/row';
 import {Text} from '../../text/text';
 import {Timer} from '../timer/timer';
 import {numberWithCommas} from '../../../utiles';
 
-export function OfferPriceDetails({item, ...prp}) {
+export interface OfferPriceDetailsProps {
+  item?: any;
+  prp?: any;
+}
+
+export function OfferPriceDetails({item, ...prp}: OfferPriceDetailsProps) {
   const {t} = useTranslation();
   const offerPersent = item?.discountPercent ?? 0;
   // expiresAt is an absolute ISO timestamp; Timer wants a countdown in
@@ -40,8 +38,8 @@ export function OfferPriceDetails({item, ...prp}) {
           flex: 1,
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: 70,
-          paddingTop: 8,
+          height: scaled(70),
+          paddingTop: scaled(8),
         }}>
         <Text
           size={15}
@@ -77,8 +75,8 @@ export function OfferPriceDetails({item, ...prp}) {
           activeStrokeColor={colors.main}
           activeStrokeSecondaryColor={colors.pallete.lightRed}
           inActiveStrokeColor={colors.pallete.lightRed}>
-          <Text style={{lineHeight: 20}}>{offerPersent}%</Text>
-          <Text color="rgba(0,0,0,.5)" style={{lineHeight: 20}}>
+          <Text style={{lineHeight: scaled(20)}}>{offerPersent}%</Text>
+          <Text color="rgba(0,0,0,.5)" style={{lineHeight: scaled(20)}}>
             {t('common.discount')}
           </Text>
         </CirleSlider>
@@ -87,7 +85,7 @@ export function OfferPriceDetails({item, ...prp}) {
         style={{
           flex: 1,
           alignItems: 'center',
-          height: 70,
+          height: scaled(70),
           justifyContent: 'space-between',
         }}>
         {secondsRemaining ? <Timer time={secondsRemaining} /> : <View />}
@@ -108,17 +106,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.pallete.gray1,
     borderTopWidth: 1,
     borderColor: colors.pallete.gray2,
-    paddingVertical: 10,
+    paddingVertical: scaled(10),
   },
   line: {
     height: 1.5,
     backgroundColor: colors.pallete.gray2,
-    width: 70,
+    width: scaled(70),
     transform: [{rotate: '-15deg'}],
     // marginTop: -20,
     position: 'absolute',
     // top:0,
-    bottom: 10,
-    left: 10,
+    bottom: scaled(10),
+    left: scaled(10),
   },
 });

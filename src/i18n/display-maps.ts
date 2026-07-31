@@ -210,7 +210,8 @@ export const categoryDisplayMap: Record<string, string> = {
   'فروش اداری و تجاری': 'Office & commercial sale',
   'رهن و اجاره اداری و تجاری': 'Office & commercial deposit & rent',
   'عقد مشارکت / امور مالی و حقوقی': 'Partnership / Financial & legal',
-  'خرید / فروش / اجاره زمین کشاورزی و باغ': 'Buy / Sell / Rent farmland & orchard',
+  'خرید / فروش / اجاره زمین کشاورزی و باغ':
+    'Buy / Sell / Rent farmland & orchard',
   آپارتمان: 'Apartment',
   'خانه و ویلا': 'House & villa',
   زمین: 'Land',

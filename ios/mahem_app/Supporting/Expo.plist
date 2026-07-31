@@ -2,16 +2,28 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <!-- OTA updates are off: the app always runs the JS bundle embedded in this
+         build. Turned off after a publish reached binaries that lacked the
+         native modules and fonts it expected (see
+         android/app/src/main/res/values/strings.xml) — relying on
+         EXUpdatesRuntimeVersion alone to prevent that is protection by
+         remembering to bump it, and one forgotten bump costs an install that
+         only a reinstall recovers. Re-enable deliberately, together with the
+         runtime-version discipline, not as a side effect of a prebuild. -->
     <key>EXUpdatesEnabled</key>
-    <true/>
+    <false/>
+    <!-- Only consulted while EXUpdatesEnabled is true. ERROR_RECOVERY_ONLY
+         rather than ALWAYS, so that re-enabling updates makes them a repair
+         channel after a fatal launch error rather than a silent every-launch
+         swap. -->
     <key>EXUpdatesCheckOnLaunch</key>
-    <string>ALWAYS</string>
+    <string>ERROR_RECOVERY_ONLY</string>
     <key>EXUpdatesLaunchWaitMs</key>
     <integer>0</integer>
     <key>EXUpdatesURL</key>
     <string>https://u.expo.dev/43fd5c66-1b97-4f66-9e2d-28e15b2e46b0</string>
     <key>EXUpdatesRuntimeVersion</key>
-    <string>1.0.0</string>
+    <string>1.0.1</string>
     <key>EXUpdatesRequestHeaders</key>
     <dict>
       <key>expo-channel-name</key>

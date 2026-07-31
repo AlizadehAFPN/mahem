@@ -24,7 +24,8 @@ import {
   Text,
 } from '../../../components';
 import {getMyAds, getMyStore, renewStore} from '../../../services';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
+import {formatJalaliDate} from '../../../utiles/date';
 import {useAdsCategories} from '../../../hooks/use-cached-categories';
 
 const {width} = Dimensions.get('window');
@@ -133,7 +134,7 @@ export function MyStoreScreen() {
               <Row style={{alignItems: 'center'}}>
                 <MaterialIcons
                   color="white"
-                  size={25}
+                  size={scaled(25)}
                   name="keyboard-arrow-right"
                 />
                 <Text color="white" size={17}>
@@ -151,10 +152,10 @@ export function MyStoreScreen() {
         <View style={styles.emptyState}>
           <Ionicons
             name="storefront-outline"
-            size={64}
+            size={scaled(64)}
             color={colors.pallete.gray3}
           />
-          <Text style={{marginTop: 12, textAlign: 'center'}}>
+          <Text style={{marginTop: scaled(12), textAlign: 'center'}}>
             {t('store.noStoreYet')}
           </Text>
           <Button
@@ -175,9 +176,7 @@ export function MyStoreScreen() {
     }
     if (store.subscriptionExpiresAt) {
       const expired = new Date(store.subscriptionExpiresAt) < new Date();
-      const date = new Date(store.subscriptionExpiresAt).toLocaleDateString(
-        'fa-IR',
-      );
+      const date = formatJalaliDate(store.subscriptionExpiresAt);
       return expired
         ? t('store.subscriptionExpired', {date})
         : t('store.subscriptionActiveUntil', {date});
@@ -205,9 +204,9 @@ export function MyStoreScreen() {
           keyExtractor={(item: any) => item.id}
           columnWrapperStyle={{
             justifyContent: 'space-between',
-            paddingHorizontal: 12,
+            paddingHorizontal: scaled(12),
           }}
-          ItemSeparatorComponent={() => <View style={{height: 12}} />}
+          ItemSeparatorComponent={() => <View style={{height: scaled(12)}} />}
           ListHeaderComponent={
             <View>
               <View style={styles.coverBox}>
@@ -228,7 +227,7 @@ export function MyStoreScreen() {
                   ) : (
                     <Ionicons
                       name="storefront-outline"
-                      size={22}
+                      size={scaled(22)}
                       color={colors.pallete.gray3}
                     />
                   )}
@@ -271,16 +270,22 @@ export function MyStoreScreen() {
                   loading={renewing}>
                   <MaterialCommunityIcons
                     name="handshake-outline"
-                    size={44}
+                    size={scaled(44)}
                     color={colors.main}
                   />
-                  <Text color={colors.main} size={14} style={{marginTop: 6}}>
+                  <Text
+                    color={colors.main}
+                    size={14}
+                    style={{marginTop: scaled(6)}}>
                     {t('store.renewStore')}
                   </Text>
                 </Button>
                 <Button style={styles.actionCard} onPress={onCreateOffer}>
-                  <Ionicons name="add" size={52} color={colors.main} />
-                  <Text color={colors.main} size={14} style={{marginTop: 6}}>
+                  <Ionicons name="add" size={scaled(52)} color={colors.main} />
+                  <Text
+                    color={colors.main}
+                    size={14}
+                    style={{marginTop: scaled(6)}}>
                     {t('store.postDiscount')}
                   </Text>
                 </Button>
@@ -315,12 +320,12 @@ const styles = StyleSheet.create({
   headerRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 10,
+    paddingHorizontal: scaled(8),
+    paddingVertical: scaled(10),
   },
   headerLogo: {
-    width: 32,
-    height: 32,
+    width: scaled(32),
+    height: scaled(32),
   },
   overlayNav: {
     position: 'absolute',
@@ -333,14 +338,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: scaled(24),
   },
   createStoreButton: {
-    marginTop: 16,
+    marginTop: scaled(16),
     backgroundColor: colors.main,
-    borderRadius: 8,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
+    borderRadius: scaled(8),
+    paddingHorizontal: scaled(24),
+    paddingVertical: scaled(10),
   },
   coverBox: {
     width: '100%',
@@ -351,8 +356,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.pallete.gray1,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: scaled(16),
+    paddingVertical: scaled(8),
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
@@ -360,10 +365,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   logoBox: {
-    width: 69,
-    height: 69,
-    marginTop: -46,
-    borderRadius: 8,
+    width: scaled(69),
+    height: scaled(69),
+    marginTop: scaled(-46),
+    borderRadius: scaled(8),
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
@@ -372,28 +377,28 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   storeName: {
-    marginRight: 12,
+    marginRight: scaled(12),
   },
   noticeBanner: {
     textAlign: 'center',
     color: colors.pallete.grayText,
-    marginTop: 4,
+    marginTop: scaled(4),
   },
   subscriptionLabel: {
     textAlign: 'center',
     color: colors.pallete.grayText,
-    marginTop: 4,
-    marginBottom: 4,
+    marginTop: scaled(4),
+    marginBottom: scaled(4),
   },
   actionsRow: {
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
-    paddingVertical: 16,
+    paddingHorizontal: scaled(8),
+    paddingVertical: scaled(16),
   },
   actionCard: {
     width: '47%',
     aspectRatio: 1,
-    borderRadius: 8,
+    borderRadius: scaled(8),
     borderWidth: 1,
     borderColor: colors.pallete.gray3,
     backgroundColor: 'white',

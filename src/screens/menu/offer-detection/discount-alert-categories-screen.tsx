@@ -15,7 +15,7 @@ import {
   getDiscountAlerts,
   setDiscountAlerts,
 } from '../../../services';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {useAdsCategories} from '../../../hooks/use-cached-categories';
 import {localizeCategory} from '../../../i18n/display-maps';
 
@@ -79,7 +79,7 @@ export function DiscountAlertCategoriesScreen() {
       <Text style={styles.hint}>{t('offers.alertsHint')}</Text>
       <FlatList
         data={subCategories}
-        style={{paddingHorizontal: 16}}
+        style={{paddingHorizontal: scaled(16)}}
         keyExtractor={(item: any) => item.id}
         ItemSeparatorComponent={() => (
           <Divider style={styles.separator} height={1} />
@@ -136,7 +136,7 @@ export function DiscountAlertCategoriesScreen() {
 
 const styles = StyleSheet.create({
   hint: {
-    padding: 16,
+    padding: scaled(16),
     color: colors.pallete.grayText,
     textAlign: 'right',
   },
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: scaled(12),
   },
   separator: {
     backgroundColor: colors.pallete.gray1,

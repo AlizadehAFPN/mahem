@@ -23,3 +23,7 @@ export const markNotificationRead = (id: string) => {
 export const markAllNotificationsRead = () => {
   return axiosInstance.patch('/notifications/me/read-all');
 };
+
+export const deleteNotification = (id: string) => {
+  return axiosInstance.delete(`/notifications/me/${id}`);
+};

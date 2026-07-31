@@ -5,11 +5,10 @@ import {
   ScrollView,
   StatusBar,
   View,
-  RefreshControl,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ScreenProps} from './screen.props';
-import {isNonScrolling, offsets, presets} from './screen.presets';
+import {offsets, presets} from './screen.presets';
 import {colors} from '../../theme';
 
 const isIos = Platform.OS === 'ios';

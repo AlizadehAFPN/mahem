@@ -2,7 +2,7 @@ import {StyleSheet, View} from 'react-native';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {MainModal} from './mainModal';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 import {Text} from '../text/text';
 import {Divider} from '../divider/divider';
 import {Button} from '../button/button';
@@ -29,7 +29,11 @@ export function ContactInfoModal({
   return (
     <MainModal onClose={onClose} visible={visible}>
       <View style={styles.card}>
-        <Text preset="bold" size={17} color={colors.pallete.red2} style={styles.title}>
+        <Text
+          preset="bold"
+          size={17}
+          color={colors.pallete.red2}
+          style={styles.title}>
           {t('callInfo.title')}
         </Text>
         <Divider />
@@ -46,11 +50,11 @@ export function ContactInfoModal({
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderRadius: 12,
-    marginBottom: 4,
+    borderRadius: scaled(12),
+    marginBottom: scaled(4),
     borderColor: colors.pallete.gray2,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: scaled(16),
+    paddingTop: scaled(16),
     backgroundColor: colors.pallete.gray1,
   },
   title: {
@@ -58,8 +62,8 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     backgroundColor: colors.main,
-    height: 40,
-    borderRadius: 8,
+    height: scaled(40),
+    borderRadius: scaled(8),
     justifyContent: 'center',
     alignItems: 'center',
   },

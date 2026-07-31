@@ -6,7 +6,7 @@ import {SelectLocation} from '../map-components/select-location';
 import {Button} from '../button/button';
 import {Text} from '../text/text';
 import {Row} from '../row/row';
-import {colors} from '../../theme';
+import {colors, scaled} from '../../theme';
 
 interface LocationSelectModalProps {
   visible: boolean;
@@ -40,7 +40,10 @@ export function LocationSelectModal({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={[styles.container, {paddingTop: insets.top}]}>
-        <Text preset="bold" size={16} style={{textAlign: 'center', padding: 12}}>
+        <Text
+          preset="bold"
+          size={16}
+          style={{textAlign: 'center', padding: scaled(12)}}>
           {t('map.selectHint')}
         </Text>
         <SelectLocation
@@ -52,7 +55,9 @@ export function LocationSelectModal({
             <Text>{t('common.cancel')}</Text>
           </Button>
           <Button
-            style={pending ? styles.confirmButton : styles.confirmButtonDisabled}
+            style={
+              pending ? styles.confirmButton : styles.confirmButtonDisabled
+            }
             disabled={!pending}
             onPress={handleConfirm}>
             <Text color="white">{t('map.confirmLocation')}</Text>
@@ -73,33 +78,33 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   footer: {
-    padding: 16,
+    padding: scaled(16),
     justifyContent: 'space-between',
   },
   cancelButton: {
     flex: 1,
-    height: 44,
-    marginEnd: 8,
+    height: scaled(44),
+    marginEnd: scaled(8),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: scaled(8),
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
   },
   confirmButton: {
     flex: 1,
-    height: 44,
+    height: scaled(44),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: scaled(8),
     backgroundColor: colors.main,
   },
   confirmButtonDisabled: {
     flex: 1,
-    height: 44,
+    height: scaled(44),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: scaled(8),
     backgroundColor: colors.main,
     opacity: 0.5,
   },

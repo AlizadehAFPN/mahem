@@ -3,16 +3,55 @@
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-  <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher_foreground" android:roundIcon="@mipmap/ic_launcher_foreground" android:allowBackup="false" android:usesCleartextTraffic="true" android:theme="@style/AppTheme">
-    <activity android:name=".MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize" android:exported="true">
+  <!-- usesCleartextTraffic is required, not sloppiness: the API is reached at
+       http://2.28.2.151:3000 because no HTTPS host is available that resolves
+       inside Iran (see src/services/axios-config.ts). On targetSdk 35 plain
+       HTTP is refused without this flag, so removing it stops every request
+       and every image from loading. Remove it the day a real domain gives the
+       API a working https:// origin — not before.
+
+       icon/roundIcon point at the composed adaptive icons in
+       mipmap-anydpi-v26, not at the bare foreground layer — see
+       mipmap-anydpi-v26/ic_launcher.xml. -->
+  <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="false" android:usesCleartextTraffic="true" android:theme="@style/AppTheme">
+    <!-- screenOrientation="portrait": every screen is laid out against fixed
+         Figma heights through scaled() (see src/theme), so landscape doesn't
+         reflow, it clips. iOS is pinned the same way, via
+         UISupportedInterfaceOrientations in Info.plist. `orientation` stays in
+         configChanges so a rotation that the system still reports (e.g. on a
+         foldable) doesn't recreate the activity and drop navigation state. -->
+    <activity android:name=".MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:launchMode="singleTask" android:screenOrientation="portrait" android:windowSoftInputMode="adjustResize" android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
+      <!-- Deep links shared from inside the app (mahem://ad/<id>, …). The iOS
+           half of the same contract is CFBundleURLTypes in Info.plist; the JS
+           half is src/navigation/linking.ts. A custom scheme rather than an
+           https:// App Link because App Links need a domain serving
+           /.well-known/assetlinks.json, and this deployment has no registered
+           domain yet — swap in an <intent-filter android:autoVerify="true">
+           with the real host once there is one. -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <data android:scheme="mahem"/>
+      </intent-filter>
     </activity>
     <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA5grPDeuuFB5pB0654G2vVEgijExfBxeU"/>
-    <meta-data android:name="expo.modules.updates.ENABLED" android:value="true"/>
-    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
+    <!-- OTA updates are off: the app always runs the JS bundle embedded in this
+         build. Turned off after a publish reached binaries that lacked the
+         native modules and fonts it expected (see res/values/strings.xml) —
+         relying on expo_runtime_version alone to prevent that is protection by
+         remembering to bump it, and one forgotten bump costs an install that
+         only a reinstall recovers. Re-enable deliberately, together with the
+         runtime-version discipline, not as a side effect of a prebuild. -->
+    <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
+    <!-- Only consulted while ENABLED is true. ERROR_RECOVERY_ONLY rather than
+         ALWAYS, so that re-enabling updates makes them a repair channel after a
+         fatal launch error rather than a silent every-launch swap. -->
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ERROR_RECOVERY_ONLY"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://u.expo.dev/43fd5c66-1b97-4f66-9e2d-28e15b2e46b0"/>
     <meta-data android:name="expo.modules.updates.EXPO_RUNTIME_VERSION" android:value="@string/expo_runtime_version"/>

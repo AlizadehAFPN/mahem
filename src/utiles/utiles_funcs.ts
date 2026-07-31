@@ -4,6 +4,34 @@ export function numberWithCommas(input: string | number | undefined) {
   return input ? input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
 }
 
+// The two halves of a money *input* field. Prices are shown everywhere else in
+// the app grouped in threes (numberWithCommas, in every product/offer card), so
+// a bare "1500000" sitting in the field the user types it into is the odd one
+// out — and the longer the number, the harder it is to tell 15 million from 1.5
+// million while typing it.
+//
+// Grouping is display-only: stripThousandSeparators takes whatever is currently
+// in the field back to plain digits before it reaches the screen's state, so
+// what gets validated and sent is the same plain number it always was and no
+// caller has to know the field is formatted. Only digits survive — a separator
+// the user types by hand is dropped rather than carried through, which is what
+// keeps the displayed grouping the one this function put there.
+//
+// Deliberately not applied to phone/mobile/fax numbers, verification codes,
+// card numbers, years, room counts, mileage or areas: none of those are read as
+// a magnitude, and grouping them makes them harder to read, not easier.
+export function stripThousandSeparators(
+  value: string | number | undefined | null,
+): string {
+  return value == null ? '' : String(value).replace(/\D/g, '');
+}
+
+export function formatThousandSeparators(
+  value: string | number | undefined | null,
+): string {
+  return numberWithCommas(stripThousandSeparators(value));
+}
+
 const PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
 const ARABIC_INDIC_DIGITS = '٠١٢٣٤٥٦٧٨٩';
 
@@ -26,7 +54,12 @@ export function toEnglishDigits(value: string): string {
   });
 }
 
-const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const SUPPORTED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+];
 
 // The backend's upload endpoint only accepts jpeg/png/webp (see
 // uploads.controller.ts's FileTypeValidator) — iPhones save photos as HEIC
@@ -96,7 +129,9 @@ const IMAGE_FIELD_PATTERN = /^image(\d+)$/;
 // silently falling back to the empty-state placeholder even when real
 // images existed. This only matches image1/image2/... and returns them in
 // numeric order (not lexicographic, so image10 doesn't sort before image2).
-export function getLegacyImagePaths(obj: Record<string, any> | null | undefined): string[] {
+export function getLegacyImagePaths(
+  obj: Record<string, any> | null | undefined,
+): string[] {
   if (!obj) {
     return [];
   }

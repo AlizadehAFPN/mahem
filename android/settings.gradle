@@ -1,4 +1,85 @@
 rootProject.name = 'mahem_app'
+
+// ---------------------------------------------------------------------------
+// aapt2 override for compileSdk 35 (see gradle.properties for the why).
+//
+// AGP only accepts an absolute path for this, so it used to be hardcoded to
+// one developer's SDK location in gradle.properties — which meant the Android
+// build could not be produced on any other machine, or on CI, at all.
+//
+// Resolved here instead, from whatever SDK this machine actually has, and set
+// as a project property before AGP is applied to :app (AGP reads it when the
+// plugin is applied, which is after settings evaluation — hence
+// startParameter rather than project.ext).
+//
+// Silently skipped when the binary isn't found: an explicit value in
+// gradle.properties still wins, a machine on AGP 8.6+ doesn't need the
+// override at all, and pointing AGP at a path that doesn't exist would be a
+// worse failure than the one this works around.
+// ---------------------------------------------------------------------------
+def resolveAapt2Override = {
+    // Anything set explicitly wins: -P on the command line, or a value written
+    // back into gradle.properties for an SDK in a non-standard place.
+    if (gradle.startParameter.projectProperties.containsKey('android.aapt2FromMavenOverride')) {
+        return null
+    }
+    def gradleProps = new File(settingsDir, 'gradle.properties')
+    if (gradleProps.exists()) {
+        def props = new Properties()
+        gradleProps.withInputStream { props.load(it) }
+        if (props.getProperty('android.aapt2FromMavenOverride')) {
+            return null
+        }
+    }
+
+    def sdkDir = null
+    def localProps = new File(settingsDir, 'local.properties')
+    if (localProps.exists()) {
+        def props = new Properties()
+        localProps.withInputStream { props.load(it) }
+        sdkDir = props.getProperty('sdk.dir')
+    }
+    if (!sdkDir) {
+        sdkDir = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
+    }
+    if (!sdkDir) {
+        def home = System.getProperty('user.home')
+        def candidates = [new File(home, 'Library/Android/sdk'), new File(home, 'Android/Sdk')]
+        sdkDir = candidates.find { it.isDirectory() }?.absolutePath
+    }
+    if (!sdkDir) {
+        return null
+    }
+
+    // Prefer build-tools 35.x — the version whose aapt2 can read android-35.jar.
+    // Falls back to the newest build-tools present, which on a machine that
+    // has only newer ones is still correct.
+    def buildTools = new File(sdkDir, 'build-tools')
+    if (!buildTools.isDirectory()) {
+        return null
+    }
+    def versions = buildTools.listFiles({ File f -> f.isDirectory() } as FileFilter)?.sort { it.name }
+    def chosen = versions?.reverse()?.find { new File(it, 'aapt2').isFile() && it.name.startsWith('35.') }
+    if (!chosen) {
+        chosen = versions?.reverse()?.find { new File(it, 'aapt2').isFile() }
+    }
+    return chosen ? new File(chosen, 'aapt2').absolutePath : null
+}
+
+def aapt2Path = resolveAapt2Override()
+if (aapt2Path) {
+    // startParameter.projectProperties is an immutable view — it has to be
+    // replaced wholesale rather than mutated in place.
+    def projectProperties = new LinkedHashMap(gradle.startParameter.projectProperties)
+    projectProperties.put('android.aapt2FromMavenOverride', aapt2Path)
+    gradle.startParameter.setProjectProperties(projectProperties)
+} else {
+    logger.lifecycle(
+        'mahem: no local aapt2 found for the compileSdk 35 workaround — if resource ' +
+        'linking fails with "RES_TABLE_TYPE_TYPE entry offsets overlap actual entry data", ' +
+        'install Android build-tools 35.0.0 or pass -Pandroid.aapt2FromMavenOverride=<path>.')
+}
+
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':react-native-vector-icons'
 project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')

@@ -1,6 +1,6 @@
 import {StyleSheet, TouchableOpacity, View, Image} from 'react-native';
 import React from 'react';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {Text} from '../../text/text';
 import {Row} from '../../row/row';
 import {useNavigation} from '@react-navigation/native';
@@ -17,9 +17,13 @@ function formatRelativeTime(t: TFunction, iso?: string) {
   return t('time.daysAgo', {value: Math.floor(hours / 24)});
 }
 
-export function ChatItem({item}) {
+export interface ChatItemProps {
+  item?: any;
+}
+
+export function ChatItem({item}: ChatItemProps) {
   const {t} = useTranslation();
-  const {navigate} = useNavigation();
+  const {navigate} = useNavigation<any>();
   const user = useSelector(s => s.user);
   const isBuyer = item?.buyerId === user?.id;
   const counterparty = isBuyer ? item?.seller : item?.buyer;
@@ -38,16 +42,16 @@ export function ChatItem({item}) {
       <Row style={{width: '100%', justifyContent: 'space-between'}}>
         <View />
         <Row style={{}}>
-          <Text style={{marginLeft: 8}} size={17}>
+          <Text style={{marginLeft: scaled(8)}} size={17}>
             {counterparty?.username || counterparty?.mobile}
           </Text>
           <Image
             style={{
               resizeMode: counterparty?.avatar ? 'cover' : 'contain',
-              marginLeft: -30,
-              height: 45,
-              width: 45,
-              borderRadius: 12,
+              marginLeft: scaled(-30),
+              height: scaled(45),
+              width: scaled(45),
+              borderRadius: scaled(12),
             }}
             source={
               counterparty?.avatar
@@ -57,7 +61,10 @@ export function ChatItem({item}) {
           />
         </Row>
       </Row>
-      <Text style={{marginBottom: 10}} size={12} color={colors.pallete.blue}>
+      <Text
+        style={{marginBottom: scaled(10)}}
+        size={12}
+        color={colors.pallete.blue}>
         {formatRelativeTime(t, item?.lastMessageAt)}
       </Text>
     </TouchableOpacity>
@@ -66,11 +73,11 @@ export function ChatItem({item}) {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 8,
+    borderRadius: scaled(8),
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
     backgroundColor: colors.pallete.gray1,
-    marginLeft: 23,
-    paddingHorizontal: 8,
+    marginLeft: scaled(23),
+    paddingHorizontal: scaled(8),
   },
 });

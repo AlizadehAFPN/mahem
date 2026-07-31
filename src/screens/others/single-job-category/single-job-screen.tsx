@@ -1,5 +1,5 @@
 import {Alert, Dimensions, Image, StyleSheet, View} from 'react-native';
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   Button,
   Divider,
@@ -10,29 +10,61 @@ import {
   Text,
   ProductLocation,
 } from '../../../components';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
-import {useMutation, useQueryClient} from 'react-query';
-import {deleteJob, renewJob} from '../../../services/job';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {deleteJob, getSingleJob, renewJob} from '../../../services/job';
 import {localizeCategory} from '../../../i18n/display-maps';
+import {RootState} from '../../../stateManager';
+import {useMissingEntityGuard} from '../../../hooks/use-missing-entity-guard';
+import {fieldStyles, useLabelColumnWidth} from './field-cell';
+import {jobFields} from './job-fields';
+import {buildJobLink} from '../../../navigation/deep-links';
 const {width} = Dimensions.get('window');
 
-// There's no established job-posting fee anywhere in the app today (unlike
-// Advertisement's Category.adFeeToman or Store's STORE_FEE_TOMAN) — Job
-// payment has always been an admin-confirmed manual/negotiated arrangement
-// (see JobsService.confirmPayment's doc comment). This is a placeholder
-// display figure for the gateway screen until an actual amount is decided.
-const JOB_RENEWAL_FEE_TOMAN = 0;
+/**
+ * What renewing this job costs — by rule, whatever posting it cost.
+ *
+ * That is how ad renewal already works (UserPanelScreen's onRenewAd reads
+ * Category.adFeeToman, the same figure CreateAdsPaymentScreen charged), and
+ * jobs follow it: whatever fee the job's صنف carries at creation is the fee
+ * to renew at.
+ *
+ * Today no job category carries one — CreateJobScreen never goes through the
+ * gateway, so a job is free to post — and the value is therefore 0. The old
+ * hardcoded `JOB_RENEWAL_FEE_TOMAN = 0` produced the same number, but as a
+ * placeholder rather than a reading, so it also sent the user to a bank
+ * gateway asking for «۰ تومان». See onRenewJob for what happens instead.
+ */
+function jobRenewalFeeToman(job: any): number {
+  return Number(job?.job_category_id?.adFeeToman ?? 0) || 0;
+}
 export function SingleJobScreen() {
   const {t} = useTranslation();
-  const {params} = useRoute();
+  const {params} = useRoute<any>();
   const {navigate, goBack} = useNavigation<any>();
   const [job, setJob] = useState(params?.job);
-  const user = useSelector(s => s.user);
+  const user = useSelector((s: RootState) => s.user);
   const isOwner = job?.userId && job.userId === user?.id;
   const queryClient = useQueryClient();
+
+  // Every list that opens this screen hands over the whole job object, but a
+  // JOB_APPROVED/JOB_REJECTED notification tap only has an id — fill in the
+  // rest (including the rejection reason, which no list carries) from the API.
+  const jobId = params?.job?.id;
+  const missingJobGuard = useMissingEntityGuard('jobs.jobDeleted');
+  const {data: fetchedJob} = useQuery(
+    ['singleJob', jobId],
+    () => getSingleJob(jobId),
+    {enabled: !!jobId && !params?.job?.title, ...missingJobGuard},
+  );
+  useEffect(() => {
+    if (fetchedJob?.data) {
+      setJob(fetchedJob.data);
+    }
+  }, [fetchedJob]);
   const {mutate: deleteJobMutate} = useMutation(() => deleteJob(job.id), {
     onSuccess: () => {
       queryClient.invalidateQueries('categoryJobs');
@@ -51,7 +83,9 @@ export function SingleJobScreen() {
       [
         {text: t('common.cancel'), style: 'cancel'},
         {
-          text: isRejected ? t('userPanel.deleteCompletely') : t('common.delete'),
+          text: isRejected
+            ? t('userPanel.deleteCompletely')
+            : t('common.delete'),
           style: 'destructive',
           onPress: () => deleteJobMutate(),
         },
@@ -59,63 +93,52 @@ export function SingleJobScreen() {
     );
   };
 
+  const submitRenewal = async () => {
+    try {
+      await renewJob(job.id);
+      goBack();
+      Alert.alert(t('store.renewRequested'), t('userPanel.renewRequestedBody'));
+    } catch (e) {
+      Alert.alert(t('common.error'), t('store.renewError'));
+    }
+  };
+
   const onRenewJob = () => {
+    const fee = jobRenewalFeeToman(job);
+
+    // No fee, no checkout. Sending someone to a card-number form to pay
+    // «۰ تومان» is the kind of thing that makes a user distrust the whole
+    // flow — and there is nothing for an admin to confirm afterwards either.
+    // A priced job category (see jobRenewalFeeToman) goes through the gateway
+    // exactly like a paid ad does.
+    if (fee <= 0) {
+      submitRenewal();
+      return;
+    }
+
     navigate('bankGateway', {
-      amount: JOB_RENEWAL_FEE_TOMAN,
+      amount: fee,
       description: t('userPanel.renewAdDescription', {title: job?.title ?? ''}),
-      onSuccess: async () => {
-        try {
-          await renewJob(job.id);
-          goBack();
-          Alert.alert(
-            t('store.renewRequested'),
-            t('userPanel.renewRequestedBody'),
-          );
-        } catch (e) {
-          Alert.alert(t('common.error'), t('store.renewError'));
-        }
-      },
+      onSuccess: submitRenewal,
     });
   };
-  const jobObj = useMemo(() => {
-    if (job) {
-      const {
-        title,
-        manager,
-        register_code,
-        phone,
-        mobile,
-        fax,
-        address,
-        telegram,
-        instagram,
-        email,
-        description,
-        job_category_id,
-      } = job;
-      return [
-        {title: t('jobs.unitName'), value: title},
-        {title: t('jobs.manager'), value: manager},
-        {title: t('jobs.guildType'), value: localizeCategory(job_category_id.title)},
-        {title: t('jobs.registerCode'), value: register_code},
-        {title: t('jobs.landline'), value: phone},
-        {title: t('jobs.mobile'), value: mobile},
-        {title: t('jobs.fax'), value: fax},
-        {title: t('jobs.address'), value: address},
-        {title: t('jobs.telegram'), value: telegram},
-        {title: t('jobs.instagram'), value: instagram},
-        {title: t('common.email'), value: email},
-        {title: t('common.description'), value: description},
-      ];
-    }
-    return [];
-  }, [job, t]);
+  const jobObj = useMemo(() => jobFields(job, t), [job, t]);
+
+  const {labelWidth, labelMeasurer} = useLabelColumnWidth(
+    jobObj.map(item => item.title),
+  );
 
   return (
     <Screen withoutScroll>
-      <MainHeader title={localizeCategory(job?.job_category_id?.title)} showBack />
+      <MainHeader
+        title={localizeCategory(job?.job_category_id?.title)}
+        showBack
+      />
       <View style={styles.nav}>
-        <GradiantHeader shareText={job?.title} />
+        <GradiantHeader
+          shareText={job?.title}
+          shareLink={job?.id ? buildJobLink(job.id) : undefined}
+        />
       </View>
       <Screen unsafe>
         <View style={styles.bannerContaier}>
@@ -136,8 +159,8 @@ export function SingleJobScreen() {
         {isOwner && isRejected && job?.rejectionReason && (
           <Text
             style={{
-              paddingHorizontal: 8,
-              marginBottom: 4,
+              paddingHorizontal: scaled(8),
+              marginBottom: scaled(4),
               textAlign: 'center',
             }}
             size={12}
@@ -148,8 +171,8 @@ export function SingleJobScreen() {
         {isOwner && job?.status === 'ARCHIVED' && (
           <Text
             style={{
-              paddingHorizontal: 8,
-              marginBottom: 4,
+              paddingHorizontal: scaled(8),
+              marginBottom: scaled(4),
               textAlign: 'center',
             }}
             size={12}
@@ -158,7 +181,7 @@ export function SingleJobScreen() {
           </Text>
         )}
         {isOwner && (
-          <Row style={{paddingHorizontal: 8, marginBottom: 4}}>
+          <Row style={{paddingHorizontal: scaled(8), marginBottom: scaled(4)}}>
             {isRejected ? (
               <Button onPress={onDeleteJob} style={styles.ownerActionButton}>
                 <Text size={13} color={colors.pallete.red2}>
@@ -174,7 +197,7 @@ export function SingleJobScreen() {
                     {t('common.edit')}
                   </Text>
                 </Button>
-                <Divider style={{width: 10}} />
+                <Divider style={{width: scaled(10)}} />
                 <Button onPress={onDeleteJob} style={styles.ownerActionButton}>
                   <Text size={13} color={colors.pallete.red2}>
                     {t('common.delete')}
@@ -185,7 +208,7 @@ export function SingleJobScreen() {
           </Row>
         )}
         {isOwner && !isRejected && job?.approvalStatus === 'APPROVED' && (
-          <Row style={{paddingHorizontal: 8, marginBottom: 4}}>
+          <Row style={{paddingHorizontal: scaled(8), marginBottom: scaled(4)}}>
             <Button
               onPress={onRenewJob}
               style={{...styles.ownerActionButton, ...styles.renewButton}}>
@@ -198,18 +221,19 @@ export function SingleJobScreen() {
           </Row>
         )}
         {jobObj.map(item => (
-          <Row key={item.title} style={{paddingHorizontal: 8}}>
-            <View style={{...styles.detailItem, width: 70}}>
-              <Text style={{...styles.itemText}}>{item.title}</Text>
+          <Row key={item.title} style={{paddingHorizontal: scaled(8)}}>
+            <View style={{...fieldStyles.cell, width: labelWidth}}>
+              <Text>{item.title}</Text>
             </View>
-            <Divider style={{width: 10}} />
-            <View style={{...styles.detailItem, flex: 1}}>
-              <Text style={{...styles.itemText, textAlign: 'right'}}>
+            <Divider style={{width: scaled(10)}} />
+            <View style={{...fieldStyles.cell, flex: 1}}>
+              <Text style={{textAlign: item.phone ? 'left' : 'right'}}>
                 {item.value}
               </Text>
             </View>
           </Row>
         ))}
+        {labelMeasurer}
         <ProductLocation
           lat={job?.lat}
           lng={job?.lng}
@@ -228,10 +252,10 @@ const styles = StyleSheet.create({
   },
   ownerActionButton: {
     flex: 1,
-    height: 32,
+    height: scaled(32),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 6,
+    borderRadius: scaled(6),
     borderWidth: 1,
     borderColor: colors.pallete.gray2,
   },
@@ -244,30 +268,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    top: 50,
+    top: scaled(50),
   },
   grayCard: {
-    height: 55,
+    height: scaled(55),
     backgroundColor: colors.pallete.gray1,
   },
   circle: {
-    height: 94,
-    width: 94,
-    borderRadius: 50,
-    marginTop: -47,
+    height: scaled(94),
+    width: scaled(94),
+    borderRadius: scaled(50),
+    marginTop: scaled(-47),
     borderWidth: 1,
-    marginLeft: 20,
+    marginLeft: scaled(20),
     overflow: 'hidden',
-  },
-  detailItem: {
-    height: 19,
-    backgroundColor: colors.pallete.gray1,
-    borderRadius: 4,
-    justifyContent: 'center',
-    marginVertical: 4,
-    paddingHorizontal: 4,
-  },
-  itemText: {
-    lineHeight: 19,
   },
 });

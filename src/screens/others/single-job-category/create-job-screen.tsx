@@ -22,7 +22,7 @@ import {
   CitySelectModal,
 } from '../../../components';
 import {LocationSelectModal} from '../../../components/modal/location-select-modal';
-import {colors} from '../../../theme';
+import {colors, scaled} from '../../../theme';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {useTranslation} from 'react-i18next';
 import {useMutation} from 'react-query';
@@ -34,11 +34,30 @@ import {
   UNSUPPORTED_IMAGE_TYPE_MESSAGE,
 } from '../../../utiles/utiles_funcs';
 import {localizeCategory, localizeCity} from '../../../i18n/display-maps';
+import {fieldStyles, useLabelColumnWidth} from './field-cell';
 
 const {width} = Dimensions.get('window');
+// Every label this form puts in its left-hand column, in the order they are
+// rendered — the column is sized off them rather than off a fixed width, see
+// field-cell.
+const FIELD_LABEL_KEYS = [
+  'jobs.unitName',
+  'jobs.manager',
+  'jobs.guildType',
+  'jobs.registerCode',
+  'jobs.landline',
+  'jobs.mobile',
+  'jobs.fax',
+  'jobs.address',
+  'jobs.telegram',
+  'jobs.instagram',
+  'common.email',
+  'common.description',
+  'jobs.city',
+];
 export function CreateJobScreen() {
   const {t} = useTranslation();
-  const {params} = useRoute();
+  const {params} = useRoute<any>();
   const editItem = params?.editItem;
   const [state, setState] = useState(() =>
     editItem
@@ -105,7 +124,7 @@ export function CreateJobScreen() {
   const {goBack, navigate} = useNavigation<any>();
 
   const {mutate} = useMutation(upload);
-  const {mutate: jobMutate, isLoading} = useMutation(
+  const {mutate: jobMutate} = useMutation(
     editItem ? (data: any) => updateJob(editItem.id, data) : createJob,
   );
 
@@ -117,10 +136,7 @@ export function CreateJobScreen() {
       register_code,
       phone,
       mobile,
-      fax,
       address,
-      telegram,
-      instagram,
       city,
       acceptance,
     } = state;
@@ -220,7 +236,7 @@ export function CreateJobScreen() {
   const onPressAvatar = () => {
     setState(s => ({...s, filePickerModal: true, tempSelect: 'avatar'}));
   };
-  const onSelectFile = file => {
+  const onSelectFile = (file: any) => {
     if (!isSupportedImageType(file.type)) {
       Alert.alert(
         t('common.imageFormatUnsupported'),
@@ -241,19 +257,35 @@ export function CreateJobScreen() {
       },
     });
   };
-  const onSelectCity = city => {
+  const onSelectCity = (city: any) => {
     setState(s => ({...s, city, citySelectModal: false}));
   };
   const onSelectLocation = (lat: number, lng: number) => {
     setState(s => ({...s, lat, lng}));
   };
 
-  const onChangeField = (field, value) => {
+  const onChangeField = (field: any, value: any) => {
     setState(s => ({...s, [field]: value}));
   };
+  const {labelWidth, labelMeasurer} = useLabelColumnWidth(
+    FIELD_LABEL_KEYS.map(key => t(key)),
+  );
+  const labelCell = {
+    ...fieldStyles.cell,
+    ...styles.formCell,
+    width: labelWidth,
+  };
+  const valueCell = {...fieldStyles.cell, ...styles.formCell, flex: 1};
+  // TextField's `default` preset carries a height of its own, which is what
+  // used to hold the text to 30pt whatever it needed: unset it and keep the 30
+  // as a floor, so a field whose text is drawn taller (a larger system font)
+  // grows the row instead of spilling out of it.
+  const fieldContainer = {borderWidth: 0, height: undefined, minHeight: 30};
   return (
     <Screen withoutScroll>
-      <MainHeader title={editItem ? t('jobs.editGuild') : t('jobs.createGuild')} />
+      <MainHeader
+        title={editItem ? t('jobs.editGuild') : t('jobs.createGuild')}
+      />
       <View style={styles.nav}>
         <GradiantHeader
           details={false}
@@ -269,7 +301,7 @@ export function CreateJobScreen() {
               source={{uri: state?.banner?.uri}}
             />
           ) : (
-            <SimpleLineIcons name="camera" color="black" size={60} />
+            <SimpleLineIcons name="camera" color="black" size={scaled(60)} />
           )}
         </TouchableOpacity>
         <View style={styles.grayCard}>
@@ -280,203 +312,252 @@ export function CreateJobScreen() {
                 source={{uri: state.avatar?.uri}}
               />
             ) : (
-              <SimpleLineIcons name="camera" color="black" size={40} />
+              <SimpleLineIcons name="camera" color="black" size={scaled(40)} />
             )}
           </TouchableOpacity>
         </View>
         <Divider height={8} />
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.unitName')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.unitName')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.title}
               onChangeText={text => onChangeField('title', text)}
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              style={fieldContainer}
+              inputStyle={{
+                padding: 0,
+                fontSize: scaled(12),
+                textAlign: 'right',
+              }}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.manager')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.manager')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.manager}
               onChangeText={text => onChangeField('manager', text)}
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              style={fieldContainer}
+              inputStyle={{
+                padding: 0,
+                fontSize: scaled(12),
+                textAlign: 'right',
+              }}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.guildType')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.guildType')}</Text>
           </View>
-          <Divider style={{width: 10}} />
+          <Divider style={{width: scaled(10)}} />
           <TouchableOpacity
             onPress={() => setState(s => ({...s, jobClassModal: true}))}
-            style={{...styles.detailItem, flex: 1}}>
-            <Text style={{...styles.itemText, textAlign: 'right'}}>
+            style={valueCell}>
+            <Text style={{textAlign: 'right'}}>
               {localizeCategory(state?.category?.title)}
             </Text>
           </TouchableOpacity>
         </Row>
-        <Row style={{paddingHorizontal: 8, justifyContent: 'flex-end'}}>
+        <Row style={{paddingHorizontal: scaled(8), justifyContent: 'flex-end'}}>
           <TouchableOpacity onPress={() => navigate('jobCategoryGuide')}>
-            <Text style={{fontSize: 12, color: colors.main}}>
+            <Text style={{fontSize: scaled(12), color: colors.main}}>
               {t('jobs.guildGuide')}
             </Text>
           </TouchableOpacity>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.registerCode')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.registerCode')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.register_code}
               onChangeText={text => onChangeField('register_code', text)}
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              style={fieldContainer}
+              inputStyle={{
+                padding: 0,
+                fontSize: scaled(12),
+                textAlign: 'right',
+              }}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.landline')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.landline')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.phone}
               onChangeText={text => onChangeField('phone', text)}
               inputMode="tel"
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              phoneNumber
+              style={fieldContainer}
+              inputStyle={{padding: 0, fontSize: scaled(12)}}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.mobile')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.mobile')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.mobile}
               onChangeText={text => onChangeField('mobile', text)}
               inputMode="tel"
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              phoneNumber
+              style={fieldContainer}
+              inputStyle={{padding: 0, fontSize: scaled(12)}}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.fax')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.fax')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.fax}
               onChangeText={text => onChangeField('fax', text)}
               inputMode="tel"
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              phoneNumber
+              style={fieldContainer}
+              inputStyle={{padding: 0, fontSize: scaled(12)}}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.address')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.address')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.address}
               onChangeText={text => onChangeField('address', text)}
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              style={fieldContainer}
+              inputStyle={{
+                padding: 0,
+                fontSize: scaled(12),
+                textAlign: 'right',
+              }}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.telegram')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.telegram')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.telegram}
               onChangeText={text => onChangeField('telegram', text)}
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              style={fieldContainer}
+              inputStyle={{
+                padding: 0,
+                fontSize: scaled(12),
+                textAlign: 'right',
+              }}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.instagram')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.instagram')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.instagram}
               onChangeText={text => onChangeField('instagram', text)}
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              style={fieldContainer}
+              inputStyle={{
+                padding: 0,
+                fontSize: scaled(12),
+                textAlign: 'right',
+              }}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('common.email')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('common.email')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.email}
               onChangeText={text => onChangeField('email', text)}
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              style={fieldContainer}
+              inputStyle={{
+                padding: 0,
+                fontSize: scaled(12),
+                textAlign: 'right',
+              }}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('common.description')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('common.description')}</Text>
           </View>
-          <Divider style={{width: 10}} />
-          <View style={{...styles.detailItem, flex: 1}}>
+          <Divider style={{width: scaled(10)}} />
+          <View style={valueCell}>
             <TextField
               value={state.description}
               onChangeText={text => onChangeField('description', text)}
-              style={{borderWidth: 0, height: 30}}
-              inputStyle={{padding: 0, fontSize: 12, textAlign: 'right'}}
+              style={fieldContainer}
+              inputStyle={{
+                padding: 0,
+                fontSize: scaled(12),
+                textAlign: 'right',
+              }}
             />
           </View>
         </Row>
-        <Row style={{paddingHorizontal: 8}}>
-          <View style={{...styles.detailItem, width: 70}}>
-            <Text style={{...styles.itemText}}>{t('jobs.city')}</Text>
+        <Row style={{paddingHorizontal: scaled(8)}}>
+          <View style={labelCell}>
+            <Text>{t('jobs.city')}</Text>
           </View>
-          <Divider style={{width: 10}} />
+          <Divider style={{width: scaled(10)}} />
           <TouchableOpacity
             onPress={() => setState(s => ({...s, citySelectModal: true}))}
-            style={{...styles.detailItem, flex: 1}}>
-            <Text style={{...styles.itemText, textAlign: 'right'}}>
+            style={valueCell}>
+            <Text style={{textAlign: 'right'}}>
               {localizeCity(state?.city?.title)}
             </Text>
           </TouchableOpacity>
         </Row>
+        {labelMeasurer}
+        {/* Closes the form, before the map rather than after it: the terms are
+            about what is being submitted, and the map is the last thing the
+            screen asks for. */}
         <Divider height={8} />
-        <View style={{paddingHorizontal: 8}}>
+        <View>
+          <Checkbox
+            value={state.acceptance}
+            onToggle={() => setState(s => ({...s, acceptance: !s.acceptance}))}
+            onTextPress={() => navigate('privacy')}
+            style={{flexDirection: 'row', alignSelf: 'center'}}
+            text={t('createAds.acceptTerms')}
+          />
+        </View>
+        <Divider height={8} />
+        <View style={{paddingHorizontal: scaled(8)}}>
           <View style={styles.mapPreview}>
             <ProductLocation
               lat={state.lat}
@@ -494,15 +575,6 @@ export function CreateJobScreen() {
             </Text>
           </TouchableOpacity>
         </View>
-        <View>
-          <Checkbox
-            value={state.acceptance}
-            onToggle={() => setState(s => ({...s, acceptance: !s.acceptance}))}
-            onTextPress={() => navigate('privacy')}
-            style={{flexDirection: 'row', alignSelf: 'center'}}
-            text={t('createAds.acceptTerms')}
-          />
-        </View>
       </Screen>
       <FilePickerModal
         visible={state.filePickerModal}
@@ -510,7 +582,7 @@ export function CreateJobScreen() {
         onSelectFile={onSelectFile}
       />
       <JobClasessModal
-        onSelect={item =>
+        onSelect={(item: any) =>
           setState(s => ({...s, category: item, jobClassModal: false}))
         }
         visible={state.jobClassModal}
@@ -543,52 +615,48 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    top: 50,
+    top: scaled(50),
   },
   grayCard: {
-    height: 55,
+    height: scaled(55),
     backgroundColor: colors.pallete.gray1,
   },
   circle: {
-    height: 94,
-    width: 94,
-    borderRadius: 50,
-    marginTop: -47,
+    height: scaled(94),
+    width: scaled(94),
+    borderRadius: scaled(50),
+    marginTop: scaled(-47),
     borderWidth: 1,
-    marginLeft: 20,
+    marginLeft: scaled(20),
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     backgroundColor: colors.pallete.gray4,
   },
-  detailItem: {
-    height: 30,
-    backgroundColor: colors.pallete.gray1,
-    borderRadius: 4,
-    justifyContent: 'center',
-    marginVertical: 4,
-    paddingHorizontal: 4,
-  },
-  itemText: {
-    lineHeight: 19,
+  // A form row is taller than a row on the detail screen because it holds an
+  // input rather than a line of text; that is the only thing this adds to the
+  // shared cell, and it is still a floor rather than a height.
+  formCell: {
+    minHeight: scaled(30),
+    paddingVertical: 0,
   },
   mapPreview: {
     width: '100%',
     aspectRatio: 1.6,
-    borderRadius: 8,
+    borderRadius: scaled(8),
     overflow: 'hidden',
     backgroundColor: colors.pallete.gray1,
   },
   locationButton: {
     alignSelf: 'center',
-    marginTop: 8,
-    marginBottom: 4,
-    height: 32,
-    minWidth: 200,
-    paddingHorizontal: 16,
+    marginTop: scaled(8),
+    marginBottom: scaled(4),
+    height: scaled(32),
+    minWidth: scaled(200),
+    paddingHorizontal: scaled(16),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 7,
+    borderRadius: scaled(7),
     borderWidth: 1,
     borderColor: colors.text,
     backgroundColor: 'white',

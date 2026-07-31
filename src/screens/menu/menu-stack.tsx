@@ -1,14 +1,8 @@
-import {View, Text} from 'react-native';
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {MenuScreen} from './menu-screen';
 import {JobsBankScreen} from './jobsBankScreen';
-import {
-  AboutUsScreen,
-  BookmarkScreen,
-  CallUsScreen,
-  UserPanelScreen,
-} from './other';
+import {AboutUsScreen, BookmarkScreen, CallUsScreen} from './other';
 import {
   OfferDetectionScreen,
   OfferCategoriesScreen,
