@@ -1,0 +1,3143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fa" xml:lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>گزارش-پروژه-ماهم</title>
+  <style>
+
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+  
+<style>
+@page { size: A4; margin: 20mm 18mm; }
+
+html { direction: rtl; }
+body {
+  direction: rtl;
+  text-align: right;
+  font-family: Tahoma, "Geeza Pro", "SF Arabic", sans-serif;
+  font-size: 11.5pt;
+  line-height: 1.9;
+  color: #1a1a1a;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fff;
+}
+
+h1, h2, h3, h4, h5, h6 { line-height: 1.6; margin: 1.6em 0 .7em; font-weight: 700; }
+h1 { font-size: 20pt; border-bottom: 3px solid #2c5f8a; padding-bottom: .35em; color: #1c4b73; }
+h2 { font-size: 16pt; border-bottom: 1px solid #d8d8d8; padding-bottom: .3em; color: #1c4b73; }
+h3 { font-size: 13.5pt; color: #2c5f8a; }
+h4 { font-size: 12pt; }
+
+p { margin: .75em 0; text-align: justify; }
+ul, ol { padding-right: 1.6em; padding-left: 0; margin: .7em 0; }
+li { margin: .35em 0; }
+blockquote {
+  border-right: 4px solid #2c5f8a; border-left: none;
+  margin: 1em 0; padding: .5em 1em; background: #f4f8fb; color: #33475b;
+}
+
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: 10.5pt; }
+th, td { border: 1px solid #cfcfcf; padding: 7px 10px; text-align: right; vertical-align: top; }
+th { background: #eaf1f7; font-weight: 700; }
+tr:nth-child(even) td { background: #fafafa; }
+
+/* کد و مسیر فایل باید چپ‌چین بماند وگرنه به‌هم می‌ریزد */
+code, pre, kbd, samp {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  direction: ltr;
+  /* plaintext = جهت هر خط از روی اولین حرف جهت‌دار همان خط تعیین می‌شود،
+     تا خطوط فارسی داخل بلوک کد برعکس نشوند */
+  unicode-bidi: plaintext;
+}
+code { background: #f0f2f4; padding: 2px 5px; border-radius: 3px; font-size: 9.5pt; }
+pre {
+  background: #f6f8fa; border: 1px solid #e0e0e0; border-radius: 5px;
+  padding: 12px 14px; overflow-x: auto; text-align: left;
+  line-height: 1.55; font-size: 9.5pt;
+}
+pre code { background: none; padding: 0; }
+a { color: #1c6fb8; }
+hr { border: none; border-top: 1px solid #ddd; margin: 2em 0; }
+img { max-width: 100%; }
+
+@media print {
+  body { padding: 0; max-width: none; }
+  h1, h2, h3 { page-break-after: avoid; }
+  pre, table, blockquote { page-break-inside: avoid; }
+  a { color: #000; text-decoration: none; }
+}
+
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">گزارش-پروژه-ماهم</h1>
+</header>
+<h1 id="گزارش-جامع-پروژه-ماهم">گزارش جامع پروژه «ماهم»</h1>
+<h3 id="مستند-تحویل-فاز-inception-و-فاز-elaboration">مستند تحویل فاز
+Inception و فاز Elaboration</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>نام پروژه</strong></td>
+<td>ماهم (Mahem) — سامانه نیازمندی‌ها، بانک مشاغل و تخفیف‌یاب استان
+گلستان</td>
+</tr>
+<tr>
+<td><strong>نسخه مستند</strong></td>
+<td>۱٫۰</td>
+</tr>
+<tr>
+<td><strong>تاریخ تدوین</strong></td>
+<td>۱۴۰۵/۰۵/۰۷ (2026-07-29)</td>
+</tr>
+<tr>
+<td><strong>نسخه نرم‌افزار</strong></td>
+<td>اپلیکیشن موبایل v1.0.0 · بک‌اند v1.0 · پنل مدیریت v0.1</td>
+</tr>
+<tr>
+<td><strong>وضعیت</strong></td>
+<td>تحویل نسخه اول قابل بهره‌برداری (Beta / Release Candidate)</td>
+</tr>
+<tr>
+<td><strong>مخاطب</strong></td>
+<td>کارفرما / تیم بهره‌بردار</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="فهرست-مطالب">فهرست مطالب</h2>
+<p><strong>بخش اول — فاز Inception</strong></p>
+<ol type="1">
+<li><a href="#۱-خلاصه-مدیریتی">خلاصه مدیریتی</a></li>
+<li><a href="#۲-چشم‌انداز-محصول-vision">چشم‌انداز محصول (Vision)</a></li>
+<li><a href="#۳-ذی‌نفعان-و-کنشگران-سیستم-actors">ذی‌نفعان و کنشگران سیستم
+(Actors)</a></li>
+<li><a href="#۴-دامنه-و-محدوده-پروژه-scope">دامنه و محدوده پروژه
+(Scope)</a></li>
+<li><a href="#۵-فهرست-موارد-کاربری-سطح-بالا-use-case-survey">فهرست موارد
+کاربری سطح بالا (Use-Case Survey)</a></li>
+<li><a href="#۶-ریسک‌ها-مفروضات-و-محدودیت‌ها">ریسک‌ها، مفروضات و
+محدودیت‌ها</a></li>
+</ol>
+<p><strong>بخش دوم — فاز Elaboration</strong></p>
+<ol start="7" type="1">
+<li><a href="#۷-معماری-کلان-سیستم">معماری کلان سیستم</a></li>
+<li><a href="#۸-مدل-دامنه-و-پایگاه-داده">مدل دامنه و پایگاه
+داده</a></li>
+<li><a href="#۹-معماری-استقرار-deployment">معماری استقرار
+(Deployment)</a></li>
+<li><a href="#۱۰-تصمیمات-معماری-کلیدی">تصمیمات معماری کلیدی</a></li>
+</ol>
+<p><strong>بخش سوم — شرح تفصیلی قابلیت‌ها</strong></p>
+<ol start="11" type="1">
+<li><a href="#۱۱-اپلیکیشن-موبایل--شرح-کامل-فیچرها">اپلیکیشن موبایل — شرح
+کامل فیچرها</a></li>
+<li><a href="#۱۲-پنل-مدیریت--شرح-کامل-فیچرها">پنل مدیریت — شرح کامل
+فیچرها</a></li>
+<li><a href="#۱۳-سرویس‌های-سمت-سرور-و-apiها">سرویس‌های سمت سرور و
+APIها</a></li>
+</ol>
+<p><strong>بخش چهارم — پیوست‌ها</strong></p>
+<ol start="14" type="1">
+<li><a href="#۱۴-ماتریس-ردیابی-طراحی-فیگما--پیاده‌سازی">ماتریس ردیابی
+طراحی فیگما ↔︎ پیاده‌سازی</a></li>
+<li><a href="#۱۵-کیفیت-امنیت-و-تست">کیفیت، امنیت و تست</a></li>
+<li><a href="#۱۶-موارد-باقی‌مانده-و-پیشنهادهای-فاز-بعد">موارد باقی‌مانده و
+پیشنهادهای فاز بعد</a></li>
+<li><a href="#۱۷-اطلاعات-تحویل-و-دسترسی‌ها">اطلاعات تحویل و
+دسترسی‌ها</a></li>
+</ol>
+<hr />
+<hr />
+<h1 id="بخش-اول--فاز-inception">بخش اول — فاز Inception</h1>
+<h2 id="۱-خلاصه-مدیریتی">۱. خلاصه مدیریتی</h2>
+<p>«ماهم» یک پلتفرم بومی نیازمندی‌ها و کسب‌وکارهای محلی است که به‌طور
+اختصاصی برای شهرها و بخش‌های <strong>استان گلستان</strong> طراحی و
+پیاده‌سازی شده است. برخلاف سامانه‌های سراسری، ماهم محتوای خود را بر پایه‌ی
+<strong>شهر</strong> سازمان می‌دهد؛ کاربر شهر خود را انتخاب می‌کند و از آن
+پس تمام آگهی‌ها، مشاغل، تخفیف‌ها، بنرها و حتی تصویر اسپلش برنامه متناسب با
+همان شهر نمایش داده می‌شود.</p>
+<p>محصول از <strong>سه سامانه‌ی مستقل و یکپارچه</strong> تشکیل شده
+است:</p>
+<table>
+<thead>
+<tr>
+<th>سامانه</th>
+<th>فناوری</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>اپلیکیشن موبایل ماهم</strong></td>
+<td>React Native 0.72 + Expo 49 (Android / iOS)</td>
+<td>رابط کاربر نهایی — ۵۱ صفحه</td>
+</tr>
+<tr>
+<td><strong>بک‌اند ماهم</strong></td>
+<td>NestJS 11 + Prisma 7 + PostgreSQL 16</td>
+<td>منطق کسب‌وکار، داده، احراز هویت، چت بلادرنگ، پوش — ۱۲۵ اندپوینت</td>
+</tr>
+<tr>
+<td><strong>پنل مدیریت ماهم</strong></td>
+<td>Next.js 16 + React 19 + Tailwind 4</td>
+<td>مدیریت محتوا، تأیید آگهی، آمار — ۲۰ بخش مدیریتی</td>
+</tr>
+</tbody>
+</table>
+<p><strong>چهار سرویس اصلی محصول:</strong></p>
+<ol type="1">
+<li><strong>آگهی و نیازمندی‌ها</strong> — ثبت، جست‌وجو، فیلتر پیشرفته و
+مشاهده آگهی در ۱۰ دسته‌ی اصلی و تا سه سطح زیردسته.</li>
+<li><strong>بانک مشاغل</strong> — دایرکتوری کسب‌وکارهای شهر در ۲۰ صنف، با
+پروفایل کامل (لوگو، بنر، تلفن، آدرس، موقعیت روی نقشه، شبکه‌های
+اجتماعی).</li>
+<li><strong>تخفیف‌یاب</strong> — سامانه‌ی کشف تخفیف‌های محلی شامل فید
+تخفیف، نقشه‌ی تخفیف‌ها، «تخفیف نزدیک من» با شعاع قابل تنظیم، اطلاع‌رسانی
+پوش بر اساس موقعیت، و <strong>فروشگاه‌های اشتراکی</strong> برای
+کسب‌وکارها.</li>
+<li><strong>چت و تعامل</strong> — گفت‌وگوی بلادرنگ خریدار و فروشنده روی
+هر آگهی، نشان‌کردن آگهی، امتیازدهی، گزارش تخلف و اشتراک‌گذاری.</li>
+</ol>
+<p>در زمان تدوین این مستند، هر سه سامانه پیاده‌سازی، یکپارچه و روی سرور
+اختصاصی مستقر شده‌اند و نسخه‌های نصبی Android (APK) و iOS (IPA) در اختیار
+کارفرما قرار گرفته است.</p>
+<hr />
+<h2 id="۲-چشمانداز-محصول-vision">۲. چشم‌انداز محصول (Vision)</h2>
+<h3 id="۲۱-بیان-مسئله">۲٫۱ بیان مسئله</h3>
+<table>
+<thead>
+<tr>
+<th>مؤلفه</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>مسئله</strong></td>
+<td>سامانه‌های سراسری نیازمندی، محتوای محلی شهرهای کوچک و متوسط استان
+گلستان را به‌درستی پوشش نمی‌دهند؛ کسب‌وکارهای محلی نیز ابزاری بومی برای
+معرفی خود و اعلام تخفیف به مشتریان نزدیک ندارند.</td>
+</tr>
+<tr>
+<td><strong>متأثرین</strong></td>
+<td>ساکنان ۳۰ شهر و بخش استان گلستان، کسب‌وکارهای خرد و متوسط محلی،
+کارجویان و کارفرمایان منطقه.</td>
+</tr>
+<tr>
+<td><strong>پیامد</strong></td>
+<td>پراکندگی اطلاعات محلی، دیده‌نشدن کسب‌وکارهای کوچک، نبود کانال مستقیم
+اطلاع‌رسانی تخفیف به مشتری نزدیک.</td>
+</tr>
+<tr>
+<td><strong>راه‌حل</strong></td>
+<td>یک اپلیکیشن بومی شهرمحور که آگهی، بانک مشاغل و تخفیف‌یاب را در یک
+تجربه‌ی واحد فارسی و راست‌به‌چپ گرد هم می‌آورد.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۲۲-موقعیتیابی-محصول">۲٫۲ موقعیت‌یابی محصول</h3>
+<blockquote>
+<p>برای <strong>ساکنان و کسب‌وکارهای استان گلستان</strong> که <strong>به
+دنبال خرید و فروش محلی، یافتن کسب‌وکار نزدیک یا استفاده از تخفیف‌های اطراف
+خود هستند</strong>، <strong>ماهم</strong> یک <strong>اپلیکیشن موبایل
+شهرمحور</strong> است که <strong>آگهی، دایرکتوری مشاغل و سامانه‌ی تخفیف
+مکان‌محور را یکجا ارائه می‌دهد</strong>. برخلاف <strong>پلتفرم‌های سراسری
+آگهی</strong>، محصول ما <strong>بر پایه‌ی شهر انتخابی کاربر ساخته شده،
+تخفیف‌ها را روی نقشه و بر اساس فاصله نمایش می‌دهد و به کسب‌وکار محلی امکان
+داشتن ویترین اختصاصی می‌بخشد</strong>.</p>
+</blockquote>
+<h3 id="۲۳-اهداف-کسبوکاری">۲٫۳ اهداف کسب‌وکاری</h3>
+<ol type="1">
+<li>ایجاد بستر واحد نیازمندی‌های محلی برای ۳۰ شهر و بخش استان
+گلستان.</li>
+<li>درآمدزایی از سه محل: <strong>هزینه‌ی ثبت آگهی استخدامی</strong>،
+<strong>اشتراک ماهانه‌ی فروشگاه تخفیف‌یاب</strong>، و <strong>بنرهای
+تبلیغاتی شهری</strong>.</li>
+<li>کنترل کامل کیفیت محتوا از طریق گردش‌کار تأیید مدیریتی پیش از
+انتشار.</li>
+<li>امکان ارتباط مستقیم و بی‌واسطه‌ی خریدار و فروشنده درون اپلیکیشن.</li>
+</ol>
+<hr />
+<h2 id="۳-ذینفعان-و-کنشگران-سیستم-actors">۳. ذی‌نفعان و کنشگران سیستم
+(Actors)</h2>
+<h3 id="۳۱-کنشگران-انسانی">۳٫۱ کنشگران انسانی</h3>
+<table>
+<thead>
+<tr>
+<th>کنشگر</th>
+<th>شرح</th>
+<th>دسترسی‌ها</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>کاربر مهمان</strong></td>
+<td>کاربری که هنوز وارد نشده یا برنامه را تازه نصب کرده است</td>
+<td>مشاهده‌ی فهرست عمومی آگهی‌ها، مشاغل، فروشگاه‌ها، دسته‌بندی‌ها، شهرها و
+محتوای اپ (اندپوینت‌های <code>@Public</code>)</td>
+</tr>
+<tr>
+<td><strong>کاربر عادی</strong></td>
+<td>کاربر احراز هویت‌شده با شماره موبایل</td>
+<td>ثبت/ویرایش/حذف آگهی، ثبت شغل، چت، نشان‌کردن، امتیازدهی، گزارش تخلف،
+تنظیم اعلان تخفیف، مشاهده آمار بازدید آگهی خود</td>
+</tr>
+<tr>
+<td><strong>صاحب فروشگاه</strong></td>
+<td>کاربری که فروشگاه تخفیف‌یاب ثبت و اشتراک آن را پرداخت کرده است</td>
+<td>همه‌ی دسترسی‌های کاربر عادی + پنل «فروشگاه من»، ثبت تخفیف رایگان زیر
+فروشگاه، تمدید اشتراک</td>
+</tr>
+<tr>
+<td><strong>ادمین (ADMIN)</strong></td>
+<td>مدیر محتوا</td>
+<td>تأیید/رد آگهی، شغل، تخفیف و فروشگاه؛ تأیید پرداخت؛ رسیدگی به
+گزارش‌ها؛ مدیریت شهرها، دسته‌بندی‌ها، بنرها، اسپلش، فیلدهای اختصاصی و
+محتوای اپ؛ مشاهده کاربران، مکالمات و آمار</td>
+</tr>
+<tr>
+<td><strong>سوپر ادمین (SUPER_ADMIN)</strong></td>
+<td>مدیر ارشد سامانه</td>
+<td>همه‌ی دسترسی‌های ادمین + تغییر نقش کاربران، حذف کاربر، ارسال
+نوتیفیکیشن همگانی، ویرایش مستقیم رکوردها، تنظیم مدت انقضای
+آگهی/شغل/فروشگاه، تمدید و آرشیو دستی</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۳۲-کنشگران-سامانهای">۳٫۲ کنشگران سامانه‌ای</h3>
+<table>
+<thead>
+<tr>
+<th>کنشگر</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>زمان‌بند انقضا (Cron)</strong></td>
+<td>سه زمان‌بند مستقل که آگهی‌ها، مشاغل و فروشگاه‌های منقضی‌شده را به‌صورت
+خودکار آرشیو می‌کنند</td>
+</tr>
+<tr>
+<td><strong>سرویس پوش (Firebase FCM)</strong></td>
+<td>ارسال نوتیفیکیشن به دستگاه‌ها؛ به‌ویژه اطلاع‌رسانی «تخفیف نزدیک
+من»</td>
+</tr>
+<tr>
+<td><strong>درگاه پیامک</strong></td>
+<td>ارسال کد یکبارمصرف ورود <em>(در حال حاضر در حالت شبیه‌سازی — بخش
+۱۶)</em></td>
+</tr>
+<tr>
+<td><strong>درگاه پرداخت</strong></td>
+<td>پرداخت هزینه‌ی آگهی/اشتراک <em>(در حال حاضر تأیید دستی توسط ادمین —
+بخش ۱۶)</em></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="۴-دامنه-و-محدوده-پروژه-scope">۴. دامنه و محدوده پروژه
+(Scope)</h2>
+<h3 id="۴۱-داخل-دامنه-in-scope--تحویلشده">۴٫۱ داخل دامنه (In Scope) —
+تحویل‌شده</h3>
+<ul>
+<li>✅ اپلیکیشن موبایل بومی برای Android و iOS با ۵۱ صفحه</li>
+<li>✅ احراز هویت با شماره موبایل و کد یکبارمصرف + توکن
+دسترسی/تازه‌سازی</li>
+<li>✅ سامانه‌ی کامل آگهی (ثبت چندمرحله‌ای، ویرایش، حذف، تمدید،
+انقضا)</li>
+<li>✅ درخت دسته‌بندی تا ۳ سطح، قابل مدیریت کامل از پنل</li>
+<li>✅ فیلتر پیشرفته‌ی دسته‌محور (املاک، وسایل نقلیه، استخدامی و…)</li>
+<li>✅ جست‌وجوی متنی با مرتب‌سازی و فیلتر</li>
+<li>✅ بانک مشاغل با ۲۰ صنف و پروفایل کامل کسب‌وکار</li>
+<li>✅ تخفیف‌یاب: فید، نقشه، نزدیک من، اطلاع‌رسانی پوش، فروشگاه
+اشتراکی</li>
+<li>✅ چت بلادرنگ خریدار–فروشنده با پشتیبانی تصویر</li>
+<li>✅ نوتیفیکیشن درون‌برنامه‌ای + پوش</li>
+<li>✅ نشان‌کردن آگهی، امتیازدهی، گزارش تخلف، اشتراک‌گذاری</li>
+<li>✅ آمار بازدید آگهی برای صاحب آگهی (نمودار ۲۲ روزه + تفکیک
+جنسیت)</li>
+<li>✅ پنل مدیریت کامل با ۲۰ بخش</li>
+<li>✅ گردش‌کار تأیید محتوا (آگهی/شغل/فروشگاه/تخفیف)</li>
+<li>✅ گزارش آماری بازدید و ثبت‌نام به تفکیک شهر و بازه زمانی</li>
+<li>✅ چندزبانگی (فارسی/انگلیسی) و پشتیبانی RTL</li>
+<li>✅ کش محلی داده‌های مرجع با مکانیزم نسخه‌گذاری</li>
+<li>✅ مدیریت حالت آفلاین و خطا</li>
+<li>✅ استقرار روی سرور اختصاصی + مستندات Swagger</li>
+</ul>
+<h3 id="۴۲-خارج-از-چارچوب-قرارداد--صرفاً-جهت-اطلاع-کارفرما">۴٫۲ خارج از
+چارچوب قرارداد — صرفاً جهت اطلاع کارفرما</h3>
+<p>موارد زیر <strong>جزو تعهدات قرارداد فعلی نیستند</strong> و در این
+نسخه پیاده‌سازی نشده‌اند. صرفاً برای شفافیت و اطلاع کارفرما فهرست
+می‌شوند:</p>
+<ul>
+<li>اتصال به درگاه پرداخت آنلاین واقعی (فرایند فعلی: تأیید دستی حواله
+بانکی توسط ادمین)</li>
+<li>اتصال به سرویس‌دهنده‌ی پیامک واقعی (فرایند فعلی: حالت شبیه‌سازی
+کد)</li>
+<li>نسخه‌ی وب کاربر نهایی (فقط پنل مدیریت وب است)</li>
+<li>تماس صوتی/تصویری درون‌برنامه‌ای</li>
+<li>سامانه‌ی نظرات و دیدگاه عمومی روی آگهی (امتیازدهی ستاره‌ای پیاده‌سازی
+شده است)</li>
+<li>پشتیبانی از استان‌های خارج از گلستان</li>
+<li>به‌روزرسانی خودکار از راه دور (OTA)</li>
+</ul>
+<hr />
+<h2 id="۵-فهرست-موارد-کاربری-سطح-بالا-use-case-survey">۵. فهرست موارد
+کاربری سطح بالا (Use-Case Survey)</h2>
+<h3 id="uc-a-احراز-هویت-و-حساب-کاربری">UC-A: احراز هویت و حساب
+کاربری</h3>
+<table>
+<thead>
+<tr>
+<th>کد</th>
+<th>مورد کاربری</th>
+<th>کنشگر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-A1</td>
+<td>ورود / ثبت‌نام با شماره موبایل و کد یکبارمصرف</td>
+<td>کاربر مهمان</td>
+</tr>
+<tr>
+<td>UC-A2</td>
+<td>تکمیل پروفایل (نام نمایشی، جنسیت، تصویر)</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-A3</td>
+<td>انتخاب شهر محل سکونت</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-A4</td>
+<td>ویرایش پروفایل و تغییر تصویر</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-A5</td>
+<td>خروج از حساب و تازه‌سازی خودکار نشست</td>
+<td>کاربر عادی</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uc-b-آگهی">UC-B: آگهی</h3>
+<table>
+<thead>
+<tr>
+<th>کد</th>
+<th>مورد کاربری</th>
+<th>کنشگر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-B1</td>
+<td>مرور آگهی‌ها در صفحه‌ی خانه به تفکیک بخش</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-B2</td>
+<td>مرور دسته‌بندی‌شده (دسته ← زیردسته ← فهرست)</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-B3</td>
+<td>جست‌وجوی متنی با مرتب‌سازی</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-B4</td>
+<td>فیلتر پیشرفته‌ی دسته‌محور</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-B5</td>
+<td>مشاهده‌ی جزئیات آگهی و اطلاعات تماس</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-B6</td>
+<td>ثبت آگهی جدید (ویزارد چندمرحله‌ای)</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-B7</td>
+<td>پرداخت هزینه‌ی ثبت آگهی (دسته‌های هزینه‌دار)</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-B8</td>
+<td>مدیریت آگهی‌های من (ویرایش/حذف/تمدید)</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-B9</td>
+<td>مشاهده‌ی آمار بازدید آگهی من</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-B10</td>
+<td>نشان‌کردن آگهی</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-B11</td>
+<td>گزارش مشکل آگهی</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-B12</td>
+<td>اشتراک‌گذاری آگهی</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-B13</td>
+<td>امتیازدهی به تخفیف</td>
+<td>کاربر عادی</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uc-c-بانک-مشاغل">UC-C: بانک مشاغل</h3>
+<table>
+<thead>
+<tr>
+<th>کد</th>
+<th>مورد کاربری</th>
+<th>کنشگر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-C1</td>
+<td>مرور اصناف بانک مشاغل</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-C2</td>
+<td>مشاهده‌ی مشاغل یک صنف / همه‌ی مشاغل شهر</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-C3</td>
+<td>مشاهده‌ی پروفایل کامل کسب‌وکار</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-C4</td>
+<td>راهنمای انتخاب صنف</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-C5</td>
+<td>ثبت کسب‌وکار در بانک مشاغل</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-C6</td>
+<td>تمدید آگهی کسب‌وکار</td>
+<td>کاربر عادی</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uc-d-تخفیفیاب">UC-D: تخفیف‌یاب</h3>
+<table>
+<thead>
+<tr>
+<th>کد</th>
+<th>مورد کاربری</th>
+<th>کنشگر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-D1</td>
+<td>مشاهده‌ی فید تخفیف‌های شهر + ردیف فروشگاه‌ها</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-D2</td>
+<td>مرور تخفیف‌ها بر اساس دسته‌بندی</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-D3</td>
+<td>مشاهده‌ی تخفیف‌ها روی نقشه با فیلتر دسته</td>
+<td>همه</td>
+</tr>
+<tr>
+<td>UC-D4</td>
+<td>«تخفیف‌های نزدیک من» با شعاع قابل تنظیم</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-D5</td>
+<td>فعال‌سازی اطلاع‌رسانی تخفیف نزدیک به تفکیک دسته</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-D6</td>
+<td>ثبت فروشگاه (فرم + قوانین + پرداخت اشتراک)</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-D7</td>
+<td>مدیریت «فروشگاه من» و ثبت تخفیف زیر آن</td>
+<td>صاحب فروشگاه</td>
+</tr>
+<tr>
+<td>UC-D8</td>
+<td>تمدید اشتراک ماهانه‌ی فروشگاه</td>
+<td>صاحب فروشگاه</td>
+</tr>
+<tr>
+<td>UC-D9</td>
+<td>مشاهده‌ی پروفایل عمومی فروشگاه</td>
+<td>همه</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uc-e-تعامل-و-اطلاعرسانی">UC-E: تعامل و اطلاع‌رسانی</h3>
+<table>
+<thead>
+<tr>
+<th>کد</th>
+<th>مورد کاربری</th>
+<th>کنشگر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-E1</td>
+<td>شروع گفت‌وگو روی یک آگهی</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-E2</td>
+<td>ارسال/دریافت پیام متنی و تصویری بلادرنگ</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-E3</td>
+<td>مشاهده‌ی فهرست مکالمات و شمارنده‌ی خوانده‌نشده</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-E4</td>
+<td>دریافت نوتیفیکیشن درون‌برنامه‌ای و پوش</td>
+<td>کاربر عادی</td>
+</tr>
+<tr>
+<td>UC-E5</td>
+<td>مشاهده و مدیریت اعلان‌ها (خواندن/حذف)</td>
+<td>کاربر عادی</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uc-f-مدیریت-پنل-ادمین">UC-F: مدیریت (پنل ادمین)</h3>
+<table>
+<thead>
+<tr>
+<th>کد</th>
+<th>مورد کاربری</th>
+<th>کنشگر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-F1</td>
+<td>ورود مدیر و مشاهده‌ی داشبورد صف‌های در انتظار</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F2</td>
+<td>تأیید / رد آگهی، تخفیف، شغل و فروشگاه (با ذکر دلیل)</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F3</td>
+<td>تأیید پرداخت و فعال‌سازی اشتراک</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F4</td>
+<td>رسیدگی به گزارش‌های تخلف</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F5</td>
+<td>مدیریت شهرها، دسته‌بندی‌ها و فیلدهای اختصاصی</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F6</td>
+<td>مدیریت بنر و تصویر اسپلش شهری</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F7</td>
+<td>ویرایش محتوای اپ (درباره ما / تماس با ما / شبکه‌های اجتماعی)</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F8</td>
+<td>مشاهده‌ی کاربران و دستگاه‌های آن‌ها</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F9</td>
+<td>مشاهده‌ی مکالمات کاربران (نظارت)</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F10</td>
+<td>گزارش آماری بازدید و ثبت‌نام به تفکیک شهر و دوره</td>
+<td>ادمین</td>
+</tr>
+<tr>
+<td>UC-F11</td>
+<td>ارسال نوتیفیکیشن همگانی یا هدفمند</td>
+<td>سوپر ادمین</td>
+</tr>
+<tr>
+<td>UC-F12</td>
+<td>تغییر نقش و حذف کاربر</td>
+<td>سوپر ادمین</td>
+</tr>
+<tr>
+<td>UC-F13</td>
+<td>تنظیم مدت انقضای آگهی/شغل/فروشگاه</td>
+<td>سوپر ادمین</td>
+</tr>
+<tr>
+<td>UC-F14</td>
+<td>ویرایش مستقیم و آرشیو دستی رکوردها</td>
+<td>سوپر ادمین</td>
+</tr>
+</tbody>
+</table>
+<p><strong>جمع: ۵۲ مورد کاربری اصلی — همگی پیاده‌سازی و تحویل
+شده‌اند.</strong></p>
+<hr />
+<h2 id="۶-ریسکها-مفروضات-و-محدودیتها">۶. ریسک‌ها، مفروضات و
+محدودیت‌ها</h2>
+<h3 id="۶۱-ریسکهای-شناساییشده-و-وضعیت-آنها">۶٫۱ ریسک‌های شناسایی‌شده و
+وضعیت آن‌ها</h3>
+<table>
+<thead>
+<tr>
+<th>ریسک</th>
+<th>اثر</th>
+<th>وضعیت / راهکار اعمال‌شده</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>نبود درگاه پرداخت رسمی در زمان توسعه</td>
+<td>مسدودشدن جریان درآمدی</td>
+<td><strong>کاهش‌یافته:</strong> جریان پرداخت کامل پیاده‌سازی شده و فقط
+لحظه‌ی «تسویه» دستی است؛ افزودن درگاه واقعی نیازمند تغییر در یک نقطه
+است</td>
+</tr>
+<tr>
+<td>نبود پنل پیامک در زمان توسعه</td>
+<td>مسدودشدن ورود کاربر</td>
+<td><strong>کاهش‌یافته:</strong> ساختار OTP کامل است (تولید، هش، انقضا،
+محدودیت تلاش)؛ فقط لایه‌ی ارسال باید جایگزین شود</td>
+</tr>
+<tr>
+<td>بارگذاری مکرر داده‌های مرجع روی اینترنت ضعیف</td>
+<td>مصرف داده و کندی</td>
+<td><strong>رفع‌شده:</strong> مکانیزم نسخه‌گذاری + کش محلی برای دسته‌بندی،
+شهر، فیلدها و محتوای اپ</td>
+</tr>
+<tr>
+<td>کیفیت پایین محتوای کاربرساخته</td>
+<td>آسیب به اعتبار</td>
+<td><strong>رفع‌شده:</strong> هیچ آگهی/شغل/فروشگاهی بدون تأیید ادمین
+منتشر نمی‌شود</td>
+</tr>
+<tr>
+<td>انباشت آگهی‌های قدیمی</td>
+<td>افت کیفیت فید</td>
+<td><strong>رفع‌شده:</strong> سه زمان‌بند خودکار آرشیو + امکان تمدید توسط
+کاربر</td>
+</tr>
+<tr>
+<td>قطع اینترنت کاربر</td>
+<td>تجربه‌ی خراب</td>
+<td><strong>رفع‌شده:</strong> دروازه‌ی آفلاین و صفحه‌ی اختصاصی «نبود
+اینترنت»</td>
+</tr>
+<tr>
+<td>محدودیت نصب iOS خارج از App Store</td>
+<td>دشواری توزیع و تست</td>
+<td><strong>مدیریت‌شده:</strong> نسخه‌ی شبیه‌ساز برای تست بدون نیاز به امضا
+ارائه شده؛ نصب روی دستگاه واقعی نیازمند حساب Apple Developer کارفرماست —
+بند ۱۷٫۷</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۶۲-مفروضات">۶٫۲ مفروضات</h3>
+<ul>
+<li>محدوده‌ی جغرافیایی محصول، استان گلستان و ۳۰ شهر/بخش آن است.</li>
+<li>زبان اصلی رابط کاربری فارسی و جهت چیدمان راست‌به‌چپ است.</li>
+<li>کاربران با شماره‌ی موبایل ایرانی احراز هویت می‌شوند (یک شماره = یک
+حساب).</li>
+<li>طراحی مرجع محصول، فایل فیگمای رسمی پروژه با ۱۷۳ فریم است.</li>
+</ul>
+<h3 id="۶۳-محدودیتها">۶٫۳ محدودیت‌ها</h3>
+<ul>
+<li>بارگذاری تصاویر روی فایل‌سیستم سرور انجام می‌شود (بدون سرویس
+ابری/CDN).</li>
+<li>API در حال حاضر روی HTTP و آدرس IP سرور ارائه می‌شود؛ برای انتشار
+عمومی، دامنه و گواهی TLS لازم است.</li>
+<li>نوتیفیکیشن پوش وابسته به سرویس Firebase و در دسترس بودن آن روی
+دستگاه کاربر است.</li>
+</ul>
+<hr />
+<hr />
+<h1 id="بخش-دوم--فاز-elaboration">بخش دوم — فاز Elaboration</h1>
+<h2 id="۷-معماری-کلان-سیستم">۷. معماری کلان سیستم</h2>
+<h3 id="۷۱-نمای-کلی">۷٫۱ نمای کلی</h3>
+<pre class="mermaid"><code>graph TB
+    subgraph &quot;لایه کاربر&quot;
+        RN[&quot;اپلیکیشن موبایل ماهم&lt;br/&gt;React Native 0.72 + Expo 49&lt;br/&gt;Android · iOS&quot;]
+        ADM[&quot;پنل مدیریت ماهم&lt;br/&gt;Next.js 16 + React 19&lt;br/&gt;مرورگر وب&quot;]
+    end
+
+    subgraph &quot;لایه سرویس — سرور اختصاصی&quot;
+        API[&quot;بک‌اند ماهم — NestJS 11&lt;br/&gt;REST API + Socket.IO&lt;br/&gt;Swagger · JWT · Cron&lt;br/&gt;پورت 3000&quot;]
+        UP[&quot;فضای ذخیره تصاویر&lt;br/&gt;uploads volume&quot;]
+        DB[(&quot;PostgreSQL 16&lt;br/&gt;۳۱ جدول&quot;)]
+    end
+
+    subgraph &quot;سرویس‌های بیرونی&quot;
+        FCM[&quot;Firebase Cloud Messaging&lt;br/&gt;نوتیفیکیشن پوش&quot;]
+        SMS[&quot;درگاه پیامک&lt;br/&gt;(آماده اتصال)&quot;]
+        PAY[&quot;درگاه پرداخت&lt;br/&gt;(آماده اتصال)&quot;]
+    end
+
+    RN --&gt;|&quot;REST&quot;| API
+    RN --&gt;|&quot;WebSocket / chat&quot;| API
+    ADM --&gt;|&quot;REST — Server Actions&quot;| API
+    API --&gt; DB
+    API --&gt; UP
+    API --&gt; FCM
+    FCM -.-&gt;|&quot;پوش&quot;| RN
+    API -.-&gt; SMS
+    RN -.-&gt; PAY</code></pre>
+<h3 id="۷۲-پشتهی-فناوری-به-تفکیک-سامانه">۷٫۲ پشته‌ی فناوری به تفکیک
+سامانه</h3>
+<h4 id="اپلیکیشن-موبایل">اپلیکیشن موبایل</h4>
+<table>
+<thead>
+<tr>
+<th>حوزه</th>
+<th>فناوری</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>چارچوب</td>
+<td>React Native 0.72.3 + Expo 49 (Bare Workflow)</td>
+</tr>
+<tr>
+<td>زبان</td>
+<td>TypeScript 4.8</td>
+</tr>
+<tr>
+<td>ناوبری</td>
+<td>React Navigation 6 (Native Stack + Bottom Tabs)</td>
+</tr>
+<tr>
+<td>مدیریت وضعیت</td>
+<td>Redux Toolkit 1.9 + redux-persist 6</td>
+</tr>
+<tr>
+<td>لایه داده سرور</td>
+<td>React Query 3 + Axios 1.6</td>
+</tr>
+<tr>
+<td>بلادرنگ</td>
+<td>socket.io-client 4.8</td>
+</tr>
+<tr>
+<td>نقشه</td>
+<td>react-native-maps 1.7 + @react-native-community/geolocation</td>
+</tr>
+<tr>
+<td>پوش</td>
+<td>@react-native-firebase/messaging 19.3</td>
+</tr>
+<tr>
+<td>چندزبانگی</td>
+<td>i18next 22 + react-i18next 12 (فارسی / انگلیسی)</td>
+</tr>
+<tr>
+<td>تاریخ شمسی</td>
+<td>moment-jalaali</td>
+</tr>
+<tr>
+<td>انیمیشن و UI</td>
+<td>Reanimated 3، Reanimated Carousel، Linear Gradient، SVG، Vector
+Icons</td>
+</tr>
+<tr>
+<td>گزارش خطا</td>
+<td>@sentry/react-native 5.36 (فقط در نسخه‌ی انتشار)</td>
+</tr>
+<tr>
+<td>لینک مستقیم</td>
+<td>طرح اختصاصی <code>mahem://</code> ثبت‌شده در AndroidManifest و
+Info.plist</td>
+</tr>
+<tr>
+<td>تست</td>
+<td>Jest 29 + React Test Renderer (۱۳ فایل تست)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="بکاند">بک‌اند</h4>
+<table>
+<thead>
+<tr>
+<th>حوزه</th>
+<th>فناوری</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>چارچوب</td>
+<td>NestJS 11 (معماری ماژولار)</td>
+</tr>
+<tr>
+<td>زبان</td>
+<td>TypeScript 5.7</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td>Prisma 7 + آداپتور pg</td>
+</tr>
+<tr>
+<td>پایگاه داده</td>
+<td>PostgreSQL 16</td>
+</tr>
+<tr>
+<td>احراز هویت</td>
+<td>Passport-JWT — توکن دسترسی + توکن تازه‌سازی چرخشی</td>
+</tr>
+<tr>
+<td>بلادرنگ</td>
+<td>Socket.IO 4.8 (namespace اختصاصی <code>/chat</code>)</td>
+</tr>
+<tr>
+<td>مستندسازی</td>
+<td>Swagger / OpenAPI 3 (مسیر <code>/docs</code>)</td>
+</tr>
+<tr>
+<td>امنیت</td>
+<td>Helmet + Throttler (محدودیت نرخ) + ValidationPipe سراسری</td>
+</tr>
+<tr>
+<td>بارگذاری فایل</td>
+<td>Multer</td>
+</tr>
+<tr>
+<td>پوش</td>
+<td>firebase-admin 14</td>
+</tr>
+<tr>
+<td>زمان‌بندی</td>
+<td>@nestjs/schedule (۳ زمان‌بند)</td>
+</tr>
+<tr>
+<td>اعتبارسنجی</td>
+<td>class-validator + class-transformer</td>
+</tr>
+</tbody>
+</table>
+<h4 id="پنل-مدیریت">پنل مدیریت</h4>
+<table>
+<thead>
+<tr>
+<th>حوزه</th>
+<th>فناوری</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>چارچوب</td>
+<td>Next.js 16 (App Router، React Server Components، Server
+Actions)</td>
+</tr>
+<tr>
+<td>زبان و UI</td>
+<td>TypeScript 5 + React 19 + Tailwind CSS 4</td>
+</tr>
+<tr>
+<td>نقشه</td>
+<td>Leaflet 1.9 + react-leaflet 5</td>
+</tr>
+<tr>
+<td>نشست</td>
+<td>کوکی <code>httpOnly</code> سمت سرور (بدون توکن در مرورگر)</td>
+</tr>
+<tr>
+<td>تاریخ</td>
+<td>تبدیل‌گر شمسی اختصاصی + انتخاب‌گر بازه‌ی جلالی</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="۸-مدل-دامنه-و-پایگاه-داده">۸. مدل دامنه و پایگاه داده</h2>
+<p>پایگاه داده شامل <strong>۳۱ جدول (Model)</strong> و <strong>۹ نوع
+شمارشی (Enum)</strong> است.</p>
+<h3 id="۸۱-نمودار-موجودیتهای-اصلی">۸٫۱ نمودار موجودیت‌های اصلی</h3>
+<pre class="mermaid"><code>erDiagram
+    User ||--o{ Advertisement : &quot;ثبت می‌کند&quot;
+    User ||--o{ Store : &quot;دارد&quot;
+    User ||--o{ Job : &quot;ثبت می‌کند&quot;
+    User ||--o{ Bookmark : &quot;نشان می‌کند&quot;
+    User ||--o{ Report : &quot;گزارش می‌دهد&quot;
+    User ||--o{ Notification : &quot;دریافت می‌کند&quot;
+    User ||--o{ DeviceToken : &quot;دستگاه&quot;
+    User ||--o{ Rating : &quot;امتیاز می‌دهد&quot;
+    User ||--o{ RefreshToken : &quot;نشست&quot;
+    User ||--o{ DiscountAlertPreference : &quot;اشتراک اعلان&quot;
+    City ||--o{ User : &quot;شهر کاربر&quot;
+    City ||--o{ Advertisement : &quot;&quot;
+    City ||--o{ Store : &quot;&quot;
+    City ||--o{ Job : &quot;&quot;
+    City ||--o{ Banner : &quot;&quot;
+    City ||--|| SplashScreen : &quot;&quot;
+    Category ||--o{ Category : &quot;زیردسته&quot;
+    Category ||--o{ Advertisement : &quot;&quot;
+    Category ||--o{ Store : &quot;&quot;
+    Category ||--o{ Job : &quot;&quot;
+    Store ||--o{ Advertisement : &quot;تخفیف زیر فروشگاه&quot;
+    Advertisement ||--o{ Conversation : &quot;گفت‌وگو&quot;
+    Advertisement ||--o{ Bookmark : &quot;&quot;
+    Advertisement ||--o{ Report : &quot;&quot;
+    Advertisement ||--o{ Rating : &quot;&quot;
+    Advertisement ||--o{ AdvertisementView : &quot;بازدید&quot;
+    Conversation ||--o{ Message : &quot;پیام&quot;
+    Store ||--o{ StoreView : &quot;&quot;
+    Job ||--o{ JobView : &quot;&quot;</code></pre>
+<h3 id="۸۲-شرح-موجودیتها">۸٫۲ شرح موجودیت‌ها</h3>
+<h4 id="هستهی-کاربر-و-احراز-هویت">هسته‌ی کاربر و احراز هویت</h4>
+<table>
+<thead>
+<tr>
+<th>موجودیت</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>User</strong></td>
+<td>کاربر سامانه — شماره موبایل (یکتا)، نام نمایشی، تصویر، جنسیت، نقش،
+شهر، آخرین موقعیت مکانی، شعاع اعلان تخفیف</td>
+</tr>
+<tr>
+<td><strong>RefreshToken</strong></td>
+<td>توکن تازه‌سازی نشست (ذخیره‌ی هش‌شده، قابل ابطال)</td>
+</tr>
+<tr>
+<td><strong>OtpCode</strong></td>
+<td>کد یکبارمصرف ورود — هش‌شده، دارای انقضا و شمارنده‌ی تلاش (حداکثر
+۵)</td>
+</tr>
+<tr>
+<td><strong>DeviceToken</strong></td>
+<td>توکن FCM دستگاه به همراه فراداده‌ی دستگاه (نام، مدل، سیستم‌عامل، نسخه‌ی
+اپ)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="دادههای-مرجع">داده‌های مرجع</h4>
+<table>
+<thead>
+<tr>
+<th>موجودیت</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>City</strong></td>
+<td>شهر/بخش با مختصات مرکز (برای مرکزیت نقشه‌ی تخفیف) — ۳۰ رکورد
+اولیه</td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>درخت دسته‌بندی تا ۳ سطح؛ دارای آیکون، رنگ پین نقشه، ترتیب نمایش مطابق
+فیگما، نوع (آگهی/شغل) و هزینه‌ی ثبت</td>
+</tr>
+<tr>
+<td><strong>AttributeOption</strong></td>
+<td>گزینه‌های تک‌انتخابی فرم‌های ثبت آگهی (برند خودرو، طبقه، تعداد اتاق،
+نوع قرارداد و…) — قابل مدیریت از پنل</td>
+</tr>
+<tr>
+<td><strong>Banner</strong></td>
+<td>بنر تبلیغاتی صفحه‌ی خانه به تفکیک شهر، با ترتیب و وضعیت
+فعال/غیرفعال</td>
+</tr>
+<tr>
+<td><strong>SplashScreen</strong></td>
+<td>تصویر اسپلش اختصاصی هر شهر</td>
+</tr>
+<tr>
+<td><strong>AppSetting</strong></td>
+<td>محتوای سراسری اپ: درباره ما، تماس با ما، تلگرام، اینستاگرام، ایمیل،
+تلفن</td>
+</tr>
+<tr>
+<td><strong><code>*Version</code></strong></td>
+<td>پنج شمارنده‌ی نسخه (دسته‌بندی، شهر، فیلدها، محتوای اپ، تصاویر اسپلش)
+برای کش هوشمند سمت اپ</td>
+</tr>
+</tbody>
+</table>
+<h4 id="محتوای-کاربرساخته">محتوای کاربرساخته</h4>
+<table>
+<thead>
+<tr>
+<th>موجودیت</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Advertisement</strong></td>
+<td>آگهی — عنوان، توضیح، قیمت، تصاویر، موقعیت، وضعیت انتشار، وضعیت
+تأیید، دلیل رد، تاریخ انقضا، شمارنده و میانگین امتیاز، اطلاعات تماس،
+<strong>فیلدهای اختصاصی دسته (JSON)</strong>، وضعیت پرداخت، فروشگاه
+مرتبط</td>
+</tr>
+<tr>
+<td><strong>Store</strong></td>
+<td>فروشگاه تخفیف‌یاب — نام، توضیح، آدرس، تلفن، لوگو، بنر، تصاویر، وضعیت
+تأیید، وضعیت پرداخت، <strong>تاریخ انقضای اشتراک</strong></td>
+</tr>
+<tr>
+<td><strong>Job</strong></td>
+<td>کسب‌وکار بانک مشاغل — عنوان، توضیح، مدیر، تلفن، همراه، فکس، کد صنفی،
+آدرس، تلگرام، اینستاگرام، ایمیل، لوگو، بنر، موقعیت روی نقشه، انقضا</td>
+</tr>
+<tr>
+<td><strong>Rating</strong></td>
+<td>امتیاز ماه‌شکل (۱ تا ۵) هر کاربر به هر تخفیف — یکتا به ازای هر
+جفت</td>
+</tr>
+<tr>
+<td><strong>Bookmark</strong></td>
+<td>نشان‌کردن آگهی</td>
+</tr>
+<tr>
+<td><strong>Report</strong></td>
+<td>گزارش مشکل آگهی در ۶ دسته (دسته‌بندی، محتوا، قیمت، اطلاعات تماس، عدم
+وجود، سایر)</td>
+</tr>
+<tr>
+<td><strong>DiscountAlertPreference</strong></td>
+<td>اشتراک کاربر در اعلان تخفیف یک دسته‌ی مشخص</td>
+</tr>
+</tbody>
+</table>
+<h4 id="تعامل">تعامل</h4>
+<table>
+<thead>
+<tr>
+<th>موجودیت</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Conversation</strong></td>
+<td>یک گفت‌وگو به ازای هر جفت (آگهی، خریدار)؛ فروشنده صاحب آگهی است</td>
+</tr>
+<tr>
+<td><strong>Message</strong></td>
+<td>پیام متنی و/یا تصویری با زمان خوانده‌شدن</td>
+</tr>
+<tr>
+<td><strong>Notification</strong></td>
+<td>اعلان درون‌برنامه‌ای در ۱۰ نوع (تأیید/رد آگهی، فروشگاه، شغل، تأیید
+پرداخت، بررسی گزارش، پیام جدید، پیام مدیر)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="آمار-و-تنظیمات-مدیریتی">آمار و تنظیمات مدیریتی</h4>
+<table>
+<thead>
+<tr>
+<th>موجودیت</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AdvertisementView / StoreView / JobView</strong></td>
+<td>ثبت تک‌به‌تک بازدیدها با شناسه‌ی بازدیدکننده (در صورت ورود) — پایه‌ی
+گزارش‌های آماری</td>
+</tr>
+<tr>
+<td><strong>AdExpirySetting / StoreExpirySetting /
+JobExpirySetting</strong></td>
+<td>تنظیم سراسری مدت اعتبار (تک‌رکوردی، فقط سوپر ادمین)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۸۳-چرخهی-حیات-محتوا">۸٫۳ چرخه‌ی حیات محتوا</h3>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; PENDING: ثبت توسط کاربر
+    PENDING --&gt; APPROVED: تأیید ادمین
+    PENDING --&gt; REJECTED: رد ادمین (با ذکر دلیل)
+    REJECTED --&gt; PENDING: ویرایش و ارسال مجدد
+    APPROVED --&gt; ARCHIVED: پایان مهلت (زمان‌بند خودکار)
+    APPROVED --&gt; ARCHIVED: آرشیو دستی سوپر ادمین
+    ARCHIVED --&gt; APPROVED: تمدید توسط کاربر
+    APPROVED --&gt; [*]: حذف توسط کاربر</code></pre>
+<p>در کنار این، وضعیت پرداخت مستقل ردیابی می‌شود: <code>PENDING</code> →
+<code>PAID</code> (پس از تأیید ادمین). آگهی‌های هزینه‌دارِ پرداخت‌نشده در
+فهرست عمومی نمایش داده نمی‌شوند.</p>
+<hr />
+<h2 id="۹-معماری-استقرار-deployment">۹. معماری استقرار (Deployment)</h2>
+<h3 id="۹۱-توپولوژی">۹٫۱ توپولوژی</h3>
+<pre class="mermaid"><code>graph LR
+    subgraph &quot;سرور اختصاصی — 2.28.2.151&quot;
+        direction TB
+        A[&quot;کانتینر App&lt;br/&gt;NestJS — پورت 3000&quot;]
+        P[(&quot;کانتینر PostgreSQL 16&lt;br/&gt;حجم داده پایدار&quot;)]
+        V[&quot;حجم uploads&lt;br/&gt;تصاویر کاربران&quot;]
+        A --&gt; P
+        A --&gt; V
+    end
+    subgraph &quot;Vercel&quot;
+        AD[&quot;پنل مدیریت&lt;br/&gt;mahem-admin&quot;]
+    end
+    subgraph &quot;هاست تحویل&quot;
+        DL[&quot;صفحه تحویل + دانلود نسخه‌ها&lt;br/&gt;indexshope.ir/download&quot;]
+    end
+    APP[&quot;اپلیکیشن موبایل&quot;] --&gt; A
+    AD --&gt; A</code></pre>
+<h3 id="۹۲-اجزای-استقرار">۹٫۲ اجزای استقرار</h3>
+<table>
+<thead>
+<tr>
+<th>جزء</th>
+<th>محل</th>
+<th>توضیح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>بک‌اند + پایگاه داده + تصاویر</td>
+<td>سرور اختصاصی (Docker Compose)</td>
+<td>کانتینرهای <code>app</code> و <code>postgres</code> با حجم‌های پایدار
+برای داده و تصاویر. سرویس <code>app</code> پورت ۳۰۰۰ را مستقیماً منتشر
+می‌کند و اپلیکیشن بدون واسطه با آن حرف می‌زند</td>
+</tr>
+<tr>
+<td>پنل مدیریت</td>
+<td>Vercel</td>
+<td>استقرار خودکار از مخزن Git</td>
+</tr>
+<tr>
+<td>صفحه‌ی تحویل و دانلود</td>
+<td>هاست اشتراکی <code>indexshope.ir/download</code></td>
+<td>شامل APK، IPA، نسخه‌ی شبیه‌ساز و آینه‌ی مستندات Swagger</td>
+</tr>
+<tr>
+<td>مستندات API</td>
+<td><code>/docs</code> روی سرور</td>
+<td>Swagger UI زنده</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۹۳-تنظیمات-محیطی-کلیدی">۹٫۳ تنظیمات محیطی کلیدی</h3>
+<p>پیکربندی به‌طور کامل از طریق متغیرهای محیطی انجام می‌شود و در زمان
+راه‌اندازی اعتبارسنجی می‌گردد (نبودِ هر متغیر ضروری باعث توقف امن سرویس
+می‌شود):</p>
+<p><code>DATABASE_URL</code> · <code>JWT_ACCESS_SECRET</code> /
+<code>JWT_REFRESH_SECRET</code> و مدت اعتبار آن‌ها ·
+<code>OTP_MOCK</code> / <code>OTP_TTL_SECONDS</code> /
+<code>OTP_CODE_LENGTH</code> · <code>FIREBASE_SERVICE_ACCOUNT</code> ·
+<code>APP_URL</code> · <code>CORS_ORIGIN</code> ·
+<code>API_PREFIX</code> · <code>PORT</code></p>
+<hr />
+<h2 id="۱۰-تصمیمات-معماری-کلیدی">۱۰. تصمیمات معماری کلیدی</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>تصمیم</th>
+<th>دلیل و اثر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADR-1</td>
+<td><strong>جدایی کامل سه سامانه</strong> (اپ / API / پنل)</td>
+<td>امکان توسعه، استقرار و مقیاس‌دهی مستقل؛ پنل روی Vercel و API روی سرور
+اختصاصی</td>
+</tr>
+<tr>
+<td>ADR-2</td>
+<td><strong>احراز هویت یکپارچه بدون صفحه‌ی ثبت‌نام مجزا</strong></td>
+<td>شماره‌ی موبایل تنها کلید حساب است؛ ناوبری ریشه بر اساس «توکن ← نام ←
+شهر» مرحله‌بندی می‌شود و کاربر قدیمی مستقیم وارد اپ می‌شود</td>
+</tr>
+<tr>
+<td>ADR-3</td>
+<td><strong>توکن دسترسی کوتاه‌مدت + توکن تازه‌سازی چرخشی</strong></td>
+<td>امنیت بالاتر؛ تازه‌سازی خودکار در لایه‌ی Axios بدون خروج کاربر</td>
+</tr>
+<tr>
+<td>ADR-4</td>
+<td><strong>نسخه‌گذاری داده‌های مرجع</strong>
+(<code>/categories/version</code> و مشابه)</td>
+<td>اپ فقط وقتی داده‌ی حجیم مرجع را دوباره می‌گیرد که شمارنده تغییر کرده
+باشد — صرفه‌جویی چشمگیر در مصرف داده</td>
+</tr>
+<tr>
+<td>ADR-5</td>
+<td><strong>فیلدهای اختصاصی دسته به‌صورت JSON</strong></td>
+<td>افزودن فیلد جدید برای یک دسته نیازمند مهاجرت پایگاه داده نیست</td>
+</tr>
+<tr>
+<td>ADR-6</td>
+<td><strong>ذخیره‌ی گزینه‌ها به‌صورت برچسب متنی (نه اندیس)</strong></td>
+<td>تغییر ترتیب یا حذف گزینه از پنل، آگهی‌های قدیمی را خراب نمی‌کند</td>
+</tr>
+<tr>
+<td>ADR-7</td>
+<td><strong>تفکیک «شهر کاربر» از «شهر مرور»</strong></td>
+<td>کاربر می‌تواند بدون تغییر شهر حسابش، محتوای شهر دیگر یا کل استان را
+ببیند</td>
+</tr>
+<tr>
+<td>ADR-8</td>
+<td><strong>گردش‌کار تأیید اجباری</strong></td>
+<td>هیچ محتوایی بدون بازبینی منتشر نمی‌شود</td>
+</tr>
+<tr>
+<td>ADR-9</td>
+<td><strong>ثبت تک‌به‌تک بازدید (به‌جای فقط شمارنده)</strong></td>
+<td>امکان تحلیل روند زمانی، تفکیک شهری و جنسیتی</td>
+</tr>
+<tr>
+<td>ADR-10</td>
+<td><strong>Socket.IO برای چت و اعلان زنده</strong></td>
+<td>تحویل آنی پیام و نوتیفیکیشن؛ اتاق اختصاصی هر کاربر و هر گفت‌وگو</td>
+</tr>
+<tr>
+<td>ADR-11</td>
+<td><strong>پوش اختیاری (Graceful Degradation)</strong></td>
+<td>نبود اعتبارنامه‌ی Firebase سرویس را متوقف نمی‌کند؛ فقط پوش غیرفعال
+می‌شود</td>
+</tr>
+<tr>
+<td>ADR-12</td>
+<td><strong>RSC + Server Actions در پنل</strong></td>
+<td>توکن هرگز به مرورگر نمی‌رسد؛ کوکی <code>httpOnly</code> سمت سرور</td>
+</tr>
+<tr>
+<td>ADR-13</td>
+<td><strong>زمان‌بند انقضا به‌جای حذف</strong></td>
+<td>محتوا آرشیو می‌شود، نه حذف — قابل تمدید و قابل بازیابی</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<hr />
+<h1 id="بخش-سوم--شرح-تفصیلی-قابلیتها">بخش سوم — شرح تفصیلی قابلیت‌ها</h1>
+<h2 id="۱۱-اپلیکیشن-موبایل--شرح-کامل-فیچرها">۱۱. اپلیکیشن موبایل — شرح
+کامل فیچرها</h2>
+<p>اپلیکیشن شامل <strong>۵۱ صفحه</strong> است که در ۵ زبانه‌ی اصلی و چند
+پشته‌ی ناوبری سازمان یافته‌اند.</p>
+<h3 id="۱۱۰-ساختار-ناوبری">۱۱٫۰ ساختار ناوبری</h3>
+<pre class="mermaid"><code>graph TD
+    S[&quot;اسپلش / بررسی نشست&quot;] --&gt; R{&quot;وضعیت کاربر&quot;}
+    R --&gt;|&quot;بدون توکن&quot;| AU[&quot;پشته احراز هویت&lt;br/&gt;ثبت‌نام · ورود · کد تایید · قوانین&quot;]
+    R --&gt;|&quot;بدون نام&quot;| PR[&quot;تکمیل پروفایل&quot;]
+    R --&gt;|&quot;بدون شهر&quot;| ON[&quot;انتخاب شهر&quot;]
+    R --&gt;|&quot;کامل&quot;| APP[&quot;پشته اصلی اپ&quot;]
+    APP --&gt; TAB[&quot;نوار زبانه پایین&quot;]
+    TAB --&gt; T1[&quot;خانه&quot;]
+    TAB --&gt; T2[&quot;منو / تخفیف‌یاب&quot;]
+    TAB --&gt; T3[&quot;ثبت آگهی&quot;]
+    TAB --&gt; T4[&quot;جست‌وجو&quot;]
+    TAB --&gt; T5[&quot;دسته‌بندی آگهی&quot;]</code></pre>
+<p>نکته‌ی طراحی: تغییر شهر از هدر، کل پشته‌ی اپ را با کلید جدید بازسازی
+می‌کند تا هیچ داده‌ی کهنه‌ای از شهر قبلی باقی نماند.</p>
+<hr />
+<h3 id="۱۱۱-احراز-هویت-و-حساب-کاربری">۱۱٫۱ احراز هویت و حساب کاربری</h3>
+<table>
+<thead>
+<tr>
+<th>صفحه</th>
+<th>قابلیت‌ها</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>اسپلش</strong></td>
+<td>نمایش تصویر اسپلش اختصاصی شهر کاربر با بازگشت به تصویر پیش‌فرض؛
+اعتبارسنجی نشست ذخیره‌شده در پس‌زمینه (جزئیات معماری در بند ۱۱٫۱۵)</td>
+</tr>
+<tr>
+<td><strong>ثبت‌نام</strong></td>
+<td>ورود شماره‌ی موبایل + بررسی «آیا این شماره قبلاً ثبت شده؟» <strong>پیش
+از ارسال پیامک</strong></td>
+</tr>
+<tr>
+<td><strong>ورود</strong></td>
+<td>مسیر ورود کاربر موجود + لینک مشاهده‌ی قوانین</td>
+</tr>
+<tr>
+<td><strong>کد تایید</strong></td>
+<td>ورود کد یکبارمصرف با فیلد اختصاصی، شمارنده‌ی معکوس و امکان ارسال
+مجدد</td>
+</tr>
+<tr>
+<td><strong>تکمیل پروفایل</strong></td>
+<td>نام نمایشی، جنسیت، تصویر پروفایل، پذیرش قوانین</td>
+</tr>
+<tr>
+<td><strong>انتخاب شهر</strong></td>
+<td>فهرست شهرهای استان با جست‌وجو</td>
+</tr>
+<tr>
+<td><strong>ویرایش پروفایل</strong></td>
+<td>تغییر نام، جنسیت و تصویر</td>
+</tr>
+<tr>
+<td><strong>تنظیمات</strong></td>
+<td>تغییر شهر، مدیریت اعلان‌ها، زبان، دسترسی به قوانین و خروج از
+حساب</td>
+</tr>
+</tbody>
+</table>
+<p><strong>سازوکار امنیتی:</strong> کد یکبارمصرف به‌صورت هش‌شده ذخیره
+می‌شود، مهلت انقضا دارد، حداکثر ۵ بار قابل امتحان است و پس از مصرف باطل
+می‌شود. درخواست کد و بررسی دسترس‌پذیری تحت محدودیت نرخ (Throttler)
+هستند.</p>
+<hr />
+<h3 id="۱۱۲-صفحهی-خانه">۱۱٫۲ صفحه‌ی خانه</h3>
+<ul>
+<li><strong>کاروسل بنر شهری</strong> — بنرهای تعریف‌شده توسط ادمین برای
+همان شهر، با ترتیب دلخواه و لینک اختیاری.</li>
+<li><strong>بخش آگهی‌های عمومی</strong> — جدیدترین آگهی‌های شهر، با حذف
+هوشمند آگهی‌های تخفیف‌یاب و استخدامی (که بخش اختصاصی خود را دارند).</li>
+<li><strong>بخش تخفیف‌ها</strong> — جدیدترین تخفیف‌های شهر.</li>
+<li><strong>بخش استخدامی</strong> — جدیدترین آگهی‌های استخدام.</li>
+<li><strong>بخش بانک مشاغل</strong> — کسب‌وکارهای شهر.</li>
+<li><strong>کشیدن برای تازه‌سازی</strong> — بازخوانی هم‌زمان همه‌ی
+بخش‌ها.</li>
+<li><strong>هدر با انتخاب‌گر شهر</strong> — امکان جابه‌جایی سریع بین شهرها
+یا حالت «کل استان» بدون تغییر شهر ثبت‌شده در حساب.</li>
+<li><strong>زنگوله‌ی اعلان</strong> با نشانگر خوانده‌نشده.</li>
+</ul>
+<hr />
+<h3 id="۱۱۳-جستوجو-و-فیلتر-پیشرفته">۱۱٫۳ جست‌وجو و فیلتر پیشرفته</h3>
+<h4 id="جستوجو">جست‌وجو</h4>
+<ul>
+<li>جست‌وجوی متنی با تأخیر هوشمند (debounce) روی عنوان و توضیحات.</li>
+<li>مرتب‌سازی: <strong>جدیدترین، قدیمی‌ترین، ارزان‌ترین، گران‌ترین،
+پربازدیدترین، نزدیک‌ترین</strong>.</li>
+<li>نمایش نشان مرتب‌سازی فعال زیر نوار جست‌وجو.</li>
+<li>صفحه‌بندی سمت سرور با بارگذاری تدریجی.</li>
+</ul>
+<h4 id="فیلتر-صفحهی-اختصاصی-پیکسلپرفکت-مطابق-فیگما">فیلتر (صفحه‌ی
+اختصاصی، پیکسل‌پرفکت مطابق فیگما)</h4>
+<p>فیلترها <strong>دسته‌محور</strong> هستند؛ یعنی با انتخاب دسته، فیلدهای
+مربوط به همان دسته نمایش داده می‌شوند:</p>
+<table>
+<thead>
+<tr>
+<th>گروه فیلتر</th>
+<th>فیلدها</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>عمومی</strong></td>
+<td>دسته‌بندی (چندسطحی)، شهر، بازه‌ی قیمت (از/تا)، فقط آگهی‌های دارای
+تصویر، مرتب‌سازی</td>
+</tr>
+<tr>
+<td><strong>مکانی</strong></td>
+<td>مختصات + شعاع (کیلومتر) برای نتایج نزدیک</td>
+</tr>
+<tr>
+<td><strong>املاک</strong></td>
+<td>تعداد اتاق، بازه‌ی متراژ، بازه‌ی رهن، بازه‌ی اجاره، فروشنده‌ی
+شخصی/مشاور، حومه‌ی شهر</td>
+</tr>
+<tr>
+<td><strong>وسایل نقلیه</strong></td>
+<td>برند، بازه‌ی سال تولید، بازه‌ی کارکرد</td>
+</tr>
+<tr>
+<td><strong>استخدامی</strong></td>
+<td>نوع قرارداد، میزان تحصیلات</td>
+</tr>
+<tr>
+<td><strong>نوع آگهی</strong></td>
+<td>فروشی / اجاره‌ای / درخواستی</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="۱۱۴-مرور-دستهبندیشده-زبانهی-دستهبندی">۱۱٫۴ مرور دسته‌بندی‌شده
+(زبانه‌ی دسته‌بندی)</h3>
+<p>جریان سه‌مرحله‌ای <strong>دسته ← زیردسته ← فهرست آگهی</strong> به‌صورت
+صفحات واقعی (نه مودال)، بر پایه‌ی همان درخت دسته‌بندی سرور. دسته‌های
+اصلی:</p>
+<table>
+<thead>
+<tr>
+<th>دسته</th>
+<th>عمق زیردسته</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>استخدامی</td>
+<td>۱۵ زیردسته</td>
+</tr>
+<tr>
+<td>تخفیف یاب</td>
+<td>۱۷ زیردسته</td>
+</tr>
+<tr>
+<td>املاک</td>
+<td>تا ۳ سطح (فروش/اجاره مسکونی و اداری، زمین کشاورزی، مشارکت)</td>
+</tr>
+<tr>
+<td>وسایل نقلیه</td>
+<td>۶ زیردسته</td>
+</tr>
+<tr>
+<td>لوازم الکترونیکی</td>
+<td>تا ۳ سطح (موبایل، رایانه، صوتی تصویری، کنسول)</td>
+</tr>
+<tr>
+<td>لوازم خانگی</td>
+<td>تا ۳ سطح (آشپزخانه، تزیینات)</td>
+</tr>
+<tr>
+<td>خدمات</td>
+<td>تا ۳ سطح (۱۲ زیرشاخه)</td>
+</tr>
+<tr>
+<td>تجهیزات و عمده فروشی</td>
+<td>تا ۳ سطح</td>
+</tr>
+<tr>
+<td>سرگرمی و فراغت</td>
+<td>تا ۳ سطح (موسیقی، کتاب، ورزش…)</td>
+</tr>
+<tr>
+<td>وسایل شخصی</td>
+<td>۵ زیردسته</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="۱۱۵-جزئیات-آگهی">۱۱٫۵ جزئیات آگهی</h3>
+<ul>
+<li><strong>گالری تصاویر</strong> با اسلایدر و امکان بزرگ‌نمایی.</li>
+<li>عنوان، قیمت (با جداکننده‌ی هزارگان فارسی)، توضیحات کامل.</li>
+<li><strong>فیلدهای اختصاصی دسته</strong> — مثلاً برای خودرو: برند، مدل،
+سال، کارکرد؛ برای املاک: متراژ، طبقه، تعداد اتاق، آسانسور، پارکینگ.</li>
+<li><strong>موقعیت روی نقشه</strong> (در صورت ثبت توسط آگهی‌دهنده).</li>
+<li><strong>کارت اطلاعات تماس</strong> — نمایش شماره با امکان تماس
+مستقیم.</li>
+<li><strong>دکمه‌ی چت</strong> — شروع گفت‌وگو با فروشنده (به‌همراه حالت «چت
+غیرفعال» برای آگهی خود کاربر).</li>
+<li><strong>نشان‌کردن</strong> (Bookmark).</li>
+<li><strong>اشتراک‌گذاری</strong> آگهی.</li>
+<li><strong>گزارش مشکل</strong> در ۶ دسته با امکان درج تلفن، ایمیل و
+توضیح.</li>
+<li><strong>امتیازدهی ماه‌شکل ۱ تا ۵</strong> برای تخفیف‌ها، با نمایش
+میانگین و تعداد آرا.</li>
+<li><strong>انتساب به فروشگاه</strong> — اگر تخفیف زیر یک فروشگاه ثبت
+شده باشد، ردیف نام/لوگوی فروشگاه با لینک به پروفایل آن نمایش داده
+می‌شود.</li>
+<li>ثبت خودکار بازدید برای آمار.</li>
+</ul>
+<hr />
+<h3 id="۱۱۶-ثبت-آگهی-ویزارد-چندمرحلهای">۱۱٫۶ ثبت آگهی (ویزارد
+چندمرحله‌ای)</h3>
+<p>جریان کامل مطابق فریم‌های فیگما:</p>
+<pre class="mermaid"><code>graph LR
+    A[&quot;۱. انتخاب دسته اصلی&quot;] --&gt; B[&quot;۲. انتخاب زیردسته&lt;br/&gt;(تکرارشونده تا ۳ سطح)&quot;]
+    B --&gt; C[&quot;۳. فرم جزئیات&lt;br/&gt;مخصوص همان دسته&quot;]
+    C --&gt; D{&quot;دسته هزینه دارد؟&quot;}
+    D --&gt;|&quot;خیر&quot;| F[&quot;۵. ثبت نهایی&lt;br/&gt;و پیام موفقیت&quot;]
+    D --&gt;|&quot;بله&quot;| E[&quot;۴. صفحه هزینه&lt;br/&gt;و درگاه پرداخت&quot;]
+    E --&gt; F</code></pre>
+<p><strong>قابلیت‌های فرم ثبت:</strong></p>
+<ul>
+<li>انتخاب و آپلود چند تصویر با پیش‌نمایش شبکه‌ای و امکان حذف.</li>
+<li>فرم‌های تخصصی: <strong>فرم خودرو</strong>، <strong>فرم
+املاک</strong>، <strong>فرم تخفیف</strong>، <strong>فرم عمومی</strong> —
+هرکدام فیلدهای خود را دارند.</li>
+<li>انتخاب موقعیت روی نقشه با قابلیت جست‌وجو و جابه‌جایی پین.</li>
+<li>فیلد قیمت با گزینه‌های «قیمت مورد نظر / مجانی / توافقی /
+معاوضه».</li>
+<li>کارت اطلاعات تماس با اعتبارسنجی شماره.</li>
+<li>اعتبارسنجی کامل سمت کاربر پیش از ارسال.</li>
+<li><strong>میان‌بر «ثبت تخفیف»</strong> از پنل فروشگاه که مستقیماً به فرم
+جزئیات با دسته و فروشگاه از پیش تعیین‌شده می‌رود.</li>
+<li>پس از ثبت، آگهی در وضعیت «در انتظار تأیید» قرار می‌گیرد و کاربر پیام
+موفقیت می‌بیند.</li>
+</ul>
+<p><strong>مدل هزینه:</strong> هزینه‌ی ثبت روی دسته‌ی ریشه تعریف می‌شود و
+از پنل قابل تغییر است. در پیکربندی فعلی، دسته‌ی <strong>استخدامی</strong>
+دارای هزینه‌ی ۷٬۰۰۰ تومان است و بقیه‌ی دسته‌ها (از جمله تخفیف‌یاب)
+رایگان‌اند. تخفیفی که زیر فروشگاه دارای اشتراک ثبت شود، در هر حال رایگان
+است.</p>
+<hr />
+<h3 id="۱۱۷-مدیریت-آگهیهای-من-پنل-کاربر">۱۱٫۷ مدیریت آگهی‌های من (پنل
+کاربر)</h3>
+<ul>
+<li>فهرست آگهی‌های ثبت‌شده با نمایش وضعیت (در انتظار / تأییدشده / ردشده
+به‌همراه دلیل / آرشیوشده).</li>
+<li><strong>ویرایش آگهی</strong> با همان فرم‌های تخصصی.</li>
+<li><strong>حذف آگهی</strong>.</li>
+<li><strong>تمدید آگهی</strong> منقضی‌شده.</li>
+<li><strong>آگهی‌های نشان‌شده</strong> در زبانه‌ی جداگانه.</li>
+<li><strong>فهرست مکالمات</strong> با نمایش آخرین پیام و شمارنده‌ی
+خوانده‌نشده.</li>
+<li><strong>آمار بازدید</strong> هر آگهی.</li>
+</ul>
+<hr />
+<h3 id="۱۱۸-آمار-بازدید-آگهی-تراز-بازدید">۱۱٫۸ آمار بازدید آگهی (تراز
+بازدید)</h3>
+<p>صفحه‌ی اختصاصی مالک آگهی شامل:</p>
+<ul>
+<li><strong>مجموع بازدید کل</strong> آگهی.</li>
+<li><strong>نمودار میله‌ای ۲۲ روزه</strong> از روند بازدید روزانه.</li>
+<li><strong>تفکیک جنسیتی بازدیدکنندگان</strong> (بازدیدهای ناشناس در
+مجموع شمرده می‌شوند اما در تفکیک جنسیتی نمی‌آیند).</li>
+</ul>
+<hr />
+<h3 id="۱۱۹-بانک-مشاغل">۱۱٫۹ بانک مشاغل</h3>
+<table>
+<thead>
+<tr>
+<th>صفحه</th>
+<th>قابلیت</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>بانک مشاغل</strong></td>
+<td>شبکه‌ی ۲۰ صنف با آیکون اختصاصی + کاشی «همه موارد»</td>
+</tr>
+<tr>
+<td><strong>همه‌ی مشاغل</strong></td>
+<td>کل کسب‌وکارهای شهر جاری، با صفحه‌بندی و واکنش زنده به تغییر شهر در
+هدر</td>
+</tr>
+<tr>
+<td><strong>مشاغل یک صنف</strong></td>
+<td>فهرست کسب‌وکارهای آن صنف</td>
+</tr>
+<tr>
+<td><strong>جزئیات کسب‌وکار</strong></td>
+<td>بنر، لوگو، نام، توضیح، مدیر، تلفن ثابت، همراه، فکس، کد صنفی، آدرس،
+ایمیل، تلگرام، اینستاگرام، موقعیت روی نقشه، دکمه‌ی تماس مستقیم</td>
+</tr>
+<tr>
+<td><strong>راهنمای انتخاب صنف</strong></td>
+<td>متن راهنما برای هر صنف تا صاحب کسب‌وکار درست انتخاب کند</td>
+</tr>
+<tr>
+<td><strong>ثبت کسب‌وکار</strong></td>
+<td>فرم کامل با آپلود لوگو و بنر، انتخاب موقعیت روی نقشه و همه‌ی فیلدهای
+تماس</td>
+</tr>
+</tbody>
+</table>
+<p><strong>اصناف:</strong> بهداشت و درمان، بازرگانی و تجارت، اتومبیل،
+آرایش و پیرایش، مراکز تحصیلی، آموزشگاه هنری، آموزشگاه ورزشی، آموزش و
+پژوهش، خدمات مجلس، کامپیوتر و موبایل، جواهرات و بدلیجات، صنعت، صنایع
+غذایی، دکوراسیون داخلی و… (۲۰ صنف).</p>
+<hr />
+<h3 id="۱۱۱۰-تخفیفیاب--سامانهی-کشف-تخفیف-محلی">۱۱٫۱۰ تخفیف‌یاب — سامانه‌ی
+کشف تخفیف محلی</h3>
+<p>این بخش، متمایزترین قابلیت محصول است و از ۹ صفحه تشکیل می‌شود.</p>
+<pre class="mermaid"><code>graph TD
+    H[&quot;صفحه اصلی تخفیف‌یاب&lt;br/&gt;ردیف فروشگاه‌ها + فید تخفیف شهر&quot;]
+    H --&gt; M[&quot;منوی تخفیف‌یاب&quot;]
+    M --&gt; N[&quot;تخفیف‌های نزدیک من&lt;br/&gt;اسلایدر شعاع کیلومتری&quot;]
+    M --&gt; C[&quot;دسته‌بندی تخفیف‌ها&quot;]
+    M --&gt; MAP[&quot;تخفیف‌ها روی نقشه&lt;br/&gt;پین رنگی + فیلتر دسته&quot;]
+    M --&gt; AL[&quot;اطلاع از تخفیف نزدیک من&lt;br/&gt;فهرست کلیدی دسته‌ها&quot;]
+    C --&gt; L[&quot;فهرست تخفیف یک دسته&quot;]
+    H --&gt; SP[&quot;پروفایل عمومی فروشگاه&quot;]
+    H --&gt; ST[&quot;ثبت فروشگاه&quot;]
+    ST --&gt; TR[&quot;قوانین و هزینه اشتراک&quot;]
+    TR --&gt; PAY[&quot;درگاه پرداخت&quot;]
+    PAY --&gt; MS[&quot;فروشگاه من&quot;]
+    MS --&gt; AD[&quot;ثبت تخفیف زیر فروشگاه&quot;]
+    MS --&gt; RN[&quot;تمدید اشتراک&quot;]</code></pre>
+<h4 id="۱۱۱۰۱-فید-و-مرور-تخفیف">۱۱٫۱۰٫۱ فید و مرور تخفیف</h4>
+<ul>
+<li>ردیف افقی <strong>فروشگاه‌های شهر</strong> در بالای صفحه.</li>
+<li>فید عمودی <strong>همه‌ی تخفیف‌های شهر</strong> با کارت تمام‌عرض (تصویر،
+عنوان، درصد/قیمت، امتیاز).</li>
+<li>مرور بر اساس <strong>۱۷ دسته‌ی تخفیف</strong> (تخفیف آخر هفته،
+رستوران و کافی‌شاپ، آرایشی و بهداشتی، سلامتی و پزشکی، تفریحی ورزشی، لوازم
+جانبی، لوازم خودرو، زیورآلات، ظروف آشپزخانه، آموزش، هنر و تئاتر، خدمات،
+هتل و سفر، لوازم سفر، پوشاک، لوازم تحریر، سایر).</li>
+</ul>
+<h4 id="۱۱۱۰۲-نقشهی-تخفیفها">۱۱٫۱۰٫۲ نقشه‌ی تخفیف‌ها</h4>
+<ul>
+<li>نمایش تخفیف‌ها به‌صورت <strong>پین‌های رنگی بر اساس دسته</strong> روی
+نقشه‌ی تمام‌صفحه.</li>
+<li><strong>پنل جمع‌شونده‌ی فیلتر دسته</strong> در کنار نقشه.</li>
+<li>مرکزیت خودکار نقشه روی مختصات شهر انتخابی کاربر.</li>
+<li>انتخاب پین → مشاهده‌ی کارت خلاصه و ورود به جزئیات.</li>
+</ul>
+<h4 id="۱۱۱۰۳-تخفیفهای-نزدیک-من">۱۱٫۱۰٫۳ تخفیف‌های نزدیک من</h4>
+<ul>
+<li>دریافت موقعیت فعلی دستگاه.</li>
+<li><strong>اسلایدر شعاع کیلومتری</strong> با به‌روزرسانی زنده‌ی برچسب و
+بهینه‌سازی کارایی (تنها هنگام رها کردن اسلایدر، فهرست دوباره واکشی
+می‌شود).</li>
+<li>فید عمودی تخفیف‌های داخل شعاع، مرتب‌شده بر اساس فاصله.</li>
+</ul>
+<h4 id="۱۱۱۰۴-اطلاعرسانی-تخفیف-نزدیک">۱۱٫۱۰٫۴ اطلاع‌رسانی تخفیف
+نزدیک</h4>
+<ul>
+<li>فهرست کلیدی (Toggle) دسته‌های تخفیف‌یاب.</li>
+<li>فعال‌کردن هر دسته = اشتراک در نوتیفیکیشن پوش وقتی تخفیف جدیدی از آن
+دسته در <strong>شعاع اعلان کاربر</strong> تأیید شود.</li>
+<li>شعاع اعلان کاربر (پیش‌فرض ۵ کیلومتر) قابل تنظیم است و آخرین موقعیت
+دستگاه به‌صورت دوره‌ای به سرور اعلام می‌شود.</li>
+</ul>
+<h4 id="۱۱۱۰۵-فروشگاه-اشتراک-کسبوکار">۱۱٫۱۰٫۵ فروشگاه (اشتراک
+کسب‌وکار)</h4>
+<table>
+<thead>
+<tr>
+<th>مرحله</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ثبت فروشگاه</strong></td>
+<td>فرم عکس کاور، لوگو، نام فروشگاه</td>
+</tr>
+<tr>
+<td><strong>قوانین و هزینه</strong></td>
+<td>نمایش شرایط و مبلغ اشتراک ماهانه</td>
+</tr>
+<tr>
+<td><strong>پرداخت</strong></td>
+<td>عبور از صفحه‌ی درگاه بانکی</td>
+</tr>
+<tr>
+<td><strong>در انتظار تأیید</strong></td>
+<td>فروشگاه تا تأیید ادمین و تأیید پرداخت، عمومی نمی‌شود</td>
+</tr>
+<tr>
+<td><strong>فروشگاه من</strong></td>
+<td>داشبورد مالک: کاور، لوگو، نام، دکمه‌ی «ثبت تخفیف»، دکمه‌ی «تمدید
+فروشگاه»، و شبکه‌ی تخفیف‌های فروشگاه شامل موارد در انتظار و ردشده</td>
+</tr>
+<tr>
+<td><strong>پروفایل عمومی فروشگاه</strong></td>
+<td>نمای عمومی: کاور، لوگوی مربعی، نام، و شبکه‌ی دوستونی تخفیف‌های
+<strong>تأییدشده</strong></td>
+</tr>
+</tbody>
+</table>
+<p>نکته: تخفیف ثبت‌شده زیر فروشگاه، هم‌زمان در فید عمومی و روی نقشه هم
+دیده می‌شود؛ فروشگاه صرفاً «راه ورود دوم» و معافیت از هزینه‌ی ثبت است.</p>
+<hr />
+<h3 id="۱۱۱۱-چت-بلادرنگ">۱۱٫۱۱ چت بلادرنگ</h3>
+<ul>
+<li><strong>یک گفت‌وگو به ازای هر جفت (آگهی، خریدار)</strong> — از تکرار
+گفت‌وگو جلوگیری می‌شود.</li>
+<li>اتصال WebSocket با احراز هویت توکن در دست‌دهی اولیه.</li>
+<li>ارسال <strong>پیام متنی</strong>، <strong>پیام تصویری</strong> و
+<strong>تصویر همراه با متن</strong>.</li>
+<li>نمایش وضعیت <strong>خوانده‌شدن</strong> پیام.</li>
+<li><strong>نوتیفیکیشن پیام جدید</strong> حتی وقتی کاربر داخل صفحه‌ی چت
+نیست.</li>
+<li>فهرست مکالمات با آخرین پیام و زمان.</li>
+<li>حالت «چت غیرفعال» برای آگهی‌های خود کاربر.</li>
+<li>تاریخچه‌ی پیام‌ها از طریق REST با صفحه‌بندی؛ تحویل زنده از طریق
+WebSocket.</li>
+</ul>
+<hr />
+<h3 id="۱۱۱۲-اعلانها">۱۱٫۱۲ اعلان‌ها</h3>
+<ul>
+<li><strong>مرکز اعلان درون‌برنامه‌ای</strong> با فهرست کامل، نمایش
+خوانده/خوانده‌نشده و تاریخ شمسی نسبی («۲ ساعت پیش»، «دیروز»…).</li>
+<li><strong>صفحه‌ی جزئیات اعلان</strong>.</li>
+<li>عملیات: علامت‌زدن به‌عنوان خوانده‌شده، خواندن همه، حذف.</li>
+<li><strong>هدایت هوشمند</strong>: هر اعلان بسته به نوع خود، کاربر را به
+آگهی، فروشگاه، شغل یا گفت‌وگوی مربوطه می‌برد.</li>
+<li><strong>۱۰ نوع اعلان</strong>: تأیید/رد آگهی، تأیید/رد فروشگاه،
+تأیید/رد شغل، تأیید پرداخت، بررسی گزارش، پیام جدید چت، پیام مدیر.</li>
+<li><strong>نوتیفیکیشن پوش</strong> از طریق Firebase با ثبت خودکار توکن
+دستگاه (شامل نام، مدل، سیستم‌عامل و نسخه‌ی اپ برای نمایش در پنل).</li>
+</ul>
+<hr />
+<h3 id="۱۱۱۳-منو-و-صفحات-محتوایی">۱۱٫۱۳ منو و صفحات محتوایی</h3>
+<table>
+<thead>
+<tr>
+<th>صفحه</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>منو</strong></td>
+<td>نقطه‌ی ورود به همه‌ی بخش‌های جانبی</td>
+</tr>
+<tr>
+<td><strong>درباره ما</strong></td>
+<td>محتوای قابل ویرایش از پنل مدیریت</td>
+</tr>
+<tr>
+<td><strong>تماس با ما</strong></td>
+<td>تلفن، ایمیل، تلگرام، اینستاگرام — همگی قابل ویرایش از پنل، با لینک
+مستقیم به هر برنامه</td>
+</tr>
+<tr>
+<td><strong>قوانین و مقررات</strong></td>
+<td>متن کامل قوانین</td>
+</tr>
+<tr>
+<td><strong>آگهی‌های نشان‌شده</strong></td>
+<td>فهرست آگهی‌های ذخیره‌شده</td>
+</tr>
+<tr>
+<td><strong>امتیازدهی به ماهم</strong></td>
+<td>هدایت به فروشگاه اپلیکیشن</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="۱۱۱۴-قابلیتهای-عرضی-cross-cutting">۱۱٫۱۴ قابلیت‌های عرضی
+(Cross-Cutting)</h3>
+<table>
+<thead>
+<tr>
+<th>قابلیت</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>چندزبانگی</strong></td>
+<td>فارسی و انگلیسی با i18next؛ چیدمان راست‌به‌چپ به‌صورت عمدی حفظ شده و
+مقادیر بازگشتی از سرور در لایه‌ی نمایش ترجمه می‌شوند</td>
+</tr>
+<tr>
+<td><strong>تاریخ شمسی</strong></td>
+<td>همه‌ی تاریخ‌ها در اپ و پنل به تقویم جلالی نمایش داده می‌شوند</td>
+</tr>
+<tr>
+<td><strong>اعداد فارسی و جداکننده‌ی هزارگان</strong></td>
+<td>در فیلدهای قیمت و نمایش مبالغ</td>
+</tr>
+<tr>
+<td><strong>کش هوشمند داده‌های مرجع</strong></td>
+<td>دسته‌بندی‌ها، شهرها، فیلدهای اختصاصی و محتوای اپ به‌صورت محلی ذخیره
+می‌شوند و فقط با تغییر شمارنده‌ی نسخه دوباره واکشی می‌شوند</td>
+</tr>
+<tr>
+<td><strong>مدیریت آفلاین</strong></td>
+<td>تشخیص قطع اینترنت، دروازه‌ی آفلاین و صفحه‌ی اختصاصی «نبود اینترنت» با
+تلاش مجدد</td>
+</tr>
+<tr>
+<td><strong>مرز خطا (Error Boundary)</strong></td>
+<td>جلوگیری از کرش کامل اپ در صورت بروز خطای غیرمنتظره</td>
+</tr>
+<tr>
+<td><strong>صفحه‌بندی یکپارچه</strong></td>
+<td>همه‌ی فهرست‌ها از یک سازوکار صفحه‌بندی سمت سرور با بارگذاری تدریجی
+استفاده می‌کنند</td>
+</tr>
+<tr>
+<td><strong>طراحی واکنش‌گرا</strong></td>
+<td>مقیاس‌بندی خودکار ابعاد فیگما (تخته‌ی ۳۶۰×۶۴۰) برای نمایشگرهای
+کوچک‌تر</td>
+</tr>
+<tr>
+<td><strong>محافظ موجودیت حذف‌شده</strong></td>
+<td>اگر آگهی/شغلی که کاربر باز کرده حذف یا آرشیو شده باشد، به‌صورت امن
+مدیریت می‌شود</td>
+</tr>
+<tr>
+<td><strong>تازه‌سازی خودکار توکن</strong></td>
+<td>در صورت انقضای توکن دسترسی، لایه‌ی شبکه یک‌بار به‌صورت شفاف تازه‌سازی
+می‌کند</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="۱۱۱۵-لینک-مستقیم-deep-link-و-اشتراکگذاری">۱۱٫۱۵ لینک مستقیم
+(Deep Link) و اشتراک‌گذاری</h3>
+<p>اپلیکیشن یک طرح آدرس اختصاصی به نام <code>mahem://</code> دارد که
+به‌صورت بومی در <code>AndroidManifest.xml</code> (از طریق intent-filter)
+و <code>Info.plist</code> (از طریق CFBundleURLTypes) ثبت شده است:</p>
+<table>
+<thead>
+<tr>
+<th>لینک</th>
+<th>مقصد</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mahem://ad/&lt;id&gt;</code></td>
+<td>صفحه‌ی جزئیات آگهی</td>
+</tr>
+<tr>
+<td><code>mahem://store/&lt;id&gt;</code></td>
+<td>پروفایل فروشگاه تخفیف‌یاب</td>
+</tr>
+<tr>
+<td><code>mahem://job/&lt;id&gt;</code></td>
+<td>پروفایل کسب‌وکار بانک مشاغل</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>دکمه‌ی <strong>اشتراک‌گذاری</strong> در صفحات آگهی، شغل و فروشگاه،
+لینک مستقیم همان مورد را همراه یک متن خوانا ارسال می‌کند؛ گیرنده‌ای که اپ
+را نصب دارد، مستقیماً روی همان صفحه فرود می‌آید.</li>
+<li>ورودی لینک به همان شکلی به صفحه تحویل داده می‌شود که یک لمس داخل خود
+اپ تولید می‌کند، بنابراین صفحه بقیه‌ی داده را از روی شناسه واکشی
+می‌کند.</li>
+</ul>
+<blockquote>
+<p><strong>نکته‌ی فنی مرتبط با بند ۱۶:</strong> به‌جای Universal Links /
+App Links (لینک‌های <code>https://</code>) از یک طرح اختصاصی استفاده شده،
+چون آن روش نیازمند یک <strong>دامنه‌ی ثبت‌شده</strong> است که فایل تأییدیه
+را سرو کند و این پروژه هنوز دامنه ندارد. پیامد عملی: بیشتر پیام‌رسان‌ها
+فقط آدرس‌های <code>http(s)</code> را خودکار لینک می‌کنند، پس
+<code>mahem://…</code> به‌صورت متن ساده می‌رسد. به همین دلیل متن
+اشتراک‌گذاری همیشه یک خط توضیح خوانا هم دارد. با تأمین دامنه، آدرس
+<code>https://</code> در کنار همین طرح اضافه می‌شود و نسخه‌های نصب‌شده‌ی
+قبلی هم کار خواهند کرد.</p>
+</blockquote>
+<p>همچنین لینک «معرفی به دوستان» در منو و «امتیاز به ماهم» در تنظیمات،
+به یک ثابت مرکزی متصل‌اند که تا زمان انتشار اپ در فروشگاه خالی است؛ هر دو
+در این حالت به‌جای هدایت به آدرس اشتباه، به‌صورت متنی عمل می‌کنند.</p>
+<hr />
+<h3 id="۱۱۱۶-اسپلش-شهری--معماری-پیشواکشی">۱۱٫۱۶ اسپلش شهری — معماری
+پیش‌واکشی</h3>
+<p>تصویر اسپلش هر شهر یک نیازمندی خاص دارد: <strong>فایل تصویر باید پیش
+از نمایش صفحه روی دیسک باشد</strong>، چون لحظه‌ی نمایش اسپلش زودتر از آن
+است که چیزی دانلود شود. بنابراین:</p>
+<ul>
+<li>یک شمارنده‌ی نسخه‌ی سبک (<code>GET /splash-screens/version</code>)
+یک‌بار در هر اجرای برنامه بررسی می‌شود؛ اگر تکان نخورده باشد هیچ کار دیگری
+انجام نمی‌شود.</li>
+<li>در صورت تغییر، <strong>کل مجموعه‌ی اسپلش همه‌ی شهرها</strong> یکجا
+دریافت و تصاویر همه‌ی شهرها پیش‌واکشی می‌شوند — نه فقط شهر فعلی — تا اگر
+کاربر شهر را عوض کرد، تصویر از قبل آماده باشد.</li>
+<li>حتی وقتی نسخه تغییر نکرده، فایل‌ها دوباره گرم می‌شوند، چون سیستم‌عامل
+ممکن است تصاویر را از کش دیسک بیرون بیندازد.</li>
+<li>اسپلش به‌صورت یک <strong>لایه‌ی رویی بالای کل ناوبری</strong> رندر
+می‌شود، نه یک صفحه؛ چون دو موقعیتی که باید ظاهر شود ساختاراً متفاوت‌اند:
+اجرای سرد (که هنوز هیچ صفحه‌ای سوار نشده) و تعویض شهر (که اصلاً ناوبری‌ای
+رخ نمی‌دهد).</li>
+<li>یک <strong>حداقل زمان نمایش تضمین‌شده</strong> تعریف شده تا در اجرای
+گرم — که ممکن است کمتر از ۲۰۰ میلی‌ثانیه طول بکشد — تصویر شهر واقعاً دیده
+شود.</li>
+</ul>
+<hr />
+<h3 id="۱۱۱۷-گزارش-خطا-و-پایش-کیفیت-sentry">۱۱٫۱۷ گزارش خطا و پایش کیفیت
+(Sentry)</h3>
+<ul>
+<li>اپلیکیشن به سرویس <strong>Sentry</strong> مجهز است و خطاها و کرش‌های
+کاربران واقعی را به‌صورت خودکار گزارش می‌کند.</li>
+<li>گزارش‌دهی <strong>فقط در نسخه‌ی انتشار</strong> فعال است و در حالت
+توسعه خاموش می‌ماند.</li>
+<li>کاربر واردشده به گزارش خطا پیوست می‌شود، بنابراین یک کرش قابل ردیابی
+به حساب مربوطه است و پشتیبانی می‌تواند دقیقاً همان مورد را بررسی کند.</li>
+<li>ردیابی کارایی (Performance Tracing) عمداً خاموش است تا فقط خطاها
+ارسال شوند و مصرف داده‌ی کاربر بی‌دلیل بالا نرود.</li>
+</ul>
+<hr />
+<h2 id="۱۲-پنل-مدیریت--شرح-کامل-فیچرها">۱۲. پنل مدیریت — شرح کامل
+فیچرها</h2>
+<p>پنل مدیریت یک برنامه‌ی وب مستقل با <strong>۲۰ بخش</strong> است. ورود
+با همان شماره‌ی موبایل و کد یکبارمصرف انجام می‌شود و فقط حساب‌های دارای نقش
+<code>ADMIN</code> یا <code>SUPER_ADMIN</code> اجازه‌ی ورود دارند.</p>
+<h3 id="۱۲۱-داشبورد">۱۲٫۱ داشبورد</h3>
+<p>کارت‌های آماری و صف‌های در انتظار اقدام:</p>
+<ul>
+<li>تعداد کل کاربران و تعداد مدیران</li>
+<li><strong>آگهی‌های در انتظار تأیید</strong></li>
+<li><strong>تخفیف‌های در انتظار تأیید</strong> (جدا از آگهی‌های عادی)</li>
+<li><strong>فروشگاه‌های در انتظار تأیید</strong></li>
+<li><strong>مشاغل در انتظار تأیید</strong></li>
+<li><strong>گزارش‌های رسیدگی‌نشده</strong></li>
+<li>مجموع آگهی، تخفیف، فروشگاه و شغل</li>
+</ul>
+<p>هر کارت مستقیماً به صف مربوطه‌ی خود لینک شده است.</p>
+<h3 id="۱۲۲-آمار-و-گزارش-بازدید">۱۲٫۲ آمار و گزارش بازدید</h3>
+<ul>
+<li>انتخاب <strong>بازه‌ی زمانی با تقویم شمسی</strong>.</li>
+<li>تفکیک <strong>روزانه / هفتگی / ماهانه</strong> (بر پایه‌ی زمان محلی
+ایران).</li>
+<li><strong>مجموع بازدید</strong> و <strong>بازدید یکتا</strong>.</li>
+<li><strong>نمودار روند بازدید</strong>.</li>
+<li><strong>تفکیک بازدید به تفکیک شهر</strong> و نسبت هر شهر.</li>
+<li><strong>آمار ثبت‌نام کاربران</strong> در بازه، به تفکیک شهر.</li>
+<li><strong>مجموع کاربران</strong> به تفکیک شهر.</li>
+</ul>
+<h3 id="۱۲۳-صفهای-بازبینی-محتوا">۱۲٫۳ صف‌های بازبینی محتوا</h3>
+<p>چهار بخش با ساختار مشابه — <strong>آگهی‌ها</strong>، <strong>تخفیف
+یاب</strong>، <strong>مشاغل</strong>، <strong>فروشگاه‌ها</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>قابلیت</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>فهرست با فیلتر</td>
+<td>بر اساس وضعیت تأیید، وضعیت پرداخت، شهر، دسته و جست‌وجو</td>
+</tr>
+<tr>
+<td>صفحه‌ی جزئیات</td>
+<td>نمایش کامل همه‌ی فیلدها، گالری تصاویر، و <strong>موقعیت روی نقشه‌ی
+Leaflet</strong></td>
+</tr>
+<tr>
+<td><strong>تأیید</strong></td>
+<td>انتشار محتوا + ارسال اعلان به کاربر</td>
+</tr>
+<tr>
+<td><strong>رد با ذکر دلیل</strong></td>
+<td>متن دلیل به کاربر نمایش داده می‌شود</td>
+</tr>
+<tr>
+<td><strong>تأیید پرداخت</strong></td>
+<td>ثبت پرداخت و — برای فروشگاه — فعال‌سازی/تمدید اشتراک</td>
+</tr>
+<tr>
+<td><strong>حذف کامل</strong></td>
+<td>حذف قطعی آگهی، شغل یا فروشگاه. حذف فروشگاه به‌صورت تراکنشی، همه‌ی
+تخفیف‌های ثبت‌شده زیر آن را هم حذف می‌کند</td>
+</tr>
+<tr>
+<td><strong>ویرایش مستقیم</strong> (سوپر ادمین)</td>
+<td>اصلاح فیلدها، آرایه‌ی تصاویر و تصویر تکی</td>
+</tr>
+<tr>
+<td><strong>تنظیم/تمدید تاریخ انقضا</strong> (سوپر ادمین)</td>
+<td>جابه‌جایی دستی مهلت</td>
+</tr>
+<tr>
+<td><strong>آرشیو دستی</strong> (سوپر ادمین)</td>
+<td>خارج‌کردن آگهی از فهرست عمومی</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۲۴-گزارشها">۱۲٫۴ گزارش‌ها</h3>
+<p>فهرست گزارش‌های تخلف کاربران با نمایش دسته‌ی گزارش، آگهی مربوطه،
+گزارش‌دهنده و اطلاعات تماس؛ قابل تغییر وضعیت به <strong>بررسی‌شده</strong>
+یا <strong>رد شده</strong> (که به گزارش‌دهنده اعلان می‌دهد).</p>
+<h3 id="۱۲۵-کاربران">۱۲٫۵ کاربران</h3>
+<ul>
+<li>فهرست کاربران با جست‌وجو و صفحه‌بندی.</li>
+<li>مشاهده‌ی جزئیات کاربر و محتوای ثبت‌شده‌ی او.</li>
+<li><strong>مشاهده‌ی دستگاه‌های کاربر</strong> (نام دستگاه، مدل،
+سیستم‌عامل، نسخه‌ی اپ، تاریخ ثبت). توکن خام دستگاه هرگز به پنل برگردانده
+نمی‌شود؛ فقط فراداده‌ی قابل خواندن.</li>
+<li><strong>ارسال نوتیفیکیشن مستقیم</strong> به یک کاربر مشخص از همین
+صفحه.</li>
+<li><strong>تغییر نقش</strong> کاربر بین USER / ADMIN / SUPER_ADMIN
+<em>(سوپر ادمین)</em>.</li>
+<li><strong>حذف کامل کاربر و تمام رد پای او</strong> <em>(سوپر
+ادمین)</em> — آگهی‌ها، فروشگاه‌ها، مشاغل، نشان‌کرده‌ها، گزارش‌ها، اعلان‌ها،
+توکن دستگاه‌ها، امتیازها، اشتراک اعلان تخفیف، مکالمات و پیام‌ها به‌صورت
+آبشاری حذف می‌شوند؛ بازدیدهای ثبت‌شده‌ی او روی آگهی دیگران و کدهای
+یکبارمصرف شماره‌اش نیز صراحتاً پاک‌سازی می‌گردند. علاوه بر رکوردها،
+<strong>فایل‌های تصویری</strong> او (آواتار، تصاویر آگهی‌ها، لوگو و بنر
+فروشگاه‌ها و مشاغل، و تصاویر ارسالی در چت) از روی دیسک سرور حذف
+می‌شوند.</li>
+</ul>
+<h3 id="۱۲۶-مکالمات-نظارت">۱۲٫۶ مکالمات (نظارت)</h3>
+<ul>
+<li>فهرست همه‌ی گفت‌وگوهای سامانه با نمایش آگهی، خریدار، فروشنده و زمان
+آخرین پیام.</li>
+<li>مشاهده‌ی متن کامل پیام‌ها و تصاویر ارسالی برای رسیدگی به شکایات.</li>
+</ul>
+<h3 id="۱۲۷-نوتیفیکیشن-همگانی-سوپر-ادمین">۱۲٫۷ نوتیفیکیشن همگانی
+<em>(سوپر ادمین)</em></h3>
+<ul>
+<li><strong>ارسال همگانی</strong> به همه‌ی کاربران، یا <strong>ارسال
+شهرمحور</strong> فقط به کاربران یک شهر مشخص (انتخاب از فهرست کشویی «همه
+شهرها / نام شهر»). پیش از ارسال، تعداد دقیق مخاطبان نمایش داده
+می‌شود.</li>
+<li><strong>ارسال هدفمند</strong> به یک کاربر مشخص (هم از این صفحه و هم
+از صفحه‌ی «کاربران»).</li>
+<li><strong>گزارش نتیجه‌ی ارسال</strong> — تعداد پوش موفق و ناموفق پس از
+هر ارسال نمایش داده می‌شود.</li>
+<li><strong>دکمه‌ی تست پوش</strong> که یک نوتیفیکیشن واقعی به دستگاه‌های
+خود مدیر می‌فرستد، برای اطمینان از صحت پیکربندی Firebase.</li>
+</ul>
+<h3 id="۱۲۸-مدیریت-دادههای-مرجع">۱۲٫۸ مدیریت داده‌های مرجع</h3>
+<table>
+<thead>
+<tr>
+<th>بخش</th>
+<th>قابلیت</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>شهرها</strong></td>
+<td>افزودن، ویرایش، حذف؛ تعیین <strong>مختصات مرکز شهر</strong> با نقشه‌ی
+تعاملی</td>
+</tr>
+<tr>
+<td><strong>دسته‌بندی‌ها</strong></td>
+<td>مدیریت کامل درخت تا ۳ سطح؛ نام، آیکون، <strong>رنگ پین
+نقشه</strong>، ترتیب نمایش، نوع (آگهی/شغل)، <strong>هزینه‌ی ثبت
+آگهی</strong></td>
+</tr>
+<tr>
+<td><strong>فیلدهای اختصاصی آگهی</strong></td>
+<td>مدیریت ۱۵ گروه گزینه (برند خودرو، نوع شاسی، طبقه، تعداد اتاق، نوع
+قرارداد، تحصیلات، نوع آگهی، نوع پرداخت، آسانسور، پارکینگ، حومه و…) با
+ترتیب و وضعیت فعال/غیرفعال</td>
+</tr>
+<tr>
+<td><strong>بنرها</strong></td>
+<td>بنر تبلیغاتی به تفکیک شهر با تصویر، لینک، ترتیب و وضعیت</td>
+</tr>
+<tr>
+<td><strong>تصویر اسپلش</strong></td>
+<td>یک تصویر اسپلش اختصاصی برای هر شهر، به‌همراه راهنمای ابعاد پیشنهادی
+(۱۲۴۰×۲۶۸۰ پیکسل، حجم زیر ۱۰۰ کیلوبایت) و اخطار هنگام انتخاب تصویر
+نامناسب — اخطار مانع آپلود نمی‌شود و تصمیم با مدیر است</td>
+</tr>
+<tr>
+<td><strong>محتوای اپ</strong></td>
+<td>ویرایش متن «درباره ما»، «تماس با ما»، تلگرام، اینستاگرام، ایمیل و
+تلفن — بلافاصله در اپ به‌روز می‌شود</td>
+</tr>
+</tbody>
+</table>
+<p>هر تغییر در این بخش‌ها، شمارنده‌ی نسخه‌ی مربوطه را افزایش می‌دهد تا اپ‌های
+نصب‌شده در اولین فرصت داده‌ی تازه را دریافت کنند.</p>
+<h3 id="۱۲۹-تنظیمات-انقضا-سوپر-ادمین">۱۲٫۹ تنظیمات انقضا <em>(سوپر
+ادمین)</em></h3>
+<p>سه بخش مجزا برای تعیین مدت اعتبار پیش‌فرض:</p>
+<ul>
+<li><strong>تاریخ انقضای آگهی</strong> — تعداد روز اعتبار آگهی جدید</li>
+<li><strong>مدت اشتراک فروشگاه</strong> — تعداد روزی که با هر تأیید
+پرداخت به اشتراک اضافه می‌شود</li>
+<li><strong>تاریخ انقضای آگهی استخدام</strong> — تعداد روز اعتبار آگهی
+شغلی</li>
+</ul>
+<hr />
+<h2 id="۱۳-سرویسهای-سمت-سرور-و-apiها">۱۳. سرویس‌های سمت سرور و APIها</h2>
+<h3 id="۱۳۱-ماژولهای-بکاند">۱۳٫۱ ماژول‌های بک‌اند</h3>
+<table>
+<thead>
+<tr>
+<th>ماژول</th>
+<th>مسئولیت</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth</code></td>
+<td>کد یکبارمصرف، صدور و تازه‌سازی توکن، خروج، بررسی دسترس‌پذیری
+شماره/نام</td>
+</tr>
+<tr>
+<td><code>users</code></td>
+<td>پروفایل، به‌روزرسانی موقعیت، شعاع اعلان، نشان‌کردن‌ها</td>
+</tr>
+<tr>
+<td><code>advertisements</code></td>
+<td>ثبت، فهرست، فیلتر، جست‌وجو، امتیازدهی، آمار بازدید، تمدید، انقضای
+خودکار</td>
+</tr>
+<tr>
+<td><code>stores</code></td>
+<td>فروشگاه تخفیف‌یاب، اشتراک، تمدید، انقضای خودکار</td>
+</tr>
+<tr>
+<td><code>jobs</code></td>
+<td>بانک مشاغل، تمدید، انقضای خودکار</td>
+</tr>
+<tr>
+<td><code>categories</code></td>
+<td>درخت دسته‌بندی + نسخه‌گذاری</td>
+</tr>
+<tr>
+<td><code>cities</code></td>
+<td>شهرها + نسخه‌گذاری</td>
+</tr>
+<tr>
+<td><code>attribute-options</code></td>
+<td>گزینه‌های فرم + نسخه‌گذاری</td>
+</tr>
+<tr>
+<td><code>app-settings</code></td>
+<td>محتوای سراسری اپ + نسخه‌گذاری</td>
+</tr>
+<tr>
+<td><code>banners</code></td>
+<td>بنر شهری</td>
+</tr>
+<tr>
+<td><code>splash-screens</code></td>
+<td>تصویر اسپلش شهری</td>
+</tr>
+<tr>
+<td><code>chat</code></td>
+<td>گفت‌وگو، پیام، دروازه‌ی WebSocket</td>
+</tr>
+<tr>
+<td><code>notifications</code></td>
+<td>اعلان درون‌برنامه‌ای</td>
+</tr>
+<tr>
+<td><code>push</code></td>
+<td>لایه‌ی ارسال Firebase (اختیاری و مقاوم در برابر نبود پیکربندی)</td>
+</tr>
+<tr>
+<td><code>device-tokens</code></td>
+<td>ثبت و حذف توکن دستگاه</td>
+</tr>
+<tr>
+<td><code>discount-alerts</code></td>
+<td>اشتراک اعلان تخفیف به تفکیک دسته</td>
+</tr>
+<tr>
+<td><code>reports</code></td>
+<td>گزارش تخلف</td>
+</tr>
+<tr>
+<td><code>uploads</code></td>
+<td>بارگذاری تصویر</td>
+</tr>
+<tr>
+<td><code>admin/*</code></td>
+<td>۱۲ زیرماژول مدیریتی (آگهی، شغل، فروشگاه، کاربر، گزارش، مکالمه،
+داشبورد، آمار، اعلان، و سه تنظیم انقضا)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۳۲-فهرست-اندپوینتها">۱۳٫۲ فهرست اندپوینت‌ها</h3>
+<p>مجموعاً <strong>۱۲۵ اندپوینت REST</strong> به‌همراه یک دروازه‌ی
+WebSocket. مستندات کامل و آزمایش‌پذیر در Swagger روی مسیر
+<code>/docs</code> در دسترس است.</p>
+<h4 id="احراز-هویت--apiauth">احراز هویت — <code>/api/auth</code></h4>
+<table>
+<thead>
+<tr>
+<th>متد</th>
+<th>مسیر</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/availability</code></td>
+<td>بررسی ثبت‌شده بودن شماره / نام</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/otp/request</code></td>
+<td>درخواست کد یکبارمصرف</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/otp/verify</code></td>
+<td>تأیید کد و صدور توکن</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/refresh</code></td>
+<td>تازه‌سازی توکن</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/logout</code></td>
+<td>ابطال نشست</td>
+</tr>
+</tbody>
+</table>
+<h4 id="کاربر--apiusers">کاربر — <code>/api/users</code></h4>
+<table>
+<thead>
+<tr>
+<th>متد</th>
+<th>مسیر</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/me</code></td>
+<td>پروفایل من</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/me</code></td>
+<td>ویرایش پروفایل</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/me/location</code></td>
+<td>ثبت آخرین موقعیت دستگاه</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/me/alert-radius</code></td>
+<td>تنظیم شعاع اعلان تخفیف</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/me/bookmarks</code></td>
+<td>آگهی‌های نشان‌شده</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/me/bookmarks/:id</code></td>
+<td>نشان‌کردن</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/me/bookmarks/:id</code></td>
+<td>حذف نشان</td>
+</tr>
+</tbody>
+</table>
+<h4 id="آگهی--apiadvertisements">آگهی —
+<code>/api/advertisements</code></h4>
+<table>
+<thead>
+<tr>
+<th>متد</th>
+<th>مسیر</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/</code></td>
+<td>فهرست عمومی با ۳۰+ پارامتر فیلتر</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/:id</code></td>
+<td>جزئیات (+ ثبت بازدید)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/mine</code></td>
+<td>آگهی‌های من</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/:id/view-stats</code></td>
+<td>آمار بازدید (فقط مالک)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/</code></td>
+<td>ثبت آگهی</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/:id/rating</code></td>
+<td>امتیازدهی</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/:id/renew</code></td>
+<td>تمدید</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/:id</code></td>
+<td>ویرایش</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/:id</code></td>
+<td>حذف</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/:adId/reports</code></td>
+<td>گزارش مشکل</td>
+</tr>
+</tbody>
+</table>
+<h4 id="فروشگاه--apistores">فروشگاه — <code>/api/stores</code></h4>
+<p><code>GET /</code> · <code>GET /:id</code> · <code>GET /mine</code> ·
+<code>POST /</code> · <code>PATCH /:id</code> ·
+<code>POST /:id/renew</code> · <code>DELETE /:id</code></p>
+<h4 id="مشاغل--apijobs">مشاغل — <code>/api/jobs</code></h4>
+<p><code>GET /</code> · <code>GET /:id</code> · <code>GET /mine</code> ·
+<code>POST /</code> · <code>PATCH /:id</code> ·
+<code>POST /:id/renew</code> · <code>DELETE /:id</code></p>
+<h4 id="دادههای-مرجع-1">داده‌های مرجع</h4>
+<p><code>GET /api/categories</code> ·
+<code>GET /api/categories/version</code> · <code>GET /api/cities</code>
+· <code>GET /api/cities/version</code> ·
+<code>GET /api/attribute-options</code> ·
+<code>GET /api/attribute-options/version</code> ·
+<code>GET /api/app-settings</code> ·
+<code>GET /api/app-settings/version</code> ·
+<code>GET /api/splash-screens</code> ·
+<code>GET /api/splash-screens/version</code> ·
+<code>GET /api/banners</code> <em>(هرکدام به‌همراه اندپوینت‌های
+ساخت/ویرایش/حذف مخصوص ادمین)</em></p>
+<h4 id="چت--apichatconversations">چت —
+<code>/api/chat/conversations</code></h4>
+<p><code>POST /</code> (شروع گفت‌وگو) · <code>GET /</code> (فهرست) ·
+<code>GET /:id</code> · <code>GET /:id/messages</code> ·
+<code>PATCH /:id/read</code></p>
+<p><strong>WebSocket:</strong> فضای‌نام <code>/chat</code> — احراز هویت
+با توکن در دست‌دهی، اتاق اختصاصی هر کاربر (<code>user:{id}</code>) و هر
+گفت‌وگو (<code>conversation:{id}</code>).</p>
+<h4 id="اعلان-و-دستگاه">اعلان و دستگاه</h4>
+<p><code>GET /api/notifications/me</code> ·
+<code>PATCH /api/notifications/me/:id/read</code> ·
+<code>PATCH /api/notifications/me/read-all</code> ·
+<code>DELETE /api/notifications/me/:id</code> ·
+<code>POST /api/device-tokens</code> ·
+<code>DELETE /api/device-tokens/:token</code> ·
+<code>GET /api/discount-alerts</code> ·
+<code>PUT /api/discount-alerts</code></p>
+<h4 id="مدیریتی--apiadmin">مدیریتی — <code>/api/admin/*</code></h4>
+<p>داشبورد، آمار، آگهی‌ها، مشاغل، فروشگاه‌ها، کاربران، گزارش‌ها، مکالمات،
+اعلان‌ها و سه بخش تنظیم انقضا — مجموعاً ۴۱ اندپوینت با کنترل دسترسی مبتنی
+بر نقش.</p>
+<h3 id="۱۳۳-فرایندهای-خودکار-cron">۱۳٫۳ فرایندهای خودکار (Cron)</h3>
+<table>
+<thead>
+<tr>
+<th>زمان‌بند</th>
+<th>عملکرد</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>انقضای آگهی</strong></td>
+<td>آگهی‌های فعالی که تاریخ انقضایشان گذشته را به وضعیت آرشیو می‌برد</td>
+</tr>
+<tr>
+<td><strong>انقضای شغل</strong></td>
+<td>همان منطق برای آگهی‌های بانک مشاغل</td>
+</tr>
+<tr>
+<td><strong>انقضای فروشگاه</strong></td>
+<td>فروشگاه‌هایی که اشتراکشان تمام شده را آرشیو می‌کند</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<hr />
+<h1 id="بخش-چهارم--پیوستها">بخش چهارم — پیوست‌ها</h1>
+<h2 id="۱۴-ماتریس-ردیابی-طراحی-فیگما--پیادهسازی">۱۴. ماتریس ردیابی طراحی
+فیگما ↔︎ پیاده‌سازی</h2>
+<p><strong>فایل طراحی مرجع:</strong>
+<code>https://www.figma.com/design/iawujXTbdgubSsg4oHri5E/</code> شناسه‌ی
+فایل: <code>iawujXTbdgubSsg4oHri5E</code> · بوم اصلی: <code>106:2</code>
+(«Final Mahem Fa») <strong>تعداد کل فریم‌های سطح اول: ۱۷۳
+صفحه</strong></p>
+<p>ایندکس کامل ۱۷۳ فریم به‌همراه شناسه‌ی گره (Node ID) و مختصات هر صفحه،
+در فایل <a href="figma-screens-index.md"><code>docs/figma-screens-index.md</code></a>
+در مخزن پروژه نگهداری می‌شود و مرجع ردیابی طراحی است.</p>
+<h3 id="۱۴۱-نگاشت-گروههای-اصلی">۱۴٫۱ نگاشت گروه‌های اصلی</h3>
+<table>
+<thead>
+<tr>
+<th>گروه صفحات فیگما</th>
+<th>تعداد فریم</th>
+<th>صفحات پیاده‌سازی‌شده</th>
+<th>وضعیت</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>احراز هویت (ثبت‌نام، کد تایید، فرم ثبت نهایی، دوربین)</td>
+<td>۴</td>
+<td>ثبت‌نام، کد تایید، تکمیل پروفایل، انتخاب تصویر</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>اسپلش و نبود نت</td>
+<td>۲</td>
+<td>اسپلش، صفحه‌ی آفلاین</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>خانه و اعلان</td>
+<td>۴</td>
+<td>صفحه‌ی خانه، اعلان‌ها، جزئیات اعلان</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>منو و صفحات محتوایی (قوانین، درباره ما، تماس با ما، تنظیمات)</td>
+<td>۶</td>
+<td>منو، قوانین، درباره ما، تماس با ما، تنظیمات</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>جست‌وجو و لیست شهر</td>
+<td>۳</td>
+<td>جست‌وجو، انتخاب‌گر شهر</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>دسته‌بندی و آگهی</td>
+<td>۵</td>
+<td>مرور دسته‌بندی، فهرست آگهی، جزئیات آگهی</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>مدیریت آگهی من، نشان‌شده‌ها، چت، گزارش، تراز بازدید، اشتراک‌گذاری</td>
+<td>۸</td>
+<td>پنل کاربر، نشان‌شده‌ها، چت، گزارش مشکل، آمار بازدید، اشتراک‌گذاری</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>بانک مشاغل</strong> (فهرست، زیرمجموعه، جزئیات، ثبت، صنف،
+راهنمایی)</td>
+<td>۶</td>
+<td>۶ صفحه‌ی بانک مشاغل</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>تخفیف‌یاب</strong> (فید، لیست شهر، جزئیات، امتیاز، منو، نزدیک
+من، دسته‌بندی، اطلاع‌رسانی، نقشه، لیست منو)</td>
+<td>۱۲</td>
+<td>۹ صفحه‌ی تخفیف‌یاب + برگه‌ی منو</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>تخفیف‌یاب — فروشگاه</strong></td>
+<td>۵</td>
+<td>ثبت فروشگاه، قوانین، فروشگاه من، پروفایل فروشگاه</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>فیلتر</strong> (عمومی + املاک + وسایل نقلیه)</td>
+<td>۳۹</td>
+<td>صفحه‌ی فیلتر دسته‌محور با همه‌ی گروه‌های فیلد</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>دسته‌بندی‌های تخصصی مرور</strong> (املاک، الکترونیکی، خانگی،
+خدمات، تجهیزات، سرگرمی، شخصی، نقلیه، استخدامی)</td>
+<td>۲۲</td>
+<td>جریان عمومی مرور دسته‌بندی (تا ۳ سطح)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>ثبت آگهی</strong> (عمومی، استخدامی، تخفیف‌یاب، املاک با همه‌ی
+زیرشاخه‌ها، وسایل نقلیه، درگاه)</td>
+<td>۴۹</td>
+<td>ویزارد ۵ مرحله‌ای + ۴ فرم تخصصی + درگاه پرداخت</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>انتخاب موقعیت، مپ، تلفن، کیبورد، پیام ثبت نهایی، امتیازدهی به
+ماهم</td>
+<td>۸</td>
+<td>انتخاب موقعیت روی نقشه، صفحه‌ی موفقیت، امتیازدهی</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>نکته: تعداد فریم‌های فیگما بیش از تعداد صفحات پیاده‌سازی‌شده است، زیرا
+در فیگما هر <strong>حالت</strong> یک صفحه (مثلاً باز/بسته بودن یک منو، یا
+فیلتر یک دسته‌ی خاص) به‌صورت فریم مستقل ترسیم شده است، در حالی که در
+پیاده‌سازی این حالت‌ها درون یک صفحه‌ی پویا و داده‌محور مدیریت می‌شوند. برای
+نمونه ۳۹ فریم فیلتر، همگی حالت‌های مختلف یک صفحه‌ی فیلتر دسته‌محور
+هستند.</p>
+</blockquote>
+<hr />
+<h2 id="۱۵-کیفیت-امنیت-و-تست">۱۵. کیفیت، امنیت و تست</h2>
+<h3 id="۱۵۱-امنیت">۱۵٫۱ امنیت</h3>
+<table>
+<thead>
+<tr>
+<th>لایه</th>
+<th>تدابیر اعمال‌شده</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>احراز هویت</strong></td>
+<td>کد یکبارمصرف هش‌شده با انقضا و سقف ۵ تلاش؛ توکن دسترسی کوتاه‌مدت +
+توکن تازه‌سازی ذخیره‌شده به‌صورت هش و قابل ابطال؛ هر توکن دارای شناسه‌ی
+یکتا</td>
+</tr>
+<tr>
+<td><strong>کنترل دسترسی</strong></td>
+<td>نگهبان سراسری JWT با استثناهای صریح <code>@Public</code>؛ کنترل
+دسترسی مبتنی بر نقش (<code>USER</code> / <code>ADMIN</code> /
+<code>SUPER_ADMIN</code>) روی همه‌ی مسیرهای مدیریتی</td>
+</tr>
+<tr>
+<td><strong>مالکیت داده</strong></td>
+<td>ویرایش/حذف آگهی، شغل و فروشگاه فقط توسط مالک؛ آمار بازدید فقط برای
+مالک آگهی</td>
+</tr>
+<tr>
+<td><strong>اعتبارسنجی ورودی</strong></td>
+<td><code>ValidationPipe</code> سراسری با حالت <code>whitelist</code> —
+هر فیلد اعلام‌نشده حذف می‌شود</td>
+</tr>
+<tr>
+<td><strong>محدودیت نرخ</strong></td>
+<td>Throttler روی درخواست کد یکبارمصرف و بررسی دسترس‌پذیری</td>
+</tr>
+<tr>
+<td><strong>سرآیندهای امنیتی</strong></td>
+<td>Helmet با پیکربندی متناسب با ارائه‌ی تصاویر بین‌مبدأ</td>
+</tr>
+<tr>
+<td><strong>نشست پنل مدیریت</strong></td>
+<td>توکن در کوکی <code>httpOnly</code> سمت سرور؛ هرگز در دسترس
+جاوااسکریپت مرورگر نیست</td>
+</tr>
+<tr>
+<td><strong>تاب‌آوری پنل</strong></td>
+<td>اگر سرویس بک‌اند موقتاً در دسترس نباشد، پنل به‌جای صفحه‌ی سفید یک پیام
+قابل‌فهم به‌همراه کد خطا و دکمه‌ی «تلاش دوباره» نشان می‌دهد</td>
+</tr>
+<tr>
+<td><strong>مدیریت خطا</strong></td>
+<td>فیلتر سراسری استثنا — جزئیات داخلی به کاربر نشت نمی‌کند</td>
+</tr>
+<tr>
+<td><strong>پیکربندی</strong></td>
+<td>اعتبارسنجی متغیرهای محیطی در زمان راه‌اندازی؛ نبودِ هر متغیر حساس باعث
+توقف امن می‌شود</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۵۲-تست">۱۵٫۲ تست</h3>
+<table>
+<thead>
+<tr>
+<th>سامانه</th>
+<th>وضعیت</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>اپلیکیشن موبایل</td>
+<td>۱۳ فایل تست با Jest — پوشش رفتار مؤلفه‌های حساس: هندسه‌ی کارت اعلان،
+تاریخ اعلان، هدایت اعلان، مقیاس‌بندی واکنش‌گرا، فیلد متنی (ارقام و
+جداکننده‌ی هزارگان)، اسلایدر تصویر، سلول فرم شغل</td>
+</tr>
+<tr>
+<td>بک‌اند</td>
+<td>تست واحد سرویس چت + تست کنترلر پایه؛ زیرساخت Jest و Supertest برای
+تست e2e آماده</td>
+</tr>
+<tr>
+<td>پنل مدیریت</td>
+<td>تست واحد منطق راهنمای تصویر اسپلش، اجراشونده با تست‌رانر داخلی
+Node</td>
+</tr>
+<tr>
+<td>پایش نسخه‌ی زنده</td>
+<td>Sentry روی اپلیکیشن — خطاهای کاربران واقعی به‌صورت خودکار گزارش و به
+حساب مربوطه نسبت داده می‌شوند (بند ۱۱٫۱۷)</td>
+</tr>
+<tr>
+<td>کیفیت کد</td>
+<td>ESLint + Prettier در هر سه مخزن؛ TypeScript در حالت سخت‌گیرانه</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۵۳-کارایی">۱۵٫۳ کارایی</h3>
+<ul>
+<li><strong>صفحه‌بندی سمت سرور</strong> روی همه‌ی فهرست‌ها.</li>
+<li><strong>نمایه‌گذاری (Index) پایگاه داده</strong> روی همه‌ی ستون‌های
+پرکاربرد در فیلتر: دسته، شهر، کاربر، وضعیت، وضعیت تأیید، وضعیت پرداخت،
+فروشگاه، و نمایه‌های ترکیبی برای زمان‌بندهای انقضا.</li>
+<li><strong>غیرنرمال‌سازی هدفمند</strong> میانگین و تعداد امتیاز روی خود
+آگهی برای پرهیز از پرس‌وجوی اضافه در فهرست‌ها.</li>
+<li><strong>کش محلی داده‌های مرجع</strong> با نسخه‌گذاری.</li>
+<li><strong>بهینه‌سازی رندر</strong> در اسلایدر شعاع تخفیف و فهرست‌های
+بلند.</li>
+</ul>
+<hr />
+<h2 id="۱۶-موارد-باقیمانده-و-پیشنهادهای-فاز-بعد">۱۶. موارد باقی‌مانده و
+پیشنهادهای فاز بعد</h2>
+<h3 id="۱۶۱-موارد-نیازمند-اقدام-کارفرما-پیشنیاز-بهرهبرداری-تجاری">۱۶٫۱
+موارد نیازمند اقدام کارفرما (پیش‌نیاز بهره‌برداری تجاری)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>مورد</th>
+<th>وضعیت فعلی</th>
+<th>اقدام لازم</th>
+<th>برآورد کار توسعه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>۱</td>
+<td><strong>درگاه پیامک (OTP)</strong></td>
+<td>ساختار کامل کد یکبارمصرف پیاده‌سازی شده؛ در حالت شبیه‌سازی، کد در پاسخ
+برگردانده می‌شود</td>
+<td>تهیه‌ی پنل پیامک <strong>سازمانی/شرکتی</strong> و ارائه‌ی
+اعتبارنامه‌ها</td>
+<td>اتصال در یک نقطه از سرویس — کمتر از یک روز کاری</td>
+</tr>
+<tr>
+<td>۲</td>
+<td><strong>درگاه پرداخت آنلاین</strong></td>
+<td>جریان کامل پرداخت (صفحه‌ی هزینه ← درگاه ← ثبت) پیاده‌سازی شده؛ تسویه
+به‌صورت تأیید دستی حواله توسط ادمین</td>
+<td>تهیه‌ی درگاه (زرین‌پال/شاپرک/…) و ارائه‌ی کلیدها</td>
+<td>جایگزینی صفحه‌ی درگاه شبیه‌سازی‌شده + وب‌هوک تأیید — حدود ۲ تا ۳ روز
+کاری</td>
+</tr>
+<tr>
+<td>۳</td>
+<td><strong>دامنه و گواهی TLS</strong></td>
+<td>API روی IP سرور و پروتکل HTTP ارائه می‌شود. پیکربندی Caddy برای صدور
+خودکار گواهی نوشته و آماده است اما تا نبودِ دامنه غیرفعال مانده — دامنه‌ی
+آزمایشی قبلی در ایران فیلتر بود و کنار گذاشته شد، پس دامنه باید حتماً
+<code>.ir</code> باشد. ضمناً لینک‌های مستقیم فعلاً با طرح اختصاصی
+<code>mahem://</code> کار می‌کنند چون Universal/App Links به دامنه نیاز
+دارد (بند ۱۱٫۱۵)</td>
+<td>ثبت دامنه و اتصال DNS به سرور</td>
+<td>فعال‌سازی TLS چند ساعت؛ افزودن لینک <code>https://</code> در کنار طرح
+فعلی حدود یک روز</td>
+</tr>
+<tr>
+<td>۴</td>
+<td><strong>کلید نقشه گوگل</strong></td>
+<td>نسخه‌ی فعلی از کلید Google Maps <strong>شرکت</strong> استفاده می‌کند و
+آزمایشی است؛ پس از پایان دوره‌ی تست از دسترس خارج می‌شود</td>
+<td>تهیه‌ی Google Maps API Key به نام کارفرما</td>
+<td>جایگزینی کلید و بیلد مجدد — کمتر از یک روز</td>
+</tr>
+<tr>
+<td>۵</td>
+<td><strong>انتشار در فروشگاه‌ها و امضای iOS</strong></td>
+<td>APK امضاشده و آماده‌ی نصب است؛ IPA بیلد کامل دستگاه واقعی است اما
+<strong>امضا نشده</strong> و تا امضا با حساب اپل روی آیفون نصب نمی‌شود.
+لینک «معرفی به دوستان» و «امتیاز به ماهم» تا زمان انتشار، به‌جای آدرس
+اشتباه به‌صورت متنی عمل می‌کنند</td>
+<td>حساب Apple Developer (هم برای امضای IPA و هم برای انتشار) و حساب
+کافه‌بازار/مایکت</td>
+<td>امضا و بیلد مجدد کمتر از یک روز؛ انتشار بسته به بررسی فروشگاه</td>
+</tr>
+<tr>
+<td>۶</td>
+<td><strong>سرور اختصاصی نهایی</strong></td>
+<td>نسخه‌ی فعلی روی سرور توسعه مستقر است</td>
+<td>تهیه‌ی سرور اختصاصی یا ابری مناسب برای نسخه‌ی نهایی</td>
+<td>مهاجرت و استقرار — ۱ تا ۲ روز کاری</td>
+</tr>
+<tr>
+<td>۷</td>
+<td><strong>مبلغ اشتراک فروشگاه و هزینه‌ی مشاغل</strong></td>
+<td>مبالغ به‌صورت مقدار نمایشی سمت اپ تعریف شده‌اند</td>
+<td>تعیین قطعی مبالغ توسط کارفرما</td>
+<td>انتقال به تنظیمات پنل — حدود یک روز کاری</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۶۲-پیشنهادهای-بهبود-برای-فازهای-بعدی--خارج-از-چارچوب-قرارداد-فعلی">۱۶٫۲
+پیشنهادهای بهبود برای فازهای بعدی — خارج از چارچوب قرارداد فعلی</h3>
+<blockquote>
+<p>موارد این بخش <strong>جزو تعهدات قرارداد فعلی نیستند</strong> و صرفاً
+به‌عنوان مسیر پیشنهادی توسعه‌ی محصول در آینده ارائه می‌شوند. اجرای هر یک
+نیازمند توافق و قرارداد جداگانه است.</p>
+</blockquote>
+<ol type="1">
+<li><strong>پنل درآمد و صورتحساب</strong> — گزارش تجمیعی پرداخت‌های آگهی
+و اشتراک فروشگاه.</li>
+<li><strong>جست‌وجوی پیشرفته‌تر</strong> — پشتیبانی از جست‌وجوی فارسی مقاوم
+به غلط املایی.</li>
+<li><strong>بخش‌بندی دقیق‌تر مخاطبان اعلان</strong> — ارسال شهرمحور
+هم‌اکنون پیاده‌سازی شده؛ گام بعدی، هدف‌گیری بر اساس دسته‌ی مورد علاقه،
+فعالیت اخیر یا مالکیت فروشگاه است.</li>
+<li><strong>نسخه‌ی وب کاربر نهایی</strong> — برای دیده‌شدن آگهی‌ها در
+موتورهای جست‌وجو.</li>
+<li><strong>انتقال تصاویر به فضای ابری/CDN</strong> — بهبود سرعت
+بارگذاری و کاهش بار سرور.</li>
+<li><strong>پشتیبان‌گیری خودکار پایگاه داده</strong> — زمان‌بندی روزانه با
+نگهداری نسخه‌های تاریخی.</li>
+<li><strong>گسترش پوشش تست خودکار</strong> بک‌اند تا سطح e2e برای
+جریان‌های حیاتی.</li>
+</ol>
+<hr />
+<h2 id="۱۷-اطلاعات-تحویل-و-دسترسیها">۱۷. اطلاعات تحویل و دسترسی‌ها</h2>
+<h3 id="۱۷۱-اقلام-تحویلی">۱۷٫۱ اقلام تحویلی</h3>
+<table>
+<thead>
+<tr>
+<th>قلم</th>
+<th>فایل / محل</th>
+<th>حجم</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>اپلیکیشن Android</strong></td>
+<td><code>mahem-1.0-release.apk</code> — امضاشده و آماده‌ی نصب
+مستقیم</td>
+<td>۳۶٫۱ مگابایت</td>
+</tr>
+<tr>
+<td><strong>اپلیکیشن iOS</strong></td>
+<td><code>mahem-1.0.ipa</code> — بیلد دستگاه واقعی (arm64)</td>
+<td>۱۵۸٫۹ مگابایت</td>
+</tr>
+<tr>
+<td><strong>نسخه‌ی شبیه‌ساز iOS</strong></td>
+<td><code>mahem-1.0-simulator.app.zip</code> — برای اجرا روی شبیه‌ساز
+Xcode</td>
+<td>۱۷٫۸ مگابایت</td>
+</tr>
+<tr>
+<td><strong>کد منبع اپلیکیشن موبایل</strong></td>
+<td>مخزن Git کامل به‌همراه تاریخچه‌ی کامیت‌ها</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>کد منبع بک‌اند</strong></td>
+<td>مخزن Git کامل شامل اسکیمای پایگاه داده، مهاجرت‌ها و اسکریپت داده‌ی
+اولیه</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>کد منبع پنل مدیریت</strong></td>
+<td>مخزن Git کامل</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>مستندات API</strong></td>
+<td>Swagger زنده روی مسیر <code>/docs</code> + نسخه‌ی OpenAPI در صفحه‌ی
+تحویل</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>ایندکس طراحی</strong></td>
+<td><code>docs/figma-screens-index.md</code> — ۱۷۳ فریم با شناسه‌ی
+گره</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>دسترسی پنل مدیریت</strong></td>
+<td>حساب <code>SUPER_ADMIN</code> روی <strong>شماره‌ی موبایل پیمانکار
+مندرج در قرارداد فی‌مابین</strong> — بند ۱۷٫۴</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>این مستند</strong></td>
+<td>گزارش جامع فاز Inception و Elaboration</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>کد منبع هر سه سامانه — اپلیکیشن موبایل، بک‌اند و پنل مدیریت —
+هم‌زمان با نسخه‌های اجرایی و به‌صورت کامل تحویل کارفرما شده است.</strong>
+تحویل شامل کل مخزن به‌همراه تاریخچه‌ی نسخه‌ها است، نه صرفاً یک اسنپ‌شات از
+فایل‌ها.</p>
+</blockquote>
+<h3 id="۱۷۲-مشخصات-فنی-نسخههای-اجرایی">۱۷٫۲ مشخصات فنی نسخه‌های
+اجرایی</h3>
+<table>
+<thead>
+<tr>
+<th>مشخصه</th>
+<th>Android</th>
+<th>iOS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>شناسه‌ی بسته</td>
+<td><code>com.mahem_app</code></td>
+<td><code>com.mahem</code></td>
+</tr>
+<tr>
+<td>نام نمایشی</td>
+<td>ماهم</td>
+<td>ماهم</td>
+</tr>
+<tr>
+<td>نسخه</td>
+<td>۱٫۰٫۰ (build 1)</td>
+<td>۱٫۰ (build 1)</td>
+</tr>
+<tr>
+<td>حداقل نسخه‌ی سیستم‌عامل</td>
+<td>Android 5.0 (API 21)</td>
+<td>iOS 13.0</td>
+</tr>
+<tr>
+<td>نسخه‌ی هدف</td>
+<td>Android 15 (API 35)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>معماری</td>
+<td>—</td>
+<td>arm64</td>
+</tr>
+<tr>
+<td>وضعیت امضا</td>
+<td>امضاشده با کلید انتشار</td>
+<td><strong>امضا نشده</strong> — بند ۱۷٫۷</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۷۳-نشانیهای-سامانه">۱۷٫۳ نشانی‌های سامانه</h3>
+<table>
+<thead>
+<tr>
+<th>سامانه</th>
+<th>نشانی</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>صفحه‌ی تحویل و دانلود نسخه‌ها</td>
+<td><code>https://indexshope.ir/download</code></td>
+</tr>
+<tr>
+<td>این گزارش (نسخه‌ی وب)</td>
+<td><code>https://indexshope.ir/download/report</code></td>
+</tr>
+<tr>
+<td>پنل مدیریت</td>
+<td><code>https://mahem-admin.vercel.app</code></td>
+</tr>
+<tr>
+<td>API</td>
+<td><code>http://2.28.2.151:3000/api</code></td>
+</tr>
+<tr>
+<td>مستندات Swagger</td>
+<td><code>http://2.28.2.151:3000/docs</code></td>
+</tr>
+<tr>
+<td>فایل طراحی فیگما</td>
+<td><code>https://www.figma.com/design/iawujXTbdgubSsg4oHri5E/</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۷۴-اطلاعات-ورود-به-پنل-مدیریت">۱۷٫۴ اطلاعات ورود به پنل
+مدیریت</h3>
+<blockquote>
+<h2 id="key-حساب-مدیر-ارشد-سامانه">🔑 حساب مدیر ارشد سامانه</h2>
+<p><strong>نام کاربری / شناسه‌ی ورود به پنل مدیریت، «شماره موبایل
+پیمانکار مندرج در قرارداد فی‌مابین» است.</strong></p>
+<p>این حساب دارای بالاترین سطح دسترسی (<code>SUPER_ADMIN</code>) است و
+همه‌ی اختیارات مدیریتی سامانه از طریق آن در دسترس قرار می‌گیرد.</p>
+</blockquote>
+<p><strong>نکته‌ی مهم: پنل مدیریت رمز عبور ندارد.</strong></p>
+<p>ورود به پنل با سازوکار <strong>شماره موبایل + کد یکبارمصرف</strong>
+انجام می‌شود، نه با نام کاربری و رمز عبور. این یک انتخاب امنیتی آگاهانه
+است: رمز عبور ثابتی وجود ندارد که بتواند لو برود، فراموش شود یا نیاز به
+تغییر دوره‌ای داشته باشد.</p>
+<p>مراحل ورود:</p>
+<table>
+<thead>
+<tr>
+<th>مرحله</th>
+<th>شرح</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>۱</td>
+<td>ورود <strong>شماره موبایل پیمانکار مندرج در قرارداد</strong> در
+صفحه‌ی ورود پنل</td>
+</tr>
+<tr>
+<td>۲</td>
+<td>دریافت کد یکبارمصرف</td>
+</tr>
+<tr>
+<td>۳</td>
+<td>ورود کد و ورود به داشبورد</td>
+</tr>
+</tbody>
+</table>
+<p><strong>کنترل دسترسی:</strong> پس از تأیید کد، نقش حساب بررسی می‌شود و
+اگر <code>ADMIN</code> یا <code>SUPER_ADMIN</code> نباشد، ورود با پیام
+«شما دسترسی ادمین ندارید» رد می‌شود. بنابراین صرفِ داشتن یک حساب کاربری در
+اپلیکیشن، دسترسی به پنل ایجاد نمی‌کند.</p>
+<p><strong>واگذاری دسترسی به کارفرما:</strong> سوپر ادمین می‌تواند از بخش
+«کاربران» نقش هر شماره‌ی دیگری را به <code>ADMIN</code> یا
+<code>SUPER_ADMIN</code> ارتقا دهد. برای انتقال کامل مالکیت سامانه به
+کارفرما کافی است شماره‌ی موبایل مدیر منتخب کارفرما در اپلیکیشن ثبت و سپس
+نقش آن به <code>SUPER_ADMIN</code> ارتقا داده شود.</p>
+<blockquote>
+<p>⚠️ <strong>وضعیت فعلی کد یکبارمصرف:</strong> تا زمانی که سرویس پیامک
+تأمین نشده (بند ۱۶٫۱، ردیف ۱)، سامانه در حالت آزمایشی کار می‌کند و کد
+یکبارمصرف به‌جای ارسال پیامکی، مستقیماً در صفحه‌ی ورود نمایش داده می‌شود. با
+اتصال پنل پیامک، این کد به‌صورت پیامک به شماره‌ی وارد‌شده ارسال خواهد شد و
+نمایش آن روی صفحه به‌طور خودکار متوقف می‌شود.</p>
+</blockquote>
+<h3 id="۱۷۵-اطلاعات-نسخه">۱۷٫۵ اطلاعات نسخه</h3>
+<table>
+<thead>
+<tr>
+<th>مؤلفه</th>
+<th>نسخه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>اپلیکیشن موبایل</td>
+<td>Android <code>1.0.0</code> · iOS <code>1.0</code></td>
+</tr>
+<tr>
+<td>بک‌اند</td>
+<td><code>0.0.1</code> — API نسخه‌ی <code>1.0</code></td>
+</tr>
+<tr>
+<td>پنل مدیریت</td>
+<td><code>0.1.0</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۷۶-دادههای-اولیهی-بارگذاریشده">۱۷٫۶ داده‌های اولیه‌ی
+بارگذاری‌شده</h3>
+<table>
+<thead>
+<tr>
+<th>مورد</th>
+<th>تعداد</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>شهرها و بخش‌های استان گلستان</td>
+<td>۳۰</td>
+</tr>
+<tr>
+<td>دسته‌بندی آگهی (ریشه)</td>
+<td>۱۰ دسته با عمق تا ۳ سطح</td>
+</tr>
+<tr>
+<td>زیردسته‌های تخفیف‌یاب</td>
+<td>۱۷</td>
+</tr>
+<tr>
+<td>زیردسته‌های استخدامی</td>
+<td>۱۵</td>
+</tr>
+<tr>
+<td>اصناف بانک مشاغل</td>
+<td>۲۰</td>
+</tr>
+<tr>
+<td>گروه‌های گزینه‌ی فرم (فیلدهای اختصاصی)</td>
+<td>۱۵ گروه: نوع آگهی، نوع قرارداد، تحصیلات، نوع فروشنده، حومه، آسانسور،
+پارکینگ، طبقه، تعداد اتاق، نوع قیمت، برند خودرو، نوع شاسی، نوع پرداخت،
+فروشنده‌ی خودرو، وجود تصویر</td>
+</tr>
+</tbody>
+</table>
+<h3 id="۱۷۷-نکات-بهرهبرداری">۱۷٫۷ نکات بهره‌برداری</h3>
+<ul>
+<li><strong>نصب Android:</strong> فایل APK با کلید انتشار امضا شده و
+مستقیماً روی هر دستگاه Android 5.0 به بالا قابل نصب است.</li>
+<li><strong>نصب iOS:</strong> فایل IPA یک بیلد کامل و اجرایی برای دستگاه
+واقعی (arm64) است، اما <strong>امضا نشده</strong> — هیچ پروفایل تأمین
+(provisioning profile) در آن جاسازی نشده است. iOS اجازه‌ی نصب باینری
+امضانشده را نمی‌دهد، بنابراین پیش از نصب روی آیفون، فایل باید با یک حساب
+Apple Developer و پروفایل معتبر امضا شود (بند ۱۶٫۱، ردیف ۵). این محدودیت
+پلتفرم اپل است و ربطی به عملکرد خود اپلیکیشن ندارد؛ برای بررسی و تست
+عملکرد بدون نیاز به امضا، <strong>نسخه‌ی شبیه‌ساز</strong> ارائه شده
+است.</li>
+<li><strong>نسخه‌ی شبیه‌ساز iOS:</strong> بدون نیاز به امضا یا حساب
+توسعه‌دهنده، روی شبیه‌ساز Xcode روی هر مک قابل اجراست.</li>
+<li><strong>حساب مدیریت:</strong> شناسه‌ی ورود، شماره‌ی موبایل پیمانکار
+مندرج در قرارداد است — جزئیات کامل در بند ۱۷٫۴.</li>
+<li><strong>پشتیبان‌گیری:</strong> داده‌های پایگاه داده و تصاویر
+بارگذاری‌شده روی حجم‌های پایدار Docker نگهداری می‌شوند. برقراری زمان‌بندی
+پشتیبان‌گیری خودکار، خارج از چارچوب قرارداد فعلی است و در صورت نیاز
+به‌صورت جداگانه قابل انجام است.</li>
+</ul>
+<hr />
+<h2 id="جمعبندی">جمع‌بندی</h2>
+<p>پروژه‌ی «ماهم» با پوشش کامل <strong>۵۲ مورد کاربری</strong>،
+<strong>۵۱ صفحه‌ی موبایل</strong>، <strong>۲۰ بخش مدیریتی</strong>،
+<strong>۱۲۵ اندپوینت API</strong> و <strong>۳۱ جدول پایگاه
+داده</strong>، اهداف تعریف‌شده در فاز Inception را به‌طور کامل محقق کرده و
+معماری، مدل داده، جریان‌های اصلی و زیرساخت استقرار آن در فاز Elaboration
+تثبیت شده است.</p>
+<p>هر سه سامانه پیاده‌سازی، یکپارچه‌سازی و روی زیرساخت اختصاصی مستقر
+شده‌اند و نسخه‌های قابل نصب Android و iOS در اختیار کارفرما قرار گرفته
+است. تنها موارد باقی‌مانده برای بهره‌برداری تجاری کامل، <strong>اتصال
+درگاه پیامک و درگاه پرداخت</strong> است که ساختار نرم‌افزاری هر دو از پیش
+آماده شده و صرفاً نیازمند تأمین اعتبارنامه‌ها از سوی کارفرما و اتصال نهایی
+است.</p>
+<hr />
+<div align="center">
+
+<p><strong>پایان مستند</strong></p>
+<p>گزارش جامع پروژه ماهم — فاز Inception و Elaboration نسخه ۱٫۰ —
+۱۴۰۵/۰۵/۰۷</p>
+</div>
+</body>
+</html>
