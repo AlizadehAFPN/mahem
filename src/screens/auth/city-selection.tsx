@@ -116,7 +116,7 @@ export function CitySelectionScreen() {
             renderItem={({item}) => (
               <Checkbox
                 text={localizeCity(item.title)}
-                value={state.city.id == item.id}
+                value={state.city?.id === item.id}
                 onToggle={() => setState(s => ({...s, city: item}))}
               />
             )}
