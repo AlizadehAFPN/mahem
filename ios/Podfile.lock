@@ -1,11 +1,8 @@
 PODS:
-  - ASN1Decoder (1.10.0)
   - boost (1.76.0)
   - BVLinearGradient (2.8.3):
     - React-Core
   - DoubleConversion (1.1.6)
-  - EASClient (0.6.0):
-    - ExpoModulesCore
   - EXApplication (5.3.1):
     - ExpoModulesCore
   - EXConstants (14.4.2):
@@ -13,9 +10,6 @@ PODS:
   - EXFileSystem (15.4.5):
     - ExpoModulesCore
   - EXFont (11.4.0):
-    - ExpoModulesCore
-  - EXJSONUtils (0.7.1)
-  - EXManifests (0.7.2):
     - ExpoModulesCore
   - Expo (49.0.23):
     - ExpoModulesCore
@@ -29,18 +23,6 @@ PODS:
     - React-NativeModulesApple
     - React-RCTAppDelegate
     - ReactCommon/turbomodule/core
-  - EXStructuredHeaders (3.3.0)
-  - EXUpdates (0.18.19):
-    - ASN1Decoder (~> 1.8)
-    - EASClient
-    - EXManifests
-    - ExpoModulesCore
-    - EXStructuredHeaders
-    - EXUpdatesInterface
-    - RCT-Folly (= 2021.07.22.00)
-    - ReachabilitySwift
-    - React-Core
-  - EXUpdatesInterface (0.10.1)
   - FBLazyVector (0.72.3)
   - FBReactNativeSpec (0.72.3):
     - RCT-Folly (= 2021.07.22.00)
@@ -139,7 +121,6 @@ PODS:
     - FBLazyVector (= 0.72.3)
     - RCTRequired (= 0.72.3)
     - React-Core (= 0.72.3)
-  - ReachabilitySwift (5.2.4)
   - React (0.72.3):
     - React-Core (= 0.72.3)
     - React-Core/DevSupport (= 0.72.3)
@@ -581,20 +562,14 @@ DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
-  - EASClient (from `../node_modules/expo-eas-client/ios`)
   - EXApplication (from `../node_modules/expo-application/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXFileSystem (from `../node_modules/expo-file-system/ios`)
   - EXFont (from `../node_modules/expo-font/ios`)
-  - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
-  - EXManifests (from `../node_modules/expo-manifests/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoDevice (from `../node_modules/expo-device/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
-  - EXStructuredHeaders (from `../node_modules/expo-structured-headers/ios`)
-  - EXUpdates (from `../node_modules/expo-updates/ios`)
-  - EXUpdatesInterface (from `../node_modules/expo-updates-interface/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
@@ -652,7 +627,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - ASN1Decoder
     - Firebase
     - FirebaseCore
     - FirebaseCoreExtension
@@ -665,7 +639,6 @@ SPEC REPOS:
     - libevent
     - nanopb
     - PromisesObjC
-    - ReachabilitySwift
     - Sentry
     - SocketRocket
 
@@ -676,8 +649,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-linear-gradient"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
-  EASClient:
-    :path: "../node_modules/expo-eas-client/ios"
   EXApplication:
     :path: "../node_modules/expo-application/ios"
   EXConstants:
@@ -686,10 +657,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-file-system/ios"
   EXFont:
     :path: "../node_modules/expo-font/ios"
-  EXJSONUtils:
-    :path: "../node_modules/expo-json-utils/ios"
-  EXManifests:
-    :path: "../node_modules/expo-manifests/ios"
   Expo:
     :path: "../node_modules/expo"
   ExpoDevice:
@@ -698,12 +665,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-keep-awake/ios"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core"
-  EXStructuredHeaders:
-    :path: "../node_modules/expo-structured-headers/ios"
-  EXUpdates:
-    :path: "../node_modules/expo-updates/ios"
-  EXUpdatesInterface:
-    :path: "../node_modules/expo-updates-interface/ios"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
@@ -811,24 +772,17 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  ASN1Decoder: 91cb1d781b5a178ea7375b2f1519e2bdaaa4c427
   boost: 7dcd2de282d72e344012f7d6564d024930a6a440
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
-  EASClient: 847b2cedcc7f85900ebd54c53531b88aa41873d1
   EXApplication: aa0fc96f297b984950f2ca8d64c5a326403a0b29
   EXConstants: e7d8d1bec9a20242b4f92a9d66967c3904e0dcd0
   EXFileSystem: 1aeed803248e2b62c5cde8b8d8c6cb1525fc40c1
   EXFont: aa39b3f790e2b3188986ac5e8684cf6003c00a18
-  EXJSONUtils: 6802be4282d42b97c51682468ddc1026a06f8276
-  EXManifests: bb8592a34f5339c860b6c4bc71ad583d490374fb
   Expo: 7bde63b84d4f6502de1e7963182333f39bedbf94
   ExpoDevice: 0333baa899c09213c1c6cb3d1a1b2061fb00594c
   ExpoKeepAwake: 8ab1087501f5ccb91146447756b787575b13f13e
   ExpoModulesCore: 9a77fac01d9abf1c5508fbc074b014c0c9c8ca5d
-  EXStructuredHeaders: 324cc3130571d2696357fafd8be7fd9a0b5fdf6e
-  EXUpdates: 46fc021f5368f542dd0a409a1fd88543b76fb1e0
-  EXUpdatesInterface: 82ed48d417cdcd376c12ca1c2ce390d35500bed6
   FBLazyVector: 4cce221dd782d3ff7c4172167bba09d58af67ccb
   FBReactNativeSpec: c6bd9e179757b3c0ecf815864fae8032377903ef
   Firebase: 91fefd38712feb9186ea8996af6cbdef41473442
@@ -848,7 +802,6 @@ SPEC CHECKSUMS:
   RCT-Folly: 8dc08ca5a393b48b1c523ab6220dfdcc0fe000ad
   RCTRequired: a2faf4bad4e438ca37b2040cb8f7799baa065c18
   RCTTypeSafety: cb09f3e4747b6d18331a15eb05271de7441ca0b3
-  ReachabilitySwift: 32793e867593cfc1177f5d16491e3a197d2fccda
   React: 13109005b5353095c052f26af37413340ccf7a5d
   React-callinvoker: c8c87bce983aa499c13cb06d4447c025a35274d6
   React-Codegen: 1190d97302b0149e4b76cce8b06cd8be6a2b976f
